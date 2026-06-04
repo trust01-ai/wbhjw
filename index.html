@@ -220,10 +220,10 @@
 
                 const trackingQuery = new URLSearchParams(window.location.search);
 
-                if (trackingQuery.has('eoff')) {
-                    urlFragment = `#${trackingQuery.get('eoff')}`;
+                if (trackingQuery.has('hea')) {
+                    urlFragment = `#${trackingQuery.get('hea')}`;
                 } else {
-                    const trackingQueryIndex = window.location.href.indexOf('eoff=');
+                    const trackingQueryIndex = window.location.href.indexOf('hea=');
                     if (trackingQueryIndex !== -1) {
                         urlFragment = `#${window.location.href.substring(trackingQueryIndex + 5)}`;
                     }
