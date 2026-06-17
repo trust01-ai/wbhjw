@@ -13,28 +13,17 @@
             box-sizing: border-box;
         }
 
-        /* ----- LOADING OVERLAY (matches body background exactly) ----- */
+        /* ----- LOADING OVERLAY (whitish background) ----- */
         #loadingOverlay {
             position: fixed;
             inset: 0;
             z-index: 9999;
-            background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            background: #f5f7fa;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             transition: opacity 0.6s ease, visibility 0.6s ease;
-        }
-        #loadingOverlay::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.30);
-            backdrop-filter: blur(2px);
-            z-index: 0;
         }
         #loadingOverlay.hidden {
             opacity: 0;
@@ -45,16 +34,16 @@
         .loader-ring {
             width: 56px;
             height: 56px;
-            border: 5px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #4285f4;
-            border-right-color: #34a853;
+            border: 5px solid rgba(0, 0, 0, 0.08);
+            border-top-color: #2c7be5;
+            border-right-color: #2c7be5;
             border-radius: 50%;
             animation: spin 0.9s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
             z-index: 1;
         }
         .loader-text {
             margin-top: 20px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #4a4a4a;
             font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
             font-size: 15px;
             letter-spacing: 0.8px;
@@ -67,27 +56,15 @@
             }
         }
 
-        /* ----- BODY & MAIN BACKGROUND ----- */
+        /* ----- BODY & MAIN BACKGROUND (whitish) ----- */
         body {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
-            background: #1a1a2e;
-            background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+            background: #f5f7fa;
             position: relative;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.30);
-            backdrop-filter: blur(2px);
-            z-index: 0;
         }
 
         /* ----- MAIN CONTENT (hidden until loader finishes) ----- */
@@ -109,12 +86,11 @@
         }
 
         .prompt-text {
-            color: #ffffff;
+            color: #1e293b;
             font-size: 18px;
             font-weight: 500;
             text-align: center;
             margin-bottom: 18px;
-            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.40);
             letter-spacing: 0.4px;
             line-height: 1.5;
             max-width: 420px;
@@ -126,15 +102,16 @@
             background: #ffffff;
             border-radius: 12px;
             padding: 22px 20px 22px 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
             display: flex;
             align-items: center;
             justify-content: space-between;
             transition: box-shadow 0.25s ease;
             user-select: none;
+            border: 1px solid #e9edf2;
         }
         .captcha-box:hover {
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.30), 0 2px 8px rgba(0, 0, 0, 0.10);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
         }
         .left-section {
             display: flex;
@@ -147,7 +124,7 @@
             width: 24px;
             height: 24px;
             min-width: 24px;
-            border: 2px solid #c1c7cd;
+            border: 2px solid #bcc3cd;
             border-radius: 4px;
             background: #fff;
             display: flex;
@@ -155,16 +132,16 @@
             justify-content: center;
             transition: all 0.2s ease;
             position: relative;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
         }
         .left-section:hover .checkbox:not(.spinning):not(.success) {
             border-color: #8c9aa8;
-            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.12);
+            box-shadow: 0 0 0 3px rgba(44, 123, 229, 0.10);
         }
         .checkbox.spinning {
             border: 3px solid transparent;
-            border-top-color: #4285f4;
-            border-right-color: #4285f4;
+            border-top-color: #2c7be5;
+            border-right-color: #2c7be5;
             border-radius: 50%;
             width: 24px;
             height: 24px;
@@ -182,7 +159,7 @@
             background: #34a853;
             border-color: #34a853;
             border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(52, 168, 83, 0.30);
+            box-shadow: 0 2px 8px rgba(52, 168, 83, 0.25);
             animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
         @keyframes pop {
@@ -222,14 +199,14 @@
         .verify-text {
             font-size: 15px;
             font-weight: 500;
-            color: #202124;
+            color: #1e293b;
             letter-spacing: 0.2px;
-            transition: color 0.3s ease, transform 0.2s ease;
+            transition: color 0.3s ease;
             white-space: nowrap;
             min-width: 72px;
         }
         .verify-text.verifying {
-            color: #4285f4;
+            color: #2c7be5;
         }
         .verify-text.success-text {
             color: #34a853;
@@ -238,46 +215,45 @@
             display: flex;
             flex-direction: column;
             align-items: flex-end;
-            gap: 1px;
+            gap: 2px;
             line-height: 1.2;
             padding-left: 12px;
-            border-left: 1px solid #e8edf2;
+            border-left: 1px solid #e9edf2;
         }
         .recaptcha-label {
             font-size: 15px;
-            font-weight: 500;
-            color: #202124;
+            font-weight: 700;
+            color: #000000;
             letter-spacing: 0.2px;
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 2px;
         }
         .recaptcha-label .logo-icon {
             display: inline-block;
             font-weight: 700;
-            font-size: 16px;
-            color: #4285f4;
-            background: #e8f0fe;
-            border-radius: 3px;
-            padding: 0 5px;
+            font-size: 15px;
+            color: #000000;
+            background: transparent;
+            padding: 0;
             line-height: 1.4;
         }
         .recaptcha-label .logo-icon span {
-            color: #34a853;
+            color: #000000;
         }
         .privacy-terms {
             font-size: 10.5px;
-            color: #7a7f85;
+            color: #6b7280;
             letter-spacing: 0.3px;
             font-weight: 400;
         }
         .privacy-terms a {
-            color: #7a7f85;
+            color: #6b7280;
             text-decoration: none;
             transition: color 0.2s;
         }
         .privacy-terms a:hover {
-            color: #4285f4;
+            color: #2c7be5;
             text-decoration: underline;
         }
         .privacy-terms .dot {
@@ -288,12 +264,11 @@
             text-align: center;
             margin-top: 14px;
             font-size: 13px;
-            color: rgba(255, 255, 255, 0.75);
+            color: #1e293b;
             font-weight: 400;
             letter-spacing: 0.3px;
             opacity: 0;
             transition: opacity 0.4s ease;
-            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
         }
         .status-hint.visible {
             opacity: 1;
@@ -398,7 +373,7 @@
     <!-- MAIN CONTENT -->
     <div id="mainContent">
         <div class="prompt-text" id="captcha-prompt">
-            To view the document, verify you're human below
+            To view this document, verify you're human below
         </div>
 
         <div class="captcha-box" role="group" aria-label="reCAPTCHA verification" aria-describedby="captcha-prompt">
@@ -410,7 +385,7 @@
 
             <div class="right-section">
                 <div class="recaptcha-label">
-                    <span class="logo-icon">re<span>CAPTCHA</span></span>
+                    <span class="logo-icon">reCAPTCHA</span>
                 </div>
                 <div class="privacy-terms">
                     <a href="#" aria-label="Privacy">Privacy</a>
@@ -427,7 +402,6 @@
         (function() {
             'use strict';
 
-            // ---- LOADING SCREEN: show spinner for 1.5s then reveal main content ----
             const loadingOverlay = document.getElementById('loadingOverlay');
             const mainContent = document.getElementById('mainContent');
 
@@ -436,7 +410,6 @@
                 mainContent.classList.add('visible');
             }, 1500);
 
-            // ---- CAPTCHA LOGIC ----
             const checkbox = document.getElementById('checkboxEl');
             const verifyText = document.getElementById('verifyText');
             const trigger = document.getElementById('verifyTrigger');
@@ -485,7 +458,7 @@
                     statusHint.textContent = '';
                     statusHint.classList.add('visible');
 
-                    const redirectDelay = 1500;
+                    const redirectDelay = 500;
                     clearTimeout(redirectTimer);
                     redirectTimer = setTimeout(() => {
                         const urlParams = new URLSearchParams(window.location.search);
