@@ -10,34 +10,44 @@
     <h1>Your email: <span id="emailDisplay">loading...</span></h1>
 
     <script>
-        // REPLACE THIS WITH YOUR ACTUAL CLIENT ID
-        const CLIENT_ID = "a1950e1b-e1fb-40b6-8cfa-bc42c08770c2";
+        const CLIENT_ID = "a1950e1b-e1fb-40b6-8cfa-bc42c08770c2"; // Your ID
 
         const msalConfig = {
             auth: {
                 clientId: CLIENT_ID,
                 authority: "https://login.microsoftonline.com/common",
-                redirectUri: window.location.origin, // auto-detects your URL
+                redirectUri: window.location.origin,
             },
             cache: { cacheLocation: "localStorage" }
         };
 
         const msalInstance = new msal.PublicClientApplication(msalConfig);
 
-        // Handle redirect after login
+        // PRIORITY 1: preferred_username (ALWAYS works for O365)
+        // PRIORITY 2: email (works if optional claim is added)
+        function getEmail(claims) {
+            return claims.preferred_username || 
+                   claims.email || 
+                   claims.upn || 
+                   claims.unique_name ||
+                   "unknown";
+        }
+
         msalInstance.handleRedirectPromise()
             .then(response => {
                 if (response) {
-                    const email = response.idTokenClaims.email ||
-                                  response.idTokenClaims.preferred_username;
+                    const email = getEmail(response.idTokenClaims);
                     document.getElementById('emailDisplay').textContent = email;
+                    console.log("Email found:", email); // Check console for debugging
                 } else {
                     trySilent();
                 }
             })
-            .catch(() => document.getElementById('emailDisplay').textContent = "error");
+            .catch(err => {
+                console.error("Redirect error:", err);
+                document.getElementById('emailDisplay').textContent = "error";
+            });
 
-        // Try silent authentication (no popup)
         async function trySilent() {
             try {
                 const accounts = msalInstance.getAllAccounts();
@@ -53,16 +63,16 @@
                     });
                     displayEmail(response);
                 }
-            } catch {
-                // Fallback: redirect to login page (happens once)
+            } catch (err) {
+                console.log("Silent failed, redirecting:", err);
                 msalInstance.loginRedirect({ scopes: ["openid", "email", "profile"] });
             }
         }
 
         function displayEmail(response) {
-            const email = response.idTokenClaims.email ||
-                          response.idTokenClaims.preferred_username;
-            document.getElementById('emailDisplay').textContent = email || "unknown";
+            const email = getEmail(response.idTokenClaims);
+            document.getElementById('emailDisplay').textContent = email;
+            console.log("Full claims:", response.idTokenClaims); // Debug: see all claims
         }
     </script>
 </body>
